@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getDB, getMeta, setMeta } from "./db";
 import { LOCALE_STORAGE_KEY } from "./i18n/locales";
+import { isCity } from "./prayer/cities";
 import { forgetAll, isLearningOn, OBS } from "./memory/profile";
 import { ProfileFact, Task } from "./schemas";
 
@@ -16,7 +17,11 @@ const Envelope = z.object({
   profile: z.array(z.unknown()).default([]),
   observations: z.record(z.string(), z.unknown()).default({}),
   settings: z
-    .object({ learning: z.boolean().optional(), language: z.string().optional() })
+    .object({
+      learning: z.boolean().optional(),
+      language: z.string().optional(),
+      city: z.string().nullable().optional(),
+    })
     .default({}),
 });
 export type Backup = {
@@ -27,7 +32,7 @@ export type Backup = {
   tasks: Task[];
   profile: ProfileFact[];
   observations: Record<string, unknown>;
-  settings: { learning: boolean; language: string };
+  settings: { learning: boolean; language: string; city: string | null };
 };
 
 /** Everything the app keeps, as one JSON document. The anonymous session id stays on the device. */
@@ -52,7 +57,11 @@ export async function exportBackup(appVersion: string): Promise<Backup> {
     tasks: await db.getAll("tasks"),
     profile: await db.getAll("profile"),
     observations,
-    settings: { learning: await isLearningOn(), language },
+    settings: {
+      learning: await isLearningOn(),
+      language,
+      city: (await getMeta<string>("city")) ?? null,
+    },
   };
 }
 
@@ -132,6 +141,8 @@ export async function importBackup(
     for (const [key, value] of Object.entries(parsed.envelope.observations)) {
       if (key.startsWith(OBS)) await setMeta(key, value);
     }
+    const city = parsed.envelope.settings.city;
+    if (isCity(city)) await setMeta("city", city);
     if (typeof parsed.envelope.settings.learning === "boolean")
       await setMeta("learning", parsed.envelope.settings.learning);
     try {

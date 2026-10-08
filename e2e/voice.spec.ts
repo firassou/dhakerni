@@ -92,6 +92,7 @@ test("holding the mic records, shows the waveform, and creates a timed task", as
   await page.mouse.down();
   await expect(page.getByRole("button", { name: "Stop and send" })).toBeVisible();
   await expect(page.getByRole("status").filter({ hasText: /0:0\d/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Cancel recording" })).toBeVisible();
   await page.waitForTimeout(900);
   await page.mouse.up();
 
@@ -114,4 +115,88 @@ test("parser failure still saves what was typed", async ({ page }) => {
   await page.getByRole("button", { name: "Add", exact: true }).click();
   await expect(page.getByText("fail please")).toBeVisible();
   await expect(page.getByText(/saved as written/)).toBeVisible();
+});
+
+test("the timer actually counts up while recording", async ({ page }) => {
+  await page.getByRole("button", { name: "Hold to talk" }).click({ delay: 40 });
+  await expect(page.getByRole("status").filter({ hasText: /0:0[2-9]/ })).toBeVisible({
+    timeout: 6000,
+  });
+});
+
+test.describe("cancelling a recording sends nothing to the AI", () => {
+  let calls = 0;
+  test.beforeEach(async ({ page }) => {
+    calls = 0;
+    await page.route("**/api/transcribe", (route) => {
+      calls++;
+      return route.fulfill({ json: { text: "x" } });
+    });
+    await page.route("**/api/parse", (route) => {
+      calls++;
+      return route.fulfill({ json: { tasks: [], reminders: [] } });
+    });
+  });
+
+  test("the cancel button, in tap mode", async ({ page }) => {
+    await page.getByRole("button", { name: "Hold to talk" }).click({ delay: 40 });
+    await page.waitForTimeout(800);
+    await page.getByRole("button", { name: "Cancel recording" }).click();
+    await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+    await page.waitForTimeout(500);
+    expect(calls).toBe(0);
+    await expect(page.getByText("Understanding…")).toHaveCount(0);
+  });
+
+  test("the cancel button is there while holding too", async ({ page }) => {
+    const box = (await page.getByRole("button", { name: "Hold to talk" }).boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await expect(page.getByText("Slide away to cancel")).toBeVisible();
+    await page.waitForTimeout(600);
+    await page.getByRole("button", { name: "Cancel recording" }).dispatchEvent("click");
+    await page.mouse.up();
+    await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+    await page.waitForTimeout(500);
+    expect(calls).toBe(0);
+  });
+
+  test("dragging the held mic away and letting go cancels", async ({ page }) => {
+    const box = (await page.getByRole("button", { name: "Hold to talk" }).boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.waitForTimeout(600);
+    await page.mouse.move(x - 140, y - 20, { steps: 6 });
+    await expect(page.getByText("Release to cancel")).toBeVisible();
+    await page.mouse.up();
+    await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+    await page.waitForTimeout(600);
+    expect(calls).toBe(0);
+    await expect(page.getByText("Understanding…")).toHaveCount(0);
+  });
+
+  test("dragging a little and letting go still sends", async ({ page }) => {
+    const box = (await page.getByRole("button", { name: "Hold to talk" }).boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.waitForTimeout(700);
+    await page.mouse.move(x + 20, y, { steps: 3 });
+    await expect(page.getByText("Release to cancel")).toHaveCount(0);
+    await page.mouse.up();
+    await expect.poll(() => calls).toBeGreaterThan(0);
+  });
+
+  test("Escape cancels, even right after pressing the mic", async ({ page }) => {
+    await page.getByRole("button", { name: "Hold to talk" }).focus();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("Escape"); // immediately: the microphone may still be starting
+    await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+    await page.waitForTimeout(800);
+    await expect(page.getByRole("button", { name: "Hold to talk" })).toBeVisible();
+    expect(calls).toBe(0);
+  });
 });

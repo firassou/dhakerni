@@ -41,7 +41,9 @@
     "listening": "Listening…",
     "stop": "Stop and send",
     "cancel": "Cancel recording",
-    "processing": "Understanding…"
+    "processing": "Understanding…",
+    "releaseCancel": "Release to cancel",
+    "slideCancel": "Slide away to cancel"
   },
   "nav": {
     "settings": "Settings",
@@ -65,7 +67,47 @@
     "version": "Version",
     "madeBy": "Made with love ❤️ by Firas",
     "reminders": "Reminders",
-    "learning": "Learning"
+    "learning": "Learning",
+    "prayer": {
+      "title": "Prayer times",
+      "help": "Choose your city so words like Asr or Maghrib become real times. Times are calculated on this device. Your city is never detected or sent anywhere.",
+      "city": "City",
+      "none": "Not set",
+      "today": "Today",
+      "names": {
+        "fajr": "Fajr",
+        "dhuhr": "Dhuhr",
+        "asr": "Asr",
+        "maghrib": "Maghrib",
+        "isha": "Isha"
+      },
+      "cities": {
+        "tunis": "Tunis",
+        "ariana": "Ariana",
+        "ben_arous": "Ben Arous",
+        "manouba": "Manouba",
+        "nabeul": "Nabeul",
+        "zaghouan": "Zaghouan",
+        "bizerte": "Bizerte",
+        "beja": "Beja",
+        "jendouba": "Jendouba",
+        "le_kef": "Le Kef",
+        "siliana": "Siliana",
+        "sousse": "Sousse",
+        "monastir": "Monastir",
+        "mahdia": "Mahdia",
+        "sfax": "Sfax",
+        "kairouan": "Kairouan",
+        "kasserine": "Kasserine",
+        "sidi_bouzid": "Sidi Bouzid",
+        "gabes": "Gabes",
+        "medenine": "Medenine",
+        "tataouine": "Tataouine",
+        "gafsa": "Gafsa",
+        "tozeur": "Tozeur",
+        "kebili": "Kebili"
+      }
+    }
   },
   "time": {
     "today": "Today",
@@ -145,7 +187,8 @@
       "after_lunch": "What time do you usually have lunch?",
       "after_dinner": "What time do you usually have dinner?"
     },
-    "show": "Show"
+    "show": "Show",
+    "prayerCity": "Use prayer times for my city"
   },
   "anchors": {
     "leave_work": "After work",
@@ -154,7 +197,17 @@
     "wake_up": "Waking up",
     "after_breakfast": "After breakfast",
     "after_lunch": "After lunch",
-    "after_dinner": "After dinner"
+    "after_dinner": "After dinner",
+    "prayer_fajr": "At Fajr",
+    "after_prayer_fajr": "After Fajr",
+    "prayer_dhuhr": "At Dhuhr",
+    "after_prayer_dhuhr": "After Dhuhr",
+    "prayer_asr": "At Asr",
+    "after_prayer_asr": "After Asr",
+    "prayer_maghrib": "At Maghrib",
+    "after_prayer_maghrib": "After Maghrib",
+    "prayer_isha": "At Isha",
+    "after_prayer_isha": "After Isha"
   },
   "facts": {
     "vague": "“{word}” = {n} min",

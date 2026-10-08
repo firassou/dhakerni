@@ -32,7 +32,7 @@ export const When = z.object({
   date: z.string().nullable().describe("YYYY-MM-DD. Only when day is date."),
   time: z.string().nullable().describe("24h HH:MM when an exact clock time was said."),
   dayPart: DayPart.nullable().describe(
-    "morning=الصباح/matin, noon=نص النهار/midi, afternoon=بعد الظهر/après-midi, late_afternoon=العشية/العصر, evening=الليل بكري/soir, night=الليل/nuit.",
+    "morning=الصباح/matin, noon=نص النهار/midi, afternoon=بعد الظهر/après-midi, late_afternoon=العشية (not a prayer), evening=الليل بكري/soir, night=الليل/nuit.",
   ),
   offsetMinutes: z.number().int().positive().nullable().describe("Only for kind=relative."),
   vagueWord: z
@@ -43,7 +43,7 @@ export const When = z.object({
     .string()
     .nullable()
     .describe(
-      "Normalized event key for kind=anchor: leave_work, arrive_home, leave_home, wake_up, after_breakfast, after_lunch, after_dinner, or prayer_fajr/dhuhr/asr/maghrib/isha. Use a short snake_case key for others.",
+      "Normalized event key for kind=anchor: leave_work, arrive_home, leave_home, wake_up, after_breakfast, after_lunch, after_dinner, prayer_fajr/dhuhr/asr/maghrib/isha (at the prayer) or after_prayer_fajr/dhuhr/asr/maghrib/isha (shortly after). Use a short snake_case key for others.",
     ),
   confidence: z.number().min(0).max(1),
 });

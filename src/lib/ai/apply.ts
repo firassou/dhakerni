@@ -78,11 +78,13 @@ export function toTasks(
           ? null
           : { reason: "none" as const, word: null, dismissed: true };
     const assumed =
-      res?.status === "resolved" && res.via
-        ? learnedValue(res.via, opts)
-        : usual && res?.status === "resolved"
-          ? { key: `usual.time.${list}`, value: usual }
-          : null;
+      res?.status === "resolved" && res.via?.startsWith("prayer.")
+        ? { key: res.via, value: clock(res.at) }
+        : res?.status === "resolved" && res.via
+          ? learnedValue(res.via, opts)
+          : usual && res?.status === "resolved"
+            ? { key: `usual.time.${list}`, value: usual }
+            : null;
     const timeBy =
       res?.status !== "resolved" || !when
         ? null
@@ -131,3 +133,6 @@ function learnedValue(via: string, opts: LearnedOptions) {
   const value = kind === "vague" ? opts.vagueMinutes?.[name] : opts.anchorTimes?.[name];
   return value === undefined ? null : { key: via, value: String(value) };
 }
+
+const clock = (d: Date) =>
+  `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;

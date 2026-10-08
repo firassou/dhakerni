@@ -14,6 +14,7 @@ export function BackupControls() {
   const { t } = useI18n();
   const { show } = useToast();
   const input = useRef<HTMLInputElement>(null);
+  const importButton = useRef<HTMLButtonElement>(null);
   const [pending, setPending] = useState<{
     name: string;
     parsed: Extract<ParseResult, { ok: true }>;
@@ -59,7 +60,11 @@ export function BackupControls() {
         <button onClick={() => void doExport()} className={`${btn} bg-surface-2`}>
           {t("backup.export")}
         </button>
-        <button onClick={() => input.current?.click()} className={`${btn} bg-surface-2`}>
+        <button
+          ref={importButton}
+          onClick={() => input.current?.click()}
+          className={`${btn} bg-surface-2`}
+        >
           {t("backup.import")}
         </button>
         <input
@@ -80,6 +85,10 @@ export function BackupControls() {
           <Dialog.Overlay className="overlay bg-ink/40 fixed inset-0 z-40" />
           <Dialog.Content
             aria-describedby={undefined}
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              importButton.current?.focus();
+            }}
             className="sheet bg-paper fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-xl rounded-t-[28px] p-5 pb-[max(20px,env(safe-area-inset-bottom))] outline-none sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 sm:rounded-[28px]"
           >
             <Dialog.Title className="t-lead" data-bidi>

@@ -15,11 +15,11 @@ RULES
 
 TUNISIAN TIME WORDS
 - غدوة / demain = day tomorrow. بعد غدوة = after_tomorrow. اليوم / lyoum = today. البارح = yesterday (a past reference: kind none).
-- الصباح / sbah / matin = morning. نص النهار / midi = noon. بعد الظهر / après-midi = afternoon. العشية / العصر = late_afternoon. الليل = night. المغرب (as a time of day) = evening.
+- الصباح / sbah / matin = morning. نص النهار / midi = noon. بعد الظهر / après-midi = afternoon. العشية (the late afternoon, not a prayer) = late_afternoon. الليل = night.
 - نهار الجمعة = Friday (day weekday, weekday 5). Days: الأحد 0, الإثنين 1, الثلاثاء 2, الأربعاء 3, الخميس 4, الجمعة 5, السبت 6.
 - بعد 10 دقايق / après 10 minutes / in ten minutes = kind relative, offsetMinutes 10. ساعة = 60, نص ساعة = 30, ربع ساعة = 15.
 - VAGUE (kind vague, copy the word into vagueWord): بعد شوية, شوية, شويا, later, tout à l'heure, plus tard, بعدين, في وقت آخر. Never turn these into minutes yourself.
-- ANCHOR (kind anchor): بعد كي نروح مالخدمة / بعد الخدمة = leave_work; كي نوصل للدار / كي نرجع للدار = arrive_home; كي نخرج من الدار = leave_home; بعد الفطور = after_breakfast (also the meal "الفطور" as breakfast); بعد الغداء = after_lunch; بعد العشاء = after_dinner; prayer words (بعد العصر, بعد المغرب, بعد الصبح, بعد الظهر as a prayer, بعد العشاء as a prayer) = prayer_asr / prayer_maghrib / prayer_fajr / prayer_dhuhr / prayer_isha when the context is prayer.
+- ANCHOR (kind anchor): بعد كي نروح مالخدمة / بعد الخدمة = leave_work; كي نوصل للدار / كي نرجع للدار = arrive_home; كي نخرج من الدار = leave_home; بعد الفطور = after_breakfast (also the meal "الفطور" as breakfast); بعد الغداء = after_lunch; بعد العشاء = after_dinner; PRAYERS (kind anchor): a prayer name used as the moment, like العصر, عند المغرب, وقت الظهر, صلاة العشاء, الصبح/الفجر = prayer_fajr / prayer_dhuhr / prayer_asr / prayer_maghrib / prayer_isha. With "بعد" (after the prayer: بعد العصر, après la prière d'Asr) = after_prayer_fajr / after_prayer_dhuhr / after_prayer_asr / after_prayer_maghrib / after_prayer_isha. Always these keys, never a clock time. العشاء alone near the evening means dinner (after_dinner); use isha only when the prayer is clearly meant (صلاة العشاء, prière d'Isha).
 - A bare day with no clock time (غدوة) is absolute with day set and time null.
 - Clock times are 24h HH:MM: "الساعة 5" with عشية means 17:00; "à 8h" means 08:00 unless the context says evening.
 

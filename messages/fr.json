@@ -41,7 +41,9 @@
     "listening": "J'écoute…",
     "stop": "Arrêter et envoyer",
     "cancel": "Annuler l'enregistrement",
-    "processing": "Je comprends…"
+    "processing": "Je comprends…",
+    "releaseCancel": "Relâchez pour annuler",
+    "slideCancel": "Glissez pour annuler"
   },
   "nav": {
     "settings": "Réglages",
@@ -65,7 +67,47 @@
     "version": "Version",
     "madeBy": "Fait avec amour ❤️ par Firas",
     "reminders": "Rappels",
-    "learning": "Apprentissage"
+    "learning": "Apprentissage",
+    "prayer": {
+      "title": "Heures de prière",
+      "help": "Choisissez votre ville pour que des mots comme Asr ou Maghrib deviennent de vraies heures. Les heures sont calculées sur cet appareil. Votre ville n'est jamais détectée ni envoyée.",
+      "city": "Ville",
+      "none": "Non définie",
+      "today": "Aujourd'hui",
+      "names": {
+        "fajr": "Fajr",
+        "dhuhr": "Dhuhr",
+        "asr": "Asr",
+        "maghrib": "Maghrib",
+        "isha": "Isha"
+      },
+      "cities": {
+        "tunis": "Tunis",
+        "ariana": "Ariana",
+        "ben_arous": "Ben Arous",
+        "manouba": "La Manouba",
+        "nabeul": "Nabeul",
+        "zaghouan": "Zaghouan",
+        "bizerte": "Bizerte",
+        "beja": "Béja",
+        "jendouba": "Jendouba",
+        "le_kef": "Le Kef",
+        "siliana": "Siliana",
+        "sousse": "Sousse",
+        "monastir": "Monastir",
+        "mahdia": "Mahdia",
+        "sfax": "Sfax",
+        "kairouan": "Kairouan",
+        "kasserine": "Kasserine",
+        "sidi_bouzid": "Sidi Bouzid",
+        "gabes": "Gabès",
+        "medenine": "Médenine",
+        "tataouine": "Tataouine",
+        "gafsa": "Gafsa",
+        "tozeur": "Tozeur",
+        "kebili": "Kébili"
+      }
+    }
   },
   "time": {
     "today": "Aujourd'hui",
@@ -145,7 +187,8 @@
       "after_lunch": "À quelle heure déjeunez-vous d'habitude ?",
       "after_dinner": "À quelle heure dînez-vous d'habitude ?"
     },
-    "show": "Voir"
+    "show": "Voir",
+    "prayerCity": "Utiliser les heures de prière de ma ville"
   },
   "anchors": {
     "leave_work": "Après le travail",
@@ -154,7 +197,17 @@
     "wake_up": "Au réveil",
     "after_breakfast": "Après le petit-déj",
     "after_lunch": "Après le déjeuner",
-    "after_dinner": "Après le dîner"
+    "after_dinner": "Après le dîner",
+    "prayer_fajr": "À Fajr",
+    "after_prayer_fajr": "Après Fajr",
+    "prayer_dhuhr": "À Dhuhr",
+    "after_prayer_dhuhr": "Après Dhuhr",
+    "prayer_asr": "À Asr",
+    "after_prayer_asr": "Après Asr",
+    "prayer_maghrib": "À Maghrib",
+    "after_prayer_maghrib": "Après Maghrib",
+    "prayer_isha": "À Isha",
+    "after_prayer_isha": "Après Isha"
   },
   "facts": {
     "vague": "« {word} » = {n} min",

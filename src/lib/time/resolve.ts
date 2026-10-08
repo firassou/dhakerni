@@ -24,6 +24,8 @@ export interface ResolveOptions {
   vagueMinutes?: Record<string, number>;
   /** Learned clock time for anchors: { leave_work: "17:00" }. */
   anchorTimes?: Record<string, string>;
+  /** Next moment of a prayer anchor ("after_prayer_asr"), when the person has chosen a city. */
+  prayerMoment?: (anchor: string, now: Date) => Date | null;
 }
 
 /** Canonical key for a vague word: "بعد شوية" and "شوية" are the same word. */
@@ -60,6 +62,9 @@ export function resolveWhen(when: When, now: Date, opts: ResolveOptions = {}): R
       return { status: "needs_time", reason: "none", word: null };
 
     case "anchor": {
+      const prayer = when.anchor ? opts.prayerMoment?.(when.anchor, now) : null;
+      if (prayer && when.anchor)
+        return { status: "resolved", at: prayer, via: `prayer.${when.anchor}` };
       const clock = when.anchor ? parseClock(opts.anchorTimes?.[when.anchor] ?? "") : null;
       if (clock && when.anchor) {
         return { status: "resolved", at: nextOccurrence(now, clock), via: `anchor.${when.anchor}` };

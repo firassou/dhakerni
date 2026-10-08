@@ -1,6 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getMeta } from "../db";
+import { isCity, type CityKey } from "../prayer/cities";
+import { nextPrayerMoment } from "../prayer/times";
 import type { ProfileFact } from "../schemas";
 import {
   learnFact,
@@ -15,6 +18,7 @@ import { sliceForParse } from "./slice";
 export function useProfile() {
   const [facts, setFacts] = useState<ProfileFact[]>([]);
   const ref = useRef<ProfileFact[]>([]);
+  const cityRef = useRef<CityKey | null>(null);
 
   useEffect(() => {
     listFacts()
@@ -23,6 +27,15 @@ export function useProfile() {
         setFacts(f);
       })
       .catch((e) => console.error("load profile failed", e));
+  }, []);
+
+  // The city is a setting the person chose, not something learned.
+  useEffect(() => {
+    getMeta<string>("city")
+      .then((c) => {
+        cityRef.current = isCity(c) ? c : null;
+      })
+      .catch(() => {});
   }, []);
 
   const learn = useCallback(
@@ -59,7 +72,12 @@ export function useProfile() {
     learn,
     refresh,
     resolveOptions,
-    getResolveOptions: () => toResolveOptions(ref.current),
+    getResolveOptions: () => ({
+      ...toResolveOptions(ref.current),
+      prayerMoment: cityRef.current
+        ? (anchor: string, now: Date) => nextPrayerMoment(cityRef.current!, anchor, now)
+        : undefined,
+    }),
     /** The few facts worth sending with this sentence. */
     hintsFor: (text: string) => sliceForParse(ref.current, text),
   };

@@ -7,6 +7,7 @@ import { ArrowUpIcon, CloseIcon, MicIcon, StopIcon } from "./Icon";
 import { Waveform } from "./Waveform";
 
 const HOLD_MS = 350; // shorter than this counts as a tap: keep recording until Stop
+const CANCEL_DRAG_PX = 90; // dragging the held mic this far away cancels instead of sending
 
 interface Props {
   busy: boolean;
@@ -21,36 +22,47 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
   const [text, setText] = useState("");
   const [tapMode, setTapMode] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [armed, setArmed] = useState(false); // finger dragged far enough that letting go cancels
+  const startPoint = useRef({ x: 0, y: 0 });
   const downAt = useRef(0);
   const pointerDown = useRef(false);
 
   const rec = useRecorder({
     onRecorded: (blob, ms) => {
       setTapMode(false);
+      setArmed(false);
       onAudio(blob, ms);
     },
     onError: (kind) => {
       setTapMode(false);
+      setArmed(false);
       onVoiceError(kind);
     },
   });
+  const { cancel } = rec; // stable between renders, unlike `rec`
   const active = rec.state !== "idle";
   const recording = rec.state === "recording";
 
+  // The clock only runs while recording.
   useEffect(() => {
     if (!recording) return;
     const t0 = Date.now();
     const id = setInterval(() => setElapsed(Date.now() - t0), 200);
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") rec.cancel();
-    };
-    window.addEventListener("keydown", onKey);
     return () => {
       clearInterval(id);
-      window.removeEventListener("keydown", onKey);
       setElapsed(0);
     };
-  }, [recording, rec]);
+  }, [recording]);
+
+  // Escape cancels, also while the microphone is still starting up.
+  useEffect(() => {
+    if (!active) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") cancel();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [active, cancel]);
 
   function submit(e: FormEvent) {
     e.preventDefault();
@@ -70,20 +82,34 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
     e.currentTarget.setPointerCapture(e.pointerId);
     pointerDown.current = true;
     downAt.current = Date.now();
+    startPoint.current = { x: e.clientX, y: e.clientY };
+    setArmed(false);
     void rec.start();
+  }
+
+  function onPointerMove(e: React.PointerEvent) {
+    if (!pointerDown.current) return;
+    const far =
+      Math.hypot(e.clientX - startPoint.current.x, e.clientY - startPoint.current.y) >
+      CANCEL_DRAG_PX;
+    setArmed((was) => (was === far ? was : far));
   }
 
   function onPointerUp() {
     if (!pointerDown.current) return;
     pointerDown.current = false;
-    if (Date.now() - downAt.current < HOLD_MS) setTapMode(true);
+    if (armed) {
+      setArmed(false);
+      cancel(); // let go away from the mic: throw the recording away, send nothing
+    } else if (Date.now() - downAt.current < HOLD_MS) setTapMode(true);
     else rec.stop();
   }
 
   function onPointerCancel() {
     if (!pointerDown.current) return;
     pointerDown.current = false;
-    rec.cancel();
+    setArmed(false);
+    cancel();
   }
 
   // Keyboard and assistive tech trigger click with detail 0: toggle like tap mode.
@@ -108,24 +134,31 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
       >
         {active ? (
           <>
-            {tapMode && (
+            {
               <button
                 type="button"
-                onClick={() => rec.cancel()}
+                onClick={() => cancel()}
                 aria-label={t("dock.cancel")}
                 className="text-ink-2 hover:bg-surface-2 grid size-11 shrink-0 place-items-center rounded-full"
               >
                 <CloseIcon />
               </button>
-            )}
+            }
             <div
               className="flex min-w-0 flex-1 items-center gap-3 ps-3"
               role="status"
               aria-live="polite"
             >
               <Waveform analyser={rec.analyser} />
-              <span className="t-small text-ink-2 tabular-nums">
-                {recording ? clock : t("dock.listening")}
+              <span className="flex flex-col leading-tight">
+                <span
+                  className={`t-small tabular-nums ${armed ? "text-danger font-medium" : "text-ink-2"}`}
+                >
+                  {armed ? t("dock.releaseCancel") : recording ? clock : t("dock.listening")}
+                </span>
+                {recording && !tapMode && !armed && (
+                  <span className="t-micro text-ink-2">{t("dock.slideCancel")}</span>
+                )}
               </span>
             </div>
             {!tapMode && <span className="sr-only">{t("dock.release")}</span>}
@@ -162,6 +195,7 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
             disabled={busy && !active}
             aria-label={active ? t("dock.stop") : t("dock.talk")}
             onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerCancel}
             onClick={onClick}

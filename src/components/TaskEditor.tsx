@@ -16,10 +16,12 @@ interface Props {
   onClose: () => void;
   onChange: (id: string, patch: Partial<Task>) => void;
   onDelete: (task: Task) => void;
+  /** Where focus goes on close: the button that opened the editor. */
+  onCloseAutoFocus?: (e: Event) => void;
 }
 
 /** Edits apply live: nothing to confirm, so nothing to lose. */
-export function TaskEditor({ task, onClose, onChange, onDelete }: Props) {
+export function TaskEditor({ task, onClose, onChange, onDelete, onCloseAutoFocus }: Props) {
   const { t } = useI18n();
 
   return (
@@ -28,6 +30,7 @@ export function TaskEditor({ task, onClose, onChange, onDelete }: Props) {
         <Dialog.Overlay className="overlay bg-ink/40 fixed inset-0 z-40" />
         <Dialog.Content
           aria-describedby={undefined}
+          onCloseAutoFocus={onCloseAutoFocus}
           className="sheet bg-paper fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-t-[28px] p-5 pb-[max(20px,env(safe-area-inset-bottom))] outline-none sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 sm:rounded-[28px]"
         >
           {task && (

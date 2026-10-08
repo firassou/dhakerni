@@ -62,6 +62,7 @@ export function HomeScreen() {
   const [filter, setFilter] = useState<Filter>("today");
   const [editingId, setEditingId] = useState<string | null>(null);
   const editSnapshot = useRef<Task | null>(null);
+  const opener = useRef<HTMLElement | null>(null);
   const [now, setNow] = useState(() => new Date());
   // Tasks just completed stay visible briefly so the check animation can play.
   const [lingering, setLingering] = useState<ReadonlySet<string>>(new Set());
@@ -159,6 +160,8 @@ export function HomeScreen() {
   const openEditor = useCallback(
     (id: string) => {
       editSnapshot.current = getTasks().find((x) => x.id === id) ?? null;
+      opener.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setEditingId(id);
     },
     [getTasks],
@@ -384,6 +387,13 @@ export function HomeScreen() {
       <TaskEditor
         task={editing}
         onClose={closeEditor}
+        onCloseAutoFocus={(e) => {
+          // Put focus back on the button that opened the editor (or the page, if that task is gone).
+          if (opener.current?.isConnected) {
+            e.preventDefault();
+            opener.current.focus();
+          }
+        }}
         onChange={(id, patch) =>
           // Setting a time by hand settles the question and replaces any learned guess.
           update(
