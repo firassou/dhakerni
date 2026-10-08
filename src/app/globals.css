@@ -241,3 +241,35 @@
 .overlay[data-state="open"] {
   animation: fade-in var(--t-base) ease both;
 }
+
+/* Recording: a soft ring pulses off the mic. */
+@keyframes mic-ring {
+  from {
+    box-shadow: 0 0 0 0 rgb(184 50 31 / 0.45);
+  }
+  to {
+    box-shadow: 0 0 0 18px rgb(184 50 31 / 0);
+  }
+}
+.mic-live {
+  animation: mic-ring 1.2s var(--ease-out) infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--surface-2) 30%,
+    var(--surface) 50%,
+    var(--surface-2) 70%
+  );
+  background-size: 250% 100%;
+  animation: shimmer 1.4s linear infinite;
+}

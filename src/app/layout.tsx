@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Voice-first tasks and reminders.",
   applicationName: "Dhakerni",
   appleWebApp: { capable: true, title: "Dhakerni", statusBarStyle: "default" },
-  icons: { icon: "/icons/icon.svg", apple: "/icons/apple-touch-icon.png" },
+  icons: { icon: "/icons/favicon.png", apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {

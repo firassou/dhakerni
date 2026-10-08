@@ -20,7 +20,8 @@ felt, not seen"; speed as a design feature), Things (calm, one primary action), 
 
 ## Identity
 
-Tunisian whitewash walls, a door-blue arch, a small sun. The mark is an arch with a sun dot.
+Tunisian whitewash walls, a door-blue arch, a small sun. The app icon is a list with a bell (white on door-blue, `assets/icon-source.png` recolored by
+`scripts/make-icons.mjs`) and doubles as the header mark.
 Sun yellow is reserved for time and reminders so it keeps its meaning.
 
 | Token                  | Light     | Dark      |

@@ -19,21 +19,23 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
-import { selectTasks, type Filter } from "@/lib/tasks/filters";
+import { useCapture } from "@/lib/ai/useCapture";
+import { matchesFilter, selectTasks, type Filter } from "@/lib/tasks/filters";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { Dock } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
 import { Mark, SlidersIcon } from "./Icon";
 import { TaskCard } from "./TaskCard";
 import { TaskEditor } from "./TaskEditor";
-import { useUndoToast } from "./Toast";
+import { useToast, useUndoToast } from "./Toast";
 
 const LINGER_MS = 450;
 
 export function HomeScreen() {
   const { t } = useI18n();
   const undoToast = useUndoToast();
-  const { tasks, ready, add, update, toggle, remove, upsert, move } = useTasks();
+  const { tasks, ready, insert, getTasks, update, toggle, remove, upsert, move } = useTasks();
+  const { show } = useToast();
   const [filter, setFilter] = useState<Filter>("today");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
@@ -82,14 +84,19 @@ export function HomeScreen() {
     [tasks, toggle, undoToast, t],
   );
 
-  const handleAdd = useCallback(
-    (text: string) => {
-      const created = add(text);
-      setFilter((f) => (f === "done" || f === "today" || f === "upcoming" ? "needsTime" : f));
-      undoToast(t("toast.added"), () => remove(created.id));
+  const { pending, submitText, submitAudio } = useCapture({
+    getTasks,
+    insert,
+    remove,
+    // Jump to the view where the first new task lives, so it is visible straight away.
+    onCreated: (created) => {
+      const at = new Date();
+      const view = (["today", "upcoming", "needsTime"] as const).find((f) =>
+        matchesFilter(created[0], f, at),
+      );
+      if (view) setFilter(view);
     },
-    [add, remove, undoToast, t],
-  );
+  });
 
   const handleDelete = useCallback(
     (task: Task) => {
@@ -133,6 +140,17 @@ export function HomeScreen() {
       <FilterTabs value={filter} onChange={setFilter} />
 
       <main className="mt-3 flex flex-1 flex-col">
+        {pending && (
+          <div
+            className="card-in shimmer rounded-card mb-2 px-4 py-3.5"
+            role="status"
+            aria-live="polite"
+          >
+            <span className="t-small text-ink-2" data-bidi>
+              {pending.text ?? t("dock.processing")}
+            </span>
+          </div>
+        )}
         {visible.length > 0 ? (
           <DndContext
             id="tasks-dnd"
@@ -160,7 +178,8 @@ export function HomeScreen() {
             </SortableContext>
           </DndContext>
         ) : (
-          ready && (
+          ready &&
+          !pending && (
             <div key={filter} className="rise my-auto max-w-[28ch] py-16">
               <h2 className="t-title">{t(`empty.${filter}.title`)}</h2>
               <p className="text-ink-2 mt-2">{t(`empty.${filter}.body`)}</p>
@@ -169,7 +188,12 @@ export function HomeScreen() {
         )}
       </main>
 
-      <Dock onSubmitText={handleAdd} />
+      <Dock
+        busy={pending !== null}
+        onSubmitText={submitText}
+        onAudio={submitAudio}
+        onVoiceError={(kind) => show({ message: t(`voice.${kind}`) })}
+      />
       <TaskEditor
         task={editing}
         onClose={() => setEditingId(null)}

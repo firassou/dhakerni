@@ -41,6 +41,14 @@ export function useTasks() {
     [commit, save],
   );
 
+  const insert = useCallback(
+    (created: Task[]) => {
+      commit([...ref.current, ...created]);
+      save(created);
+    },
+    [commit, save],
+  );
+
   const add = useCallback(
     (title: string, extra?: Partial<Task>) => {
       const task = newTask(title, ref.current, new Date(), extra);
@@ -86,5 +94,16 @@ export function useTasks() {
     [commit, save],
   );
 
-  return { tasks, ready, add, update, toggle, remove, upsert, move };
+  return {
+    tasks,
+    ready,
+    insert,
+    getTasks: () => ref.current,
+    add,
+    update,
+    toggle,
+    remove,
+    upsert,
+    move,
+  };
 }

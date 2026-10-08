@@ -36,7 +36,12 @@
     "talk": "Hold to talk",
     "inputLabel": "Add a task",
     "placeholder": "Or type it here…",
-    "send": "Add"
+    "send": "Add",
+    "release": "Release to send",
+    "listening": "Listening…",
+    "stop": "Stop and send",
+    "cancel": "Cancel recording",
+    "processing": "Understanding…"
   },
   "nav": {
     "settings": "Settings",
@@ -92,5 +97,19 @@
     "deleted": "Task deleted",
     "done": "Marked as done",
     "undo": "Undo"
+  },
+  "voice": {
+    "denied": "Microphone is blocked. Allow it in your browser settings, or type instead.",
+    "unsupported": "Voice needs a secure connection (https) and a microphone. You can still type.",
+    "failed": "Couldn't start the microphone. Try again or type instead.",
+    "tooShort": "Too short. Hold the mic while you speak.",
+    "empty": "Didn't catch anything. Try again.",
+    "noTask": "No task found in that. Try rephrasing."
+  },
+  "capture": {
+    "fallback": "Couldn't understand that, so it was saved as written.",
+    "rateLimited": "Too many requests. Wait a minute and try again.",
+    "transcribeFailed": "Couldn't process the recording. Try again or type it.",
+    "addedMany": "{count} tasks added"
   }
 }

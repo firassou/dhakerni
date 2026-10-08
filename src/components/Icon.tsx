@@ -41,12 +41,17 @@ export const BackIcon = (p: P) => (
   </svg>
 );
 
-/** The mark: a Tunisian door arch with a sun above. */
-export const Mark = (p: P) => (
-  <svg viewBox="0 0 32 32" aria-hidden {...p}>
-    <path d="M7 29V14.5C7 9.5 11 6 16 6s9 3.5 9 8.5V29z" fill="currentColor" />
-    <circle cx="16" cy="19" r="2.4" fill="var(--sun)" />
-  </svg>
+/** The app icon, also used as the brand mark in the header. */
+export const Mark = ({ className }: { className?: string }) => (
+  // eslint-disable-next-line @next/next/no-img-element -- tiny static icon, no optimization needed
+  <img
+    src="/icons/icon-192.png"
+    alt=""
+    aria-hidden
+    width={32}
+    height={32}
+    className={`rounded-[9px] ${className ?? ""}`}
+  />
 );
 
 export const CheckIcon = (p: P) => (
@@ -75,5 +80,11 @@ export const TrashIcon = (p: P) => (
 export const CloseIcon = (p: P) => (
   <svg {...base} {...p}>
     <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+);
+
+export const StopIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="6" y="6" width="12" height="12" rx="2.5" fill="currentColor" />
   </svg>
 );

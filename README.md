@@ -3,8 +3,8 @@
 Voice-first todo and reminder app for Tunisian Arabic (Derja), French and English. You speak or type;
 it turns what you said into tasks and reminders.
 
-Status: **v0.1.0 foundation** (shell, i18n/RTL, local storage, PWA). Voice, parsing, memory and push
-arrive in v0.2 to v0.7. See [CHANGELOG](CHANGELOG.md).
+Status: **v0.3.0**: tasks, voice and typed capture, structured parsing. Clarifying questions, memory, push
+reminders and polish arrive in v0.4 to v0.7. See [CHANGELOG](CHANGELOG.md).
 
 ## Setup
 
@@ -14,6 +14,8 @@ cp .env.example .env.local   # fill in keys (see below)
 npm run dev                  # http://localhost:3000
 npm test                     # unit tests
 npm run test:e2e             # Playwright (run `npx playwright install chromium` once)
+npm run eval                 # parser accuracy on evals/cases.json (uses real API calls)
+# /dev/stt (dev only): record once, compare speech-to-text providers
 ```
 
 ## Environment variables

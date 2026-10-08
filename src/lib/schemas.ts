@@ -29,6 +29,11 @@ export const Task = z.object({
   recurrence: Recurrence.nullable().default(null),
   subtasks: z.array(Subtask).default([]),
   uncertain: Uncertain,
+  /** Why the task has no time yet. Drives the clarifying question (v0.4). */
+  needs: z
+    .object({ reason: z.enum(["vague", "anchor", "none"]), word: z.string().nullable() })
+    .nullable()
+    .default(null),
   done: z.boolean().default(false),
   doneAt: z.iso.datetime({ offset: true }).nullable().default(null),
   order: z.number(),

@@ -1,6 +1,27 @@
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
+  // The parser is mocked: every typed text becomes one task with no time.
+  await page.route("**/api/parse", (route) => {
+    const { text } = route.request().postDataJSON() as { text: string };
+    return route.fulfill({
+      json: {
+        tasks: [
+          {
+            title: text,
+            notes: null,
+            priority: null,
+            list: null,
+            reminderId: null,
+            recurrence: null,
+            subtasks: [],
+            uncertain: [],
+          },
+        ],
+        reminders: [],
+      },
+    });
+  });
   await page.goto("/");
   await page.evaluate(async () => {
     const dbs = await indexedDB.databases();
