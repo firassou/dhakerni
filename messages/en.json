@@ -79,7 +79,8 @@
       "low": "Low",
       "normal": "Normal",
       "high": "High"
-    }
+    },
+    "assumedHint": "Learned from you. Tap to change."
   },
   "editor": {
     "title": "Task",
@@ -96,7 +97,11 @@
     "added": "Task added",
     "deleted": "Task deleted",
     "done": "Marked as done",
-    "undo": "Undo"
+    "undo": "Undo",
+    "timeSet": "Time set",
+    "learned": "Saved: {fact}. Change anytime.",
+    "resurfaced": "Still need a time for “{title}”.",
+    "unclear": "Couldn't tell the time. Pick one of the options."
   },
   "voice": {
     "denied": "Microphone is blocked. Allow it in your browser settings, or type instead.",
@@ -111,5 +116,42 @@
     "rateLimited": "Too many requests. Wait a minute and try again.",
     "transcribeFailed": "Couldn't process the recording. Try again or type it.",
     "addedMany": "{count} tasks added"
+  },
+  "q": {
+    "min": "{n} min",
+    "hour": "1 h",
+    "tonight": "Tonight",
+    "tomorrowMorning": "Tomorrow morning",
+    "other": "Other time",
+    "set": "Set",
+    "voice": "Answer by voice",
+    "stopVoice": "Stop and send answer",
+    "notNow": "Not now",
+    "thinking": "Understanding…",
+    "vague": "How long is “{word}” for you?",
+    "generic": "When should I remind you?",
+    "anchor": {
+      "leave_work": "What time do you usually leave work?",
+      "arrive_home": "What time do you usually get home?",
+      "leave_home": "What time do you usually leave home?",
+      "wake_up": "What time do you usually wake up?",
+      "after_breakfast": "What time do you usually have breakfast?",
+      "after_lunch": "What time do you usually have lunch?",
+      "after_dinner": "What time do you usually have dinner?"
+    },
+    "show": "Show"
+  },
+  "anchors": {
+    "leave_work": "After work",
+    "arrive_home": "Getting home",
+    "leave_home": "Leaving home",
+    "wake_up": "Waking up",
+    "after_breakfast": "After breakfast",
+    "after_lunch": "After lunch",
+    "after_dinner": "After dinner"
+  },
+  "facts": {
+    "vague": "“{word}” = {n} min",
+    "anchor": "{label} ≈ {time}"
   }
 }
