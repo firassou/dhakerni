@@ -1,0 +1,1193 @@
+{
+ "model": "gemini-3.5-flash",
+ "ran": "2026-10-08T09:00:34.079Z",
+ "results": [
+  {
+   "id": "a01",
+   "category": "anchor",
+   "text": "بعد كي نروح مالخدمة نعدي على السوبرمارشي",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h6m48.542932476s."
+  },
+  {
+   "id": "a02",
+   "category": "anchor",
+   "text": "كي نوصل للدار نشعل الغسالة",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h6m48.180639946s."
+  },
+  {
+   "id": "a03",
+   "category": "anchor",
+   "text": "بعد الفطور نشرب الدوا",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h5m50.959148504s."
+  },
+  {
+   "id": "a04",
+   "category": "anchor",
+   "text": "بعد المغرب نعيط لخالتي",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h5m34.807771143s."
+  },
+  {
+   "id": "a05",
+   "category": "anchor",
+   "text": "Quand je rentre à la maison, appeler le médecin",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h5m34.519948801s."
+  },
+  {
+   "id": "e01",
+   "category": "time-english",
+   "text": "Remind me to call mom in ten minutes",
+   "ms": 4721,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-08T09:10:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "call mom",
+      "notes": null,
+      "priority": null,
+      "list": "family",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "relative",
+       "day": null,
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": null,
+       "offsetMinutes": 10,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "e02",
+   "category": "time-english",
+   "text": "Tomorrow at 3pm dentist appointment",
+   "ms": 2319,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-09T14:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "dentist appointment",
+      "notes": null,
+      "priority": null,
+      "list": "health",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "tomorrow",
+       "weekday": null,
+       "date": null,
+       "time": "15:00",
+       "dayPart": null,
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "e03",
+   "category": "vague",
+   "text": "Later I need to water the plants",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h10m30.284823741s."
+  },
+  {
+   "id": "e04",
+   "category": "time-english",
+   "text": "Submit the report by Monday morning",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h10m28.711552518s."
+  },
+  {
+   "id": "e05",
+   "category": "no-time",
+   "text": "Buy groceries",
+   "ms": 53003,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "needs_time",
+     "reason": "none",
+     "word": null
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "Buy groceries",
+      "notes": null,
+      "priority": null,
+      "list": "shopping",
+      "reminderId": null,
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": []
+   }
+  },
+  {
+   "id": "f01",
+   "category": "time-french",
+   "text": "Rappelle-moi d'appeler le plombier demain à 14h",
+   "ms": 4079,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-09T13:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "appeler le plombier",
+      "notes": null,
+      "priority": null,
+      "list": "home",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "tomorrow",
+       "weekday": null,
+       "date": null,
+       "time": "14:00",
+       "dayPart": "afternoon",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "f02",
+   "category": "time-french",
+   "text": "Dans 20 minutes sortir le linge",
+   "ms": 2766,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-08T09:20:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "sortir le linge",
+      "notes": null,
+      "priority": null,
+      "list": "home",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "relative",
+       "day": null,
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": null,
+       "offsetMinutes": 20,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "f03",
+   "category": "time-french",
+   "text": "Vendredi matin payer le loyer",
+   "ms": 54478,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-09T07:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "payer le loyer",
+      "notes": null,
+      "priority": null,
+      "list": null,
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "weekday",
+       "weekday": 5,
+       "date": null,
+       "time": null,
+       "dayPart": "morning",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "f04",
+   "category": "time-french",
+   "text": "Le 25 décembre à 9h appeler mamie",
+   "ms": 49481,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-12-25T08:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "appeler mamie",
+      "notes": null,
+      "priority": null,
+      "list": "family",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "date",
+       "weekday": null,
+       "date": "2026-12-25",
+       "time": "09:00",
+       "dayPart": null,
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "f05",
+   "category": "vague",
+   "text": "Tout à l'heure envoyer le rapport",
+   "ms": 52973,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "needs_time",
+     "reason": "vague",
+     "word": "tout à l'heure"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "envoyer le rapport",
+      "notes": null,
+      "priority": null,
+      "list": "work",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "vague",
+       "day": null,
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": null,
+       "offsetMinutes": null,
+       "vagueWord": "tout à l'heure",
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "f06",
+   "category": "no-time",
+   "text": "Acheter du lait",
+   "ms": 1923,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "needs_time",
+     "reason": "none",
+     "word": null
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "Acheter du lait",
+      "notes": null,
+      "priority": null,
+      "list": "shopping",
+      "reminderId": null,
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": []
+   }
+  },
+  {
+   "id": "fu01",
+   "category": "follow-up",
+   "text": "نص ساعة",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h1m53.90772177s."
+  },
+  {
+   "id": "fu02",
+   "category": "follow-up",
+   "text": "الليلة",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h55.959835656s."
+  },
+  {
+   "id": "fu03",
+   "category": "follow-up",
+   "text": "ساعة",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h40.407359638s."
+  },
+  {
+   "id": "fu04",
+   "category": "follow-up",
+   "text": "الساعة 5 و نص",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h40.337005124s."
+  },
+  {
+   "id": "fu05",
+   "category": "follow-up",
+   "text": "dans une heure",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 14h59m42.256442913s."
+  },
+  {
+   "id": "fu06",
+   "category": "follow-up",
+   "text": "tomorrow morning",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 14h59m25.962879246s."
+  },
+  {
+   "id": "m01",
+   "category": "mixed",
+   "text": "نحضّر le rapport غدوة الصباح",
+   "ms": 2967,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-09T07:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نحضّر le rapport",
+      "notes": null,
+      "priority": null,
+      "list": null,
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "tomorrow",
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": "morning",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "m02",
+   "category": "mixed",
+   "text": "غدوة à 9h عندي réunion مع الفريق",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h9m32.346560324s."
+  },
+  {
+   "id": "m03",
+   "category": "mixed",
+   "text": "فكرني نهار السبت نعيط للـ plombier",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h9m16.185297543s."
+  },
+  {
+   "id": "m04",
+   "category": "mixed",
+   "text": "بعد 15 دقيقة نبعث le mail لل client",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h9m15.305491405s."
+  },
+  {
+   "id": "p01",
+   "category": "priority",
+   "text": "لازم نخلص الفاتورة اليوم، مهم برشا",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h3m23.520431418s."
+  },
+  {
+   "id": "p02",
+   "category": "priority",
+   "text": "URGENT appeler le médecin demain à 8h",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h3m7.649687498s."
+  },
+  {
+   "id": "p03",
+   "category": "priority",
+   "text": "Si j'ai le temps, ranger le garage",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h3m7.58189696s."
+  },
+  {
+   "id": "r01",
+   "category": "recurrence",
+   "text": "كل يوم الصباح نشرب الدوا",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h2m9.9122442s."
+  },
+  {
+   "id": "r02",
+   "category": "recurrence",
+   "text": "Chaque lundi à 9h réunion d'équipe",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h1m54.052018306s."
+  },
+  {
+   "id": "t01",
+   "category": "time-derja",
+   "text": "غدوة الصباح نمشي للطبيب",
+   "ms": 3241,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-09T07:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نمشي للطبيب",
+      "notes": null,
+      "priority": null,
+      "list": "health",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "tomorrow",
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": "morning",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t02",
+   "category": "time-derja",
+   "text": "فكرني نهار الجمعة العشية نشري الخبز",
+   "ms": 4909,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-09T16:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نشري الخبز",
+      "notes": null,
+      "priority": null,
+      "list": "shopping",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "weekday",
+       "weekday": 5,
+       "date": null,
+       "time": null,
+       "dayPart": "late_afternoon",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t03",
+   "category": "time-derja",
+   "text": "بعد غدوة نخلص الفاتورة",
+   "ms": 2875,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-10T07:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نخلص الفاتورة",
+      "notes": null,
+      "priority": null,
+      "list": null,
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "after_tomorrow",
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": null,
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t04",
+   "category": "time-derja",
+   "text": "نهار الإثنين الصباح عندي rendez-vous مع المحامي",
+   "ms": 3464,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-12T07:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "rendez-vous مع المحامي",
+      "notes": null,
+      "priority": null,
+      "list": null,
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "weekday",
+       "weekday": 1,
+       "date": null,
+       "time": null,
+       "dayPart": "morning",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t05",
+   "category": "time-derja",
+   "text": "اليوم الساعة 5 عشية نعدي على بنتي",
+   "ms": 4478,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-08T16:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نعدي على بنتي",
+      "notes": null,
+      "priority": null,
+      "list": "عائلة",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "today",
+       "weekday": null,
+       "date": null,
+       "time": "17:00",
+       "dayPart": "late_afternoon",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t06",
+   "category": "time-derja",
+   "text": "غدوة الساعة 7 و نص نفيق الصغير",
+   "ms": 5071,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-09T06:30:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نفيق الصغير",
+      "notes": null,
+      "priority": null,
+      "list": "عائلة",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "tomorrow",
+       "weekday": null,
+       "date": null,
+       "time": "07:30",
+       "dayPart": "morning",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t07",
+   "category": "time-derja",
+   "text": "الليلة نكلم خويا",
+   "ms": 47343,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-08T20:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نكلم خويا",
+      "notes": null,
+      "priority": null,
+      "list": "family",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "absolute",
+       "day": "today",
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": "night",
+       "offsetMinutes": null,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t08",
+   "category": "time-derja",
+   "text": "بعد 10 دقايق نطفي الفرن",
+   "ms": 47256,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-08T09:10:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نطفي الفرن",
+      "notes": null,
+      "priority": null,
+      "list": "home",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "relative",
+       "day": null,
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": null,
+       "offsetMinutes": 10,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t09",
+   "category": "time-derja",
+   "text": "بعد ساعة نتفقد الخبز",
+   "ms": 34787,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-08T10:00:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نتفقد الخبز",
+      "notes": null,
+      "priority": null,
+      "list": null,
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "relative",
+       "day": null,
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": null,
+       "offsetMinutes": 60,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "t10",
+   "category": "time-derja",
+   "text": "بعد نص ساعة نعيط لماما",
+   "ms": 2296,
+   "checks": {
+    "count": true,
+    "titles": true,
+    "time": true,
+    "shared": true,
+    "extras": true
+   },
+   "pass": true,
+   "resolutions": [
+    {
+     "status": "resolved",
+     "at": "2026-10-08T09:30:00.000Z"
+    }
+   ],
+   "output": {
+    "tasks": [
+     {
+      "title": "نعيط لماما",
+      "notes": null,
+      "priority": null,
+      "list": "family",
+      "reminderId": "rem_1",
+      "recurrence": null,
+      "subtasks": [],
+      "uncertain": []
+     }
+    ],
+    "reminders": [
+     {
+      "id": "rem_1",
+      "when": {
+       "kind": "relative",
+       "day": null,
+       "weekday": null,
+       "date": null,
+       "time": null,
+       "dayPart": null,
+       "offsetMinutes": 30,
+       "vagueWord": null,
+       "anchor": null,
+       "confidence": 1
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "v01",
+   "category": "vague",
+   "text": "بعد شوية باش نعمل réunion و نبعث الميل",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h8m18.492669723s."
+  },
+  {
+   "id": "v02",
+   "category": "vague",
+   "text": "شوية نشري الحليب",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h8m2.346647782s."
+  },
+  {
+   "id": "v03",
+   "category": "vague",
+   "text": "بعدين نرد على الميساج",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h8m1.763581484s."
+  },
+  {
+   "id": "v04",
+   "category": "vague",
+   "text": "Remind me later to call John",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h7m4.688591156s."
+  },
+  {
+   "id": "x01",
+   "category": "multi",
+   "text": "غدوة الصباح نشري الخبز و نعدي على البوسطة",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h4m37.230655064s."
+  },
+  {
+   "id": "x02",
+   "category": "multi",
+   "text": "بعد 10 دقايق نطفي الفرن و نكلم ماما",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h4m21.359401268s."
+  },
+  {
+   "id": "x03",
+   "category": "multi",
+   "text": "غدوة نشري الخبز و نهار السبت نخلص الفاتورة",
+   "pass": false,
+   "error": "AI_RetryError: Failed after 3 attempts. Last error: AI_APICallError: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\nPlease retry in 15h4m21.218304491s."
+  }
+ ]
+}
