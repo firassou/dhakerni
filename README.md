@@ -50,8 +50,9 @@ Keys are read only in server routes and never sent to the client.
    `/api/cron/fire` when it is due. Without a caller, reminders only show while the app is open (Settings then
    shows a red warning). There are three callers, and any one is enough:
    - **GitHub Actions** (`.github/workflows/reminders.yml`): calls once a minute. Set the repository secret
-     `CRON_SECRET` to the same value as in Vercel (`gh secret set CRON_SECRET`). GitHub can start a run a few
-     minutes late, so reminders may be a few minutes late with this alone.
+     `CRON_SECRET` to the same value as in Vercel (`gh secret set CRON_SECRET`). GitHub starts scheduled runs
+     late and skips some, so each run keeps calling for most of an hour until the next one takes over.
+     Reminders can be up to a minute late with this alone.
    - **Upstash QStash** (recommended, exact to the second): in the Upstash console open QStash, copy
      `QSTASH_TOKEN` (and `QSTASH_URL` if it shows one) into Vercel's environment variables, and redeploy. The
      server then books a call for the exact minute of every reminder. Free plan: 1,000 calls a day.

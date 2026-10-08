@@ -2,8 +2,10 @@
 #
 # The app is serverless: nothing in it runs unless something calls it. Without a caller, reminders are
 # only shown while the app is open. This workflow is that caller, and it needs no account anywhere else.
-# GitHub may start a scheduled run several minutes late, so each run keeps calling for five minutes and
-# the runs overlap. For to-the-second timing, also set QSTASH_TOKEN (see README, "Scheduler").
+# GitHub starts scheduled runs late, and skips some: gaps of ten minutes and more are normal. So a run does
+# not stop after five minutes: it keeps calling once a minute for most of an hour, and the next run that
+# GitHub does start takes over from it (the older one is cancelled, which is expected and not a failure).
+# For to-the-second timing, also set QSTASH_TOKEN (see README, "Scheduler").
 #
 # Needs the repository secret CRON_SECRET (the same value as in Vercel).
 # Note: GitHub switches scheduled workflows off after 60 days without any activity in the repository.
@@ -16,10 +18,15 @@ on:
 
 permissions: {}
 
+# One caller at a time: a new run replaces the one before it.
+concurrency:
+  group: send-due-reminders
+  cancel-in-progress: true
+
 jobs:
   fire:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 59
     steps:
       - name: Ask the app to send what is due, once a minute
         env:
@@ -31,14 +38,14 @@ jobs:
             exit 1
           fi
           failures=0
-          for i in 1 2 3 4 5; do
+          for i in $(seq 1 55); do
             if curl -fsS -m 40 -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/cron/fire"; then
               echo
             else
               echo "::warning::call $i failed"
               failures=$((failures + 1))
             fi
-            if [ "$i" -lt 5 ]; then sleep 60; fi
+            # A few bad calls are a blip. Ten means reminders are not going out.
+            if [ "$failures" -ge 10 ]; then exit 1; fi
+            if [ "$i" -lt 55 ]; then sleep 60; fi
           done
-          # One bad call is a blip. All of them failing means reminders are not going out.
-          if [ "$failures" -eq 5 ]; then exit 1; fi

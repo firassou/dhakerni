@@ -258,7 +258,8 @@ relied on (cron-job.org, set up by hand) was not running, and nothing in the app
 
 What changed:
 
-- **Callers that need no manual setup.** A GitHub Actions workflow calls once a minute; a daily Vercel cron is
+- **Callers that need no manual setup.** A GitHub Actions workflow calls once a minute (each run keeps going for most of an hour and the next one
+  takes over, because GitHub starts scheduled runs late and skips some); a daily Vercel cron is
   a safety net; every app sync also sends whatever is due. With `QSTASH_TOKEN` set, the server books a call
   for the exact minute of each reminder (`src/lib/server/schedule.ts`), including repeats and retries.
 - **No silent failure.** `/api/push/key` reports `background: "stalled"` when a reminder has waited more than
