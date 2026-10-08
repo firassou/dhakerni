@@ -14,6 +14,8 @@ cp .env.example .env.local   # fill in keys (see below)
 npm run dev                  # http://localhost:3000
 npm test                     # unit tests
 npm run test:e2e             # Playwright (run `npx playwright install chromium` once)
+npm run eval                 # parser accuracy on evals/cases.json (uses real API calls)
+# /dev/stt (dev only): record once, compare speech-to-text providers
 ```
 
 ## Environment variables
