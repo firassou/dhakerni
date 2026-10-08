@@ -182,3 +182,40 @@ become learned facts, because they come from the clock.
   IndexedDB write. The 100 ms budget is asserted for the first two.
 - **Motion:** every animation is switched off by `prefers-reduced-motion`.
 - **Not verified:** real screen readers (VoiceOver, TalkBack, NVDA), 60 fps on low-end phones, and iOS Safari.
+
+## D13. A smarter parser: understanding, not extracting
+
+The parser's job is to turn a loose spoken idea into a clear, usable task. For each task it returns:
+
+- **title**: a short action (verb + object), clearer than the raw words but in the person's own dialect and script
+  ("nelbess labsa 9bal ma tji x" becomes "nbadel 7wayji").
+- **description**: the full idea restated, keeping every detail (order, conditions, people, places, reasons).
+  Stored in the task's description field. Never adds facts. With several tasks from one sentence, each gets only
+  its own part.
+- **items** with quantity and unit ("ill bought two juice" gives title "Buy juice" and 2x juice). Things bought or
+  prepared together become ONE task with a checklist; different actions stay separate tasks.
+- **steps** (explicit sequence words only) and **suggested steps** (at most 4, only for big multi-part goals).
+  Suggestions are never steps until the person adds them.
+- **decision** when the person is undecided: the options, plus a recommendation and one-sentence reason only when
+  what they said tips the balance (null otherwise, always null for medical, legal or investment questions). The
+  UI labels it "Suggestion" and the person picks freely.
+- **priority** also from consequences (a bill that will be cut off), and "low" from "if I have time".
+
+Guardrails in the prompt, each added after a real failure in the eval: never translate or formalize Derja; never
+drop a time cue (Latin-letter Derja like "ghodwa" included); a plain "and" between two actions is two tasks; a
+repeating task does not get "today" as its day.
+
+**Honest limits.** The eval cases (68) are written by us, so a high score is not a promise about real speech.
+Quantities, items and decisions are model judgments and can be wrong, which is why each is editable, and
+suggestions and recommendations are labelled as suggestions. Task data saved by older versions is normalized when
+loaded (missing fields get safe defaults), after an early build crashed on tasks saved before items existed.
+
+## D14. Feedback for every action
+
+Whenever the person does something, the screen shows what is happening. Dragging to reorder: the card lifts (shadow,
+ring, slight tilt) and follows the pointer, a dashed placeholder marks where it will land, neighbours glide aside,
+the card eases into its slot on release and its landing spot flashes briefly, with a small vibration on pick-up and
+drop, and spoken announcements for screen readers. Deleting: the card slides away before it is removed, with Undo.
+Completing: the check draws, then the card fades. Adding: the card springs in. Recording: live waveform, a running
+clock, a cancel button. A bug found here: an entrance animation that kept its end state overrode the drag library's
+movement, so cards only snapped at the end. Entrance animations must not keep `transform` after they finish.

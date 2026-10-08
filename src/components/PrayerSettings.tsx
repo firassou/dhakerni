@@ -13,10 +13,16 @@ export function PrayerSettings() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    // React may run this effect twice in development. Only the latest read may write, or a slow
+    // earlier read could overwrite what the person has already chosen.
+    let current = true;
     getMeta<string>("city")
-      .then((c) => setCity(isCity(c) ? c : ""))
+      .then((c) => current && setCity(isCity(c) ? c : ""))
       .catch(() => {})
-      .finally(() => setLoaded(true));
+      .finally(() => current && setLoaded(true));
+    return () => {
+      current = false;
+    };
   }, []);
 
   function choose(value: string) {

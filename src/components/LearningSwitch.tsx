@@ -11,9 +11,13 @@ export function LearningSwitch() {
   const [on, setOn] = useState<boolean | null>(null);
 
   useEffect(() => {
+    let current = true; // ignore a stale read (see PrayerSettings)
     isLearningOn()
-      .then(setOn)
-      .catch(() => setOn(true));
+      .then((v) => current && setOn(v))
+      .catch(() => current && setOn(true));
+    return () => {
+      current = false;
+    };
   }, []);
 
   if (on === null) return <div className="h-16" />;
