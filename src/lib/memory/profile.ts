@@ -6,8 +6,10 @@ export type FactSource = ProfileFact["source"];
 
 /** A learned value is only used silently once it is at least this confident. */
 export const USE_THRESHOLD = 0.6;
-const CONFIRM_STEP = 0.1;
+const CONFIRM_STEP = 0.15;
 const FIRST_CONFIDENCE = 0.75;
+/** Learned from behavior alone: not used until the same value is seen again. */
+const BEHAVIOR_CONFIDENCE = 0.4;
 const CORRECTION_CONFIDENCE = 0.7;
 
 export async function listFacts(): Promise<ProfileFact[]> {
@@ -55,7 +57,7 @@ export async function learnFact(
       key,
       value,
       source,
-      confidence: FIRST_CONFIDENCE,
+      confidence: source === "behavior" ? BEHAVIOR_CONFIDENCE : FIRST_CONFIDENCE,
       updatedAt: stamp,
     };
   }

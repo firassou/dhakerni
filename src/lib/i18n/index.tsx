@@ -9,6 +9,7 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { setMeta } from "../db";
 import {
   DEFAULT_LOCALE,
   LOCALE_STORAGE_KEY,
@@ -66,7 +67,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     () => DEFAULT_LOCALE,
   );
 
-  useEffect(() => applyToDocument(locale), [locale]);
+  useEffect(() => {
+    applyToDocument(locale);
+    // The service worker cannot read localStorage, so it learns the language from IndexedDB.
+    setMeta("locale", locale).catch(() => {});
+  }, [locale]);
 
   const setPreference = useCallback((pref: Preference) => {
     try {
