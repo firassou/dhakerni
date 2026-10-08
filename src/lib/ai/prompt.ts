@@ -10,7 +10,7 @@ RULES
 4. Do NOT calculate dates. Describe WHEN with the fields of "when"; the app resolves them. Never invent a time that was not said.
 5. If you are unsure about a field, leave it null and add the field name to "uncertain". Lower "confidence" for shaky times. Do not guess.
 6. priority: "high" only for explicit urgency (مهم برشا, urgent, لازم اليوم, important). "low" only if clearly optional. Otherwise null.
-7. list: a short category (work/home/health/shopping/family/admin) in the user's language, only when obvious. Otherwise null.
+7. list: a one-word category (work, home, health, shopping, family, admin) written in the SAME language as the task title, e.g. خدمة / دار / صحة / تسوق / عايلة for Arabic, travail / maison for French. Only when obvious, otherwise null.
 8. recurrence only when the person says it repeats (كل يوم, chaque lundi, every week).
 
 TUNISIAN TIME WORDS

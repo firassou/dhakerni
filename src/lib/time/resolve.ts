@@ -11,13 +11,19 @@ export const DEFAULT_DAYPART_TIME: Record<DayPart, string> = {
 };
 
 export type Resolution =
-  | { status: "resolved"; at: Date }
+  | {
+      status: "resolved";
+      at: Date;
+      /** Fact key when a learned value decided the time. */ via?: string;
+    }
   | { status: "needs_time"; reason: "vague" | "anchor" | "none"; word: string | null };
 
 export interface ResolveOptions {
   dayPartTimes?: Partial<Record<DayPart, string>>;
   /** Learned meaning of vague words, in minutes: { "شوية": 20 }. */
   vagueMinutes?: Record<string, number>;
+  /** Learned clock time for anchors: { leave_work: "17:00" }. */
+  anchorTimes?: Record<string, string>;
 }
 
 /** Canonical key for a vague word: "بعد شوية" and "شوية" are the same word. */
@@ -38,6 +44,12 @@ function parseClock(value: string): [number, number] | null {
   return h < 24 && min < 60 ? [h, min] : null;
 }
 
+/** Today at this time if still ahead, otherwise tomorrow. */
+export function nextOccurrence(now: Date, clock: [number, number]): Date {
+  const today = atClock(now, clock, 0);
+  return today > now ? today : atClock(now, clock, 1);
+}
+
 const atClock = (base: Date, [h, m]: [number, number], dayOffset: number) =>
   new Date(base.getFullYear(), base.getMonth(), base.getDate() + dayOffset, h, m, 0, 0);
 
@@ -47,13 +59,24 @@ export function resolveWhen(when: When, now: Date, opts: ResolveOptions = {}): R
     case "none":
       return { status: "needs_time", reason: "none", word: null };
 
-    case "anchor":
+    case "anchor": {
+      const clock = when.anchor ? parseClock(opts.anchorTimes?.[when.anchor] ?? "") : null;
+      if (clock && when.anchor) {
+        return { status: "resolved", at: nextOccurrence(now, clock), via: `anchor.${when.anchor}` };
+      }
       return { status: "needs_time", reason: "anchor", word: when.anchor };
+    }
 
     case "vague": {
       const word = when.vagueWord ? normalizeVague(when.vagueWord) : null;
       const minutes = word ? opts.vagueMinutes?.[word] : undefined;
-      if (minutes) return { status: "resolved", at: new Date(now.getTime() + minutes * 60_000) };
+      if (minutes) {
+        return {
+          status: "resolved",
+          at: new Date(now.getTime() + minutes * 60_000),
+          via: `vague.${word}`,
+        };
+      }
       return { status: "needs_time", reason: "vague", word };
     }
 

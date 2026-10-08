@@ -50,9 +50,9 @@ describe("toTasks", () => {
     };
     const [a, b, c] = toTasks(r, now, []);
     expect([a.dueAt, b.dueAt, c.dueAt]).toEqual([null, null, null]);
-    expect(a.needs).toEqual({ reason: "vague", word: "شوية" });
-    expect(b.needs).toEqual({ reason: "anchor", word: "leave_work" });
-    expect(c.needs).toEqual({ reason: "none", word: null });
+    expect(a.needs).toMatchObject({ reason: "vague", word: "شوية", dismissed: false });
+    expect(b.needs).toMatchObject({ reason: "anchor", word: "leave_work", dismissed: false });
+    expect(c.needs).toMatchObject({ reason: "none", word: null, dismissed: true }); // nothing to ask
   });
 
   it("applies learned vague meanings and flags low confidence", () => {
@@ -63,5 +63,30 @@ describe("toTasks", () => {
     const [a] = toTasks(r, now, [], { vagueMinutes: { شوية: 20 } });
     expect(a.dueAt).toBe(new Date(2026, 9, 8, 10, 20).toISOString());
     expect(a.uncertain).toContain("time");
+  });
+
+  it("gives tasks that share a reminder one group, so they are asked about once", () => {
+    const r: ParseResult = {
+      tasks: [task("a", "r1"), task("b", "r1"), task("c", "r2")],
+      reminders: [
+        { id: "r1", when: when({ kind: "vague", vagueWord: "شوية" }) },
+        { id: "r2", when: when({ kind: "vague", vagueWord: "بعدين" }) },
+      ],
+    };
+    const [a, b, c] = toTasks(r, now, []);
+    expect(a.needs?.group).toBeTruthy();
+    expect(b.needs?.group).toBe(a.needs?.group);
+    expect(c.needs?.group).not.toBe(a.needs?.group);
+  });
+
+  it("records what a learned value decided, for the editable chip", () => {
+    const r: ParseResult = {
+      tasks: [task("a", "r1")],
+      reminders: [{ id: "r1", when: when({ kind: "anchor", anchor: "leave_work" }) }],
+    };
+    const [a] = toTasks(r, now, [], { anchorTimes: { leave_work: "17:00" } });
+    expect(a.dueAt).toBe(new Date(2026, 9, 8, 17, 0).toISOString());
+    expect(a.assumed).toEqual({ key: "anchor.leave_work", value: "17:00" });
+    expect(a.needs).toBeNull();
   });
 });

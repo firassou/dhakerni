@@ -17,6 +17,21 @@ export const Subtask = z.object({
   done: z.boolean().default(false),
 });
 
+/**
+ * Why a task has no time. For "vague" the word is the normalized vague word; for "anchor" it is the
+ * anchor key (leave_work, ...). Tasks created together from one reminder share a group, so they are
+ * asked about once.
+ */
+export const Needs = z.object({
+  reason: z.enum(["vague", "anchor", "none"]),
+  word: z.string().nullable(),
+  group: z.string().nullable().default(null),
+  openedAt: z.iso.datetime({ offset: true }).nullable().default(null),
+  dismissed: z.boolean().default(false),
+  resurfaced: z.boolean().default(false),
+});
+export type Needs = z.infer<typeof Needs>;
+
 export const Task = z.object({
   id: z.string(),
   title: z.string().min(1),
@@ -30,10 +45,9 @@ export const Task = z.object({
   subtasks: z.array(Subtask).default([]),
   uncertain: Uncertain,
   /** Why the task has no time yet. Drives the clarifying question (v0.4). */
-  needs: z
-    .object({ reason: z.enum(["vague", "anchor", "none"]), word: z.string().nullable() })
-    .nullable()
-    .default(null),
+  needs: Needs.nullable().default(null),
+  /** Set when the time came from something the app learned, so the card can show an editable chip. */
+  assumed: z.object({ key: z.string(), value: z.string() }).nullable().default(null),
   done: z.boolean().default(false),
   doneAt: z.iso.datetime({ offset: true }).nullable().default(null),
   order: z.number(),
