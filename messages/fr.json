@@ -289,7 +289,7 @@
     "enable": "Activer",
     "disable": "Désactiver",
     "test": "Envoyer un test",
-    "testSent": "Test envoyé",
+    "testSent": "Test envoyé. Un second passe par le serveur dans une minute environ : verrouillez le téléphone et attendez-le.",
     "ios": {
       "title": "Ajoutez Dhakerni à l'écran d'accueil",
       "step1": "Touchez le bouton Partager dans Safari.",
@@ -300,8 +300,10 @@
     "bannerAction": "Activer",
     "bannerDismiss": "Pas maintenant",
     "firefox": "Firefox sur ordinateur n'affiche pas de boutons sur les notifications. Cliquez sur la notification pour ouvrir l'app, puis utilisez Terminé ou Reporter.",
-    "repeats": "Un rappel sans réponse est renvoyé deux fois, à 3 minutes d'intervalle.",
-    "android": "Pas de rappels quand le téléphone est verrouillé ? Dans les Paramètres Android, ouvrez Applications, Chrome, Batterie et choisissez Sans restriction."
+    "repeats": "Un rappel sans réponse est renvoyé deux fois, à 3 minutes d'intervalle, jusqu'à ce que vous touchiez Terminé ou Reporter.",
+    "android": "Pas de rappels quand le téléphone est verrouillé ? Dans les Paramètres Android, ouvrez Applications, Chrome, Batterie et choisissez Sans restriction.",
+    "testLocalOnly": "Test affiché, mais le serveur n'a pas accepté le second. Les rappels en arrière-plan ne fonctionnent peut-être pas.",
+    "stalled": "Les rappels en arrière-plan ne sont pas envoyés en ce moment : rien ne déclenche le serveur. En attendant, les rappels n'apparaissent que lorsque l'app est ouverte."
   },
   "trigger": {
     "label": "Déclencheurs",
@@ -377,5 +379,21 @@
   },
   "install": {
     "action": "Installer"
+  },
+  "native": {
+    "channel": "Rappels",
+    "status": {
+      "on": "Activé. Les rappels sonnent depuis ce téléphone, même app fermée, téléphone en veille ou sans internet.",
+      "denied": "Bloqué. Autorisez les notifications de Dhakerni dans Paramètres Android, Applications, Dhakerni, Notifications."
+    },
+    "testSent": "Un rappel de test sonne dans 20 secondes. Verrouillez le téléphone maintenant.",
+    "exactOff": "Android n'autorise pas Dhakerni à sonner à l'heure exacte : les rappels peuvent arriver avec plusieurs minutes de retard.",
+    "allowExact": "Autoriser les alarmes exactes",
+    "battery": "Si un rappel arrive en retard : dans Paramètres Android, Applications, Dhakerni, Batterie, choisissez Sans restriction. Certains téléphones (Xiaomi, Oppo, Huawei) demandent aussi d'autoriser le démarrage automatique.",
+    "get": {
+      "title": "Application Android",
+      "body": "Des rappels qui sonnent à l'heure, téléphone en veille, sans serveur entre les deux. Elle se met à jour toute seule : on l'installe une fois.",
+      "action": "Télécharger l'application Android"
+    }
   }
 }

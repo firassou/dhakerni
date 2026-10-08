@@ -40,3 +40,6 @@ yarn-error.log*
 scripts/stt-bench/clips
 scripts/stt-bench/results.json
 evals/reports/*.json
+
+# Android app: the built APK (it is published as a GitHub release, not committed)
+/dhakerni.apk

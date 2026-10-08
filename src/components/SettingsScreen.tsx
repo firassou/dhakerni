@@ -6,6 +6,7 @@ import { getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import { LOCALES } from "@/lib/i18n/locales";
 import { Brand } from "./Brand";
+import { AndroidAppLink } from "./AndroidAppLink";
 import { BackIcon } from "./Icon";
 import { BackupControls } from "./BackupControls";
 import { LearningSwitch } from "./LearningSwitch";
@@ -79,6 +80,8 @@ export function SettingsScreen() {
         </h2>
         <PushControls />
       </section>
+
+      <AndroidAppLink />
 
       <section id="prayer" aria-labelledby="prayer-h" className="mt-10">
         <h2 id="prayer-h" className="t-small text-ink-2 mb-2 font-medium">

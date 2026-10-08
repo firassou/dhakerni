@@ -68,3 +68,42 @@ const entries = pngs.map((png, i) => {
   return e;
 });
 writeFileSync("src/app/favicon.ico", Buffer.concat([header, ...entries, ...pngs]));
+
+// ---- Android app (android/): launcher icons in every density ----
+// Legacy square and round icons, plus the adaptive pair: a transparent foreground holding the glyph inside
+// the middle two thirds (launchers crop the rest into their own shape) over a plain blue background.
+const res = "android/app/src/main/res";
+const densities = { mdpi: 1, hdpi: 1.5, xhdpi: 2, xxhdpi: 3, xxxhdpi: 4 };
+for (const [name, k] of Object.entries(densities)) {
+  const legacy = Math.round(48 * k);
+  const square = await sharp({
+    create: { width: legacy, height: legacy, channels: 4, background: { ...BLUE, alpha: 1 } },
+  })
+    .composite([{ input: await sharp(glyphPng).resize(legacy, legacy).png().toBuffer() }])
+    .png()
+    .toBuffer();
+  const rounded = (radius) =>
+    Buffer.from(
+      `<svg width="${legacy}" height="${legacy}"><rect width="${legacy}" height="${legacy}" rx="${radius}" ry="${radius}"/></svg>`,
+    );
+  await sharp(square)
+    .composite([{ input: rounded(legacy * 0.22), blend: "dest-in" }])
+    .toFile(`${res}/mipmap-${name}/ic_launcher.png`);
+  await sharp(square)
+    .composite([{ input: rounded(legacy / 2), blend: "dest-in" }])
+    .toFile(`${res}/mipmap-${name}/ic_launcher_round.png`);
+
+  const layer = Math.round(108 * k);
+  const g = Math.round(layer * 0.6);
+  await sharp({
+    create: {
+      width: layer,
+      height: layer,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    },
+  })
+    .composite([{ input: await sharp(glyphPng).resize(g, g).png().toBuffer(), gravity: "center" }])
+    .png()
+    .toFile(`${res}/mipmap-${name}/ic_launcher_foreground.png`);
+}

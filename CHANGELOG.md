@@ -4,8 +4,13 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-08
+
 ### Added
 
+- **An Android app.** A thin shell around the live site, so it updates itself with every deploy and never
+  needs reinstalling. Inside it, reminders are Android alarms set on the phone: they ring on time with the
+  phone asleep, the app closed and no internet. Android browsers see a download link in Settings.
 - The text field takes several lines and grows as you type. With a keyboard Enter sends and Shift+Enter breaks
   the line; on a phone Enter breaks the line and the button sends.
 - Tapping anywhere on a task card opens the editor, not only the title.
@@ -27,6 +32,13 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ### Fixed
 
+- **Reminders did not arrive with the app closed.** Nothing was triggering the server to send them. It is now
+  triggered once a minute by a GitHub Actions workflow, daily by Vercel, on every app sync, and (with
+  `QSTASH_TOKEN`) at the exact minute of each reminder. Settings warns in red when reminders are not going out,
+  and "Send a test" now also sends one through the whole server path a minute later.
+- A reminder that became due while the app was alive in the background was deleted before it was sent.
+- A push the push service refused for a passing reason was dropped; it is now retried.
+- A task added just before locking the phone could miss the server; the app now syncs on the way out.
 - A long list typed under a heading ("8odwa sba7:" then one action per line) was saved as one plain task: the
   backup model's answer was cut off. Each line is now its own task, in order, on the heading's day.
 - The Done list showed its tasks for a moment and then they faded away.
