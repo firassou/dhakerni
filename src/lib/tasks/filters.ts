@@ -33,6 +33,14 @@ export function selectTasks(tasks: Task[], filter: Filter, now: Date): Task[] {
   return list.sort((a, b) => a.order - b.order);
 }
 
+/** Finished tasks are kept this long, then removed: the Done list is a short look back, not an archive. */
+export const DONE_KEEP_MS = 24 * 3_600_000;
+
+export function expiredDone(tasks: readonly Task[], now: Date): Task[] {
+  const limit = now.getTime() - DONE_KEEP_MS;
+  return tasks.filter((t) => t.done && Date.parse(t.doneAt ?? t.updatedAt) <= limit);
+}
+
 export function isOverdue(task: Task, now: Date): boolean {
   return !task.done && task.dueAt !== null && Date.parse(task.dueAt) < now.getTime();
 }

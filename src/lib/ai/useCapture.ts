@@ -73,11 +73,15 @@ export function useCapture({
     [finish, getResolveOptions, getTasks, hintsFor, locale, show, t],
   );
 
-  const submitAudio = useCallback(
-    async (audio: Blob, durationMs: number) => {
+  /**
+   * Audio in, words out. The transcript is handed back, not turned into tasks: speech-to-text gets Derja
+   * wrong often enough that the person checks (and fixes) what was heard before it is understood.
+   */
+  const hear = useCallback(
+    async (audio: Blob, durationMs: number): Promise<string | null> => {
       if (durationMs < MIN_AUDIO_MS) {
         show({ message: t("voice.tooShort") });
-        return;
+        return null;
       }
       setPending({ text: null });
       let text: string;
@@ -92,17 +96,18 @@ export function useCapture({
               : "capture.transcribeFailed",
           ),
         });
-        return;
+        return null;
       }
+      setPending(null);
       if (!text) {
-        setPending(null);
         show({ message: t("voice.empty") });
-        return;
+        return null;
       }
-      await submitText(text);
+      show({ message: t("voice.review") });
+      return text;
     },
-    [show, submitText, t],
+    [show, t],
   );
 
-  return { pending, submitText, submitAudio };
+  return { pending, submitText, hear };
 }

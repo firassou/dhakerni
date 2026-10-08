@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Dhakerni",
-    short_name: "dhakerni",
+    short_name: "Dhakerni",
     description: "Voice-first tasks and reminders.",
     start_url: "/",
     scope: "/",

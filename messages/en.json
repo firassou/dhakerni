@@ -29,7 +29,7 @@
     },
     "done": {
       "title": "Nothing done yet",
-      "body": "Finished tasks land here."
+      "body": "Finished tasks stay here for a day."
     }
   },
   "dock": {
@@ -62,7 +62,7 @@
     "privacy": {
       "title": "Privacy",
       "local": "Your tasks and what Dhakerni learns about you stay on this device.",
-      "server": "For reminders when the app is closed, our server keeps only: your push address, an anonymous ID, the time each reminder fires, and a short title (cut to 80 characters). All of it is encrypted, each reminder is deleted right after it is sent, and turning notifications off deletes the rest."
+      "server": "For reminders when the app is closed, our server keeps only: your push address, an anonymous ID, the time each reminder fires, and a short title (cut to 80 characters). All of it is encrypted, each reminder is deleted once you answer it or after its last repeat, and turning notifications off deletes the rest."
     },
     "anonymousId": "Anonymous ID",
     "version": "Version",
@@ -108,6 +108,13 @@
         "tozeur": "Tozeur",
         "kebili": "Kebili"
       }
+    },
+    "reset": {
+      "title": "Reset",
+      "action": "Reset everything",
+      "confirm": "Delete all tasks, everything Dhakerni has learned and all settings on this device, and turn off notifications? This can't be undone.",
+      "yes": "Yes, delete everything",
+      "cancel": "Cancel"
     }
   },
   "time": {
@@ -140,7 +147,8 @@
       "movedTo": "{title} moved to position {pos} of {total}.",
       "dropped": "{title} dropped at position {pos} of {total}.",
       "cancelled": "Move cancelled. {title} is back at position {pos}."
-    }
+    },
+    "doneKeep": "Finished tasks are removed after a day."
   },
   "editor": {
     "title": "Task",
@@ -182,7 +190,8 @@
     "resurfaced": "Still need a time for “{title}”.",
     "unclear": "Couldn't tell the time. Pick one of the options.",
     "triggered": "Reminders sent",
-    "noticed": "Noticed: {fact}. Change anytime."
+    "noticed": "Noticed: {fact}. Change anytime.",
+    "deletedMany": "{count} tasks deleted"
   },
   "voice": {
     "denied": "Microphone is blocked. Allow it in your browser settings, or type instead.",
@@ -190,7 +199,8 @@
     "failed": "Couldn't start the microphone. Try again or type instead.",
     "tooShort": "Too short. Hold the mic while you speak.",
     "empty": "Didn't catch anything. Try again.",
-    "noTask": "No task found in that. Try rephrasing."
+    "noTask": "No task found in that. Try rephrasing.",
+    "review": "Check what I heard, fix it if needed, then send."
   },
   "capture": {
     "fallback": "Couldn't understand that, so it was saved as written.",
@@ -289,7 +299,9 @@
     "banner": "Get reminders even when the app is closed.",
     "bannerAction": "Turn on",
     "bannerDismiss": "Not now",
-    "firefox": "Desktop Firefox shows no buttons on notifications. Click the notification to open the app, then use Done or Snooze there."
+    "firefox": "Desktop Firefox shows no buttons on notifications. Click the notification to open the app, then use Done or Snooze there.",
+    "repeats": "A reminder you don't answer is sent again twice, 3 minutes apart.",
+    "android": "Not getting reminders while the phone is locked? In Android Settings open Apps, Chrome, Battery and choose Unrestricted."
   },
   "trigger": {
     "label": "Triggers",
@@ -356,5 +368,11 @@
       "too_new": "This backup comes from a newer version of Dhakerni.",
       "too_large": "That file is too large."
     }
+  },
+  "select": {
+    "label": "Selected tasks",
+    "count": "{n} selected",
+    "delete": "Delete",
+    "cancel": "Cancel selection"
   }
 }

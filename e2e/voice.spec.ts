@@ -85,7 +85,9 @@ test("typed multi-task utterance shares one vague reminder and lands in Needs ti
   await expect(page.getByText("نعمل réunion")).toHaveCount(0);
 });
 
-test("holding the mic records, shows the waveform, and creates a timed task", async ({ page }) => {
+test("holding the mic records, shows the waveform, and writes what it heard for review", async ({
+  page,
+}) => {
   const mic = page.getByRole("button", { name: "Hold to talk" });
   const box = (await mic.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -96,9 +98,17 @@ test("holding the mic records, shows the waveform, and creates a timed task", as
   await page.waitForTimeout(900);
   await page.mouse.up();
 
-  // 10 minutes from now is due today
+  // What was heard is not acted on yet: it sits in the field, where it can be fixed.
+  const field = page.getByLabel("Add a task");
+  await expect(field).toHaveValue("بعد 10 دقايق نطفي الفرن");
+  await expect(page.getByText(/Check what I heard/)).toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(0);
+
+  // Sending it makes the task. 10 minutes from now is due today.
+  await page.getByRole("button", { name: "Add", exact: true }).click();
   await expect(page.getByRole("tab", { name: "Today" })).toHaveAttribute("aria-selected", "true");
-  await expect(page.getByText("نطفي الفرن")).toBeVisible();
+  await expect(page.getByRole("listitem").filter({ hasText: "نطفي الفرن" })).toBeVisible();
+  await expect(field).toHaveValue("");
 });
 
 test("tap to talk keeps recording until Stop", async ({ page }) => {
@@ -107,7 +117,7 @@ test("tap to talk keeps recording until Stop", async ({ page }) => {
   await expect(stop).toBeVisible();
   await page.waitForTimeout(700);
   await stop.click();
-  await expect(page.getByText("نطفي الفرن")).toBeVisible();
+  await expect(page.getByLabel("Add a task")).toHaveValue("بعد 10 دقايق نطفي الفرن");
 });
 
 test("parser failure still saves what was typed", async ({ page }) => {

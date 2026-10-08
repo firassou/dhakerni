@@ -2,6 +2,28 @@
 
 All notable changes to this project are documented here. Format: Keep a Changelog; versions: SemVer.
 
+## [Unreleased]
+
+### Added
+
+- The text field takes several lines and grows as you type. With a keyboard Enter sends and Shift+Enter breaks
+  the line; on a phone Enter breaks the line and the button sends.
+- Tapping anywhere on a task card opens the editor, not only the title.
+- Long-press (or long-click) a card to pick several, then delete them together, with one Undo.
+- Settings, Reset everything: wipes tasks, what was learned, settings and the server's copy of the reminders.
+- A reminder nobody answers is sent again twice, 3 minutes apart, and each copy vibrates. Done, Snooze or opening
+  the app stops the repeats. On Android, Settings explains how to stop the phone holding reminders back.
+
+### Changed
+
+- Voice no longer creates tasks directly: what was heard is written into the text field so it can be checked and
+  corrected before it is sent.
+- Finished tasks are kept for one day, then removed.
+
+### Fixed
+
+- The Done list showed its tasks for a moment and then they faded away.
+
 ## [0.8.0] - 2026-10-08
 
 ### Added

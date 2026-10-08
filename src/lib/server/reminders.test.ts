@@ -67,6 +67,7 @@ const body = (reminders: SyncBody["reminders"], mode: SyncBody["mode"] = "replac
   subscription: sub,
   mode,
   forget: false,
+  cancel: [],
   reminders,
 });
 const at = (min: number) => new Date(now.getTime() + min * 60_000).toISOString();
@@ -165,7 +166,7 @@ describe("turning notifications off", () => {
 });
 
 describe("firing", () => {
-  it("sends due reminders once and deletes them", async () => {
+  it("sends a due reminder, repeats it twice a few minutes apart, then deletes it", async () => {
     const { store, kv } = memoryStore();
     await syncReminders(
       store,
@@ -182,7 +183,37 @@ describe("firing", () => {
     expect(await fireDue(store, send, t)).toEqual({ sent: 1, failed: 0, dropped: 0 });
     expect(await fireDue(store, send, t)).toEqual({ sent: 0, failed: 0, dropped: 0 }); // not twice
     expect(sent).toEqual(["soon"]);
+    const later = (min: number) => new Date(t.getTime() + min * 60_000);
+    expect((await fireDue(store, send, later(3))).sent).toBe(1);
+    expect((await fireDue(store, send, later(6))).sent).toBe(1);
+    expect((await fireDue(store, send, later(9))).sent).toBe(0); // three in all, then it stops
+    expect(sent).toEqual(["soon", "soon", "soon"]);
     expect([...kv.keys()].filter((k) => k.startsWith("r:"))).toEqual(["r:s:later"]);
+  });
+
+  it("stops repeating once the person answers", async () => {
+    const one = [{ taskId: "a", fireAt: at(1), title: "a" }];
+    const after = (min: number) => new Date(now.getTime() + min * 60_000);
+    let sent = 0;
+    const send = async () => void sent++;
+
+    // Done on the notification
+    let { store, kv } = memoryStore();
+    await syncReminders(store, "s", body(one), now);
+    await fireDue(store, send, after(2));
+    await syncReminders(store, "s", { ...body([]), mode: "upsert", cancel: ["a"] }, after(2));
+    await fireDue(store, send, after(10));
+    expect(sent).toBe(1);
+    expect([...kv.keys()].filter((k) => k.startsWith("r:"))).toEqual([]);
+
+    // opening the app: its sync no longer lists the reminder
+    ({ store, kv } = memoryStore());
+    await syncReminders(store, "s", body(one), now);
+    await fireDue(store, send, after(2));
+    await syncReminders(store, "s", body([]), after(2));
+    await fireDue(store, send, after(10));
+    expect(sent).toBe(2);
+    expect([...kv.keys()].filter((k) => k.startsWith("r:"))).toEqual([]);
   });
 
   it("deletes the reminder even when sending fails, and forgets dead subscriptions", async () => {

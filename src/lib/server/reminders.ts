@@ -3,8 +3,8 @@ import { decrypt, encrypt } from "./crypto";
 
 /**
  * What the server keeps, and nothing else: the push subscription, the anonymous session id, the time a
- * reminder fires, and a short title. Everything is encrypted at rest and each reminder is deleted the
- * moment it fires.
+ * reminder fires, and a short title. Everything is encrypted at rest. A reminder is deleted once it is
+ * answered (Done, Snooze, or the app opened), or after its last repeat.
  */
 
 /** Only real push services. Without this, anyone could make the server POST to any URL. */
@@ -35,6 +35,9 @@ export type Subscription = z.infer<typeof Subscription>;
 export const MAX_TITLE = 80;
 export const MAX_REMINDERS = 200;
 const MAX_AHEAD_MS = 400 * 86_400_000;
+/** A reminder nobody answers is sent again: a phone asleep can delay or drop a single push. */
+export const REPEATS = 2;
+export const REPEAT_MS = 3 * 60_000;
 
 export const SyncBody = z.object({
   subscription: Subscription,
@@ -42,6 +45,8 @@ export const SyncBody = z.object({
   mode: z.enum(["replace", "upsert"]).default("replace"),
   /** Turning reminders off: delete the stored subscription and everything scheduled. */
   forget: z.boolean().default(false),
+  /** Answered from the notification (Done): stop repeating these. */
+  cancel: z.array(z.string().min(1).max(64)).max(MAX_REMINDERS).default([]),
   reminders: z
     .array(
       z.object({
@@ -82,6 +87,7 @@ export async function syncReminders(store: ReminderStore, sid: string, body: Syn
     return;
   }
   await store.putSub(sid, encrypt(JSON.stringify(body.subscription)), SUB_TTL);
+  for (const id of body.cancel) await store.delReminder(sid, id);
 
   const keep = new Set<string>();
   for (const r of body.reminders) {
@@ -105,6 +111,8 @@ export interface PushPayload {
   taskId: string;
   title: string;
   fireAt: string;
+  /** How many times it was already sent. Absent on the first send. */
+  attempt?: number;
 }
 export type Sender = (sub: Subscription, payload: PushPayload) => Promise<void>;
 
@@ -114,10 +122,15 @@ export interface FireReport {
   dropped: number;
 }
 
-/** Sends everything that is due, then deletes it. A dead subscription (404/410) is forgotten too. */
+/**
+ * Sends everything that is due. Each reminder is then scheduled again a few minutes later, up to REPEATS
+ * times, and deleted after the last one (the client cancels it sooner when the person answers).
+ * A reminder that could not be sent is deleted, and a dead subscription (404/410) is forgotten too.
+ */
 export async function fireDue(store: ReminderStore, send: Sender, now: Date): Promise<FireReport> {
   const report: FireReport = { sent: 0, failed: 0, dropped: 0 };
   for (const { sid, taskId } of await store.claimDue(now.getTime(), 100)) {
+    let again = false;
     try {
       const [encR, encS] = await Promise.all([store.getReminder(sid, taskId), store.getSub(sid)]);
       if (!encR || !encS) {
@@ -129,6 +142,12 @@ export async function fireDue(store: ReminderStore, send: Sender, now: Date): Pr
       try {
         await send(sub, payload);
         report.sent++;
+        const attempt = payload.attempt ?? 0;
+        if (attempt < REPEATS) {
+          const next = encrypt(JSON.stringify({ ...payload, attempt: attempt + 1 }));
+          await store.putReminder(sid, taskId, next, now.getTime() + REPEAT_MS, 3600);
+          again = true;
+        }
       } catch (e) {
         const status = (e as { statusCode?: number }).statusCode;
         if (status === 404 || status === 410) await store.delSub(sid);
@@ -137,8 +156,8 @@ export async function fireDue(store: ReminderStore, send: Sender, now: Date): Pr
     } catch {
       report.dropped++;
     } finally {
-      // Delete after firing, whatever happened: the server keeps nothing it no longer needs.
-      await store.delReminder(sid, taskId);
+      // Unless it repeats, delete after firing: the server keeps nothing it no longer needs.
+      if (!again) await store.delReminder(sid, taskId);
     }
   }
   return report;

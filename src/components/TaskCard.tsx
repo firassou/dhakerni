@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useI18n } from "@/lib/i18n";
@@ -31,7 +31,18 @@ interface Props extends Omit<BodyProps, "grip"> {
   leaving?: boolean;
   /** Just dropped after a drag: shows a brief settle highlight. */
   settled?: boolean;
+  /** Completed in a list it no longer belongs to: fades out. Not in the Done list, where it stays. */
+  finishing?: boolean;
+  /** Several cards are being picked (to delete together): a tap picks or unpicks instead of opening. */
+  selecting?: boolean;
+  selected?: boolean;
+  /** Held down for a moment: starts picking, with this card. */
+  onLongPress?: (id: string) => void;
+  onSelect?: (id: string) => void;
 }
+
+const LONG_PRESS_MS = 500;
+const LONG_PRESS_SLOP_PX = 10; // moving further than this is a scroll or a drag, not a press
 
 const MAX_CHIPS = 4;
 
@@ -192,8 +203,71 @@ const cardClass = (task: Task) =>
   `group rounded-card bg-surface ${task.priority === "high" ? "border-s-door border-s-[3px]" : ""}`;
 
 /** The card in the list. While it is being dragged it stays behind as a dashed placeholder. */
-export function TaskCard({ draggable, leaving, settled, ...body }: Props) {
+export function TaskCard({
+  draggable,
+  leaving,
+  settled,
+  finishing,
+  selecting,
+  selected,
+  onLongPress,
+  onSelect,
+  ...body
+}: Props) {
   const { t } = useI18n();
+  const { id } = body.task;
+  const press = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number } | null>(null);
+  const longPressed = useRef(false);
+  const touch = useRef(false);
+
+  const cancelPress = () => {
+    if (press.current) clearTimeout(press.current.timer);
+    press.current = null;
+  };
+  useEffect(() => cancelPress, []);
+
+  function onPointerDown(e: React.PointerEvent) {
+    touch.current = e.pointerType === "touch";
+    longPressed.current = false;
+    // The grip is for dragging; a second finger or a right click is not a press.
+    if (!onLongPress || selecting || e.button > 0 || !e.isPrimary) return;
+    if ((e.target as HTMLElement).closest("[data-grip]")) return;
+    cancelPress();
+    press.current = {
+      x: e.clientX,
+      y: e.clientY,
+      timer: setTimeout(() => {
+        press.current = null;
+        longPressed.current = true;
+        navigator.vibrate?.(15);
+        onLongPress(id);
+      }, LONG_PRESS_MS),
+    };
+  }
+
+  function onPointerMove(e: React.PointerEvent) {
+    const p = press.current;
+    if (p && Math.hypot(e.clientX - p.x, e.clientY - p.y) > LONG_PRESS_SLOP_PX) cancelPress();
+  }
+
+  // Runs before the buttons inside: while picking, the whole card is one target.
+  function onClickCapture(e: React.MouseEvent) {
+    if (longPressed.current) {
+      longPressed.current = false; // the click that ends the long press itself
+    } else if (selecting) {
+      onSelect?.(id);
+    } else return;
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  // A tap anywhere that is not a control of its own opens the editor.
+  function onClick(e: React.MouseEvent) {
+    if ((e.target as HTMLElement).closest("button, a, input, select, textarea, [role=group]"))
+      return;
+    body.onOpen(id);
+  }
+
   const {
     attributes,
     listeners,
@@ -215,6 +289,7 @@ export function TaskCard({ draggable, leaving, settled, ...body }: Props) {
       {...attributes}
       {...listeners}
       aria-label={t("task.reorder")}
+      data-grip
       className="text-ink-2/70 hover:text-ink grid size-11 shrink-0 cursor-grab touch-none place-items-center active:cursor-grabbing"
     >
       <GripIcon />
@@ -226,9 +301,23 @@ export function TaskCard({ draggable, leaving, settled, ...body }: Props) {
       ref={setNodeRef}
       style={{ transform: CSS.Translate.toString(transform), transition }}
       data-dragging={isDragging || undefined}
-      className={`${cardClass(body.task)} card-in ${isDragging ? "drag-ghost" : ""} ${
-        leaving ? "card-out" : body.task.done ? "card-done-out" : ""
-      } ${settled ? "drop-settle" : ""}`}
+      data-selected={selected || undefined}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={cancelPress}
+      onPointerCancel={cancelPress}
+      onPointerLeave={cancelPress}
+      onContextMenu={(e) => {
+        // On a phone a long press also asks for the context menu; the press already has a meaning here.
+        if (touch.current) e.preventDefault();
+      }}
+      onClickCapture={onClickCapture}
+      onClick={onClick}
+      className={`${cardClass(body.task)} card-in cursor-pointer select-none [-webkit-touch-callout:none] ${
+        isDragging ? "drag-ghost" : ""
+      } ${leaving ? "card-out" : finishing ? "card-done-out" : ""} ${
+        settled ? "drop-settle" : ""
+      } ${selected ? "ring-door ring-2" : ""}`}
     >
       <TaskCardBody {...body} grip={grip} />
     </li>

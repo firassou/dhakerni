@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { usePush } from "@/lib/push/usePush";
-import { isFirefox } from "@/lib/push/support";
+import { isAndroid, isFirefox } from "@/lib/push/support";
 import { useToast } from "./Toast";
 
 const btn =
@@ -88,6 +88,13 @@ export function PushControls() {
         )}
       </div>
 
+      {state === "enabled" && typeof navigator !== "undefined" && (
+        <p className="t-micro text-ink-2">{t("push.repeats")}</p>
+      )}
+      {/* A sleeping phone may hold notifications back from a battery-restricted browser. */}
+      {state === "enabled" && typeof navigator !== "undefined" && isAndroid() && (
+        <p className="t-micro text-ink-2">{t("push.android")}</p>
+      )}
       {state === "enabled" && typeof navigator !== "undefined" && isFirefox() && (
         <p className="t-micro text-ink-2">{t("push.firefox")}</p>
       )}

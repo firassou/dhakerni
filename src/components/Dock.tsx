@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useRecorder, type RecorderError } from "@/lib/voice/useRecorder";
 import { ArrowUpIcon, CloseIcon, MicIcon, StopIcon } from "./Icon";
@@ -12,11 +12,15 @@ const CANCEL_DRAG_PX = 90; // dragging the held mic this far away cancels instea
 interface Props {
   busy: boolean;
   onSubmitText: (text: string) => void;
-  onAudio: (audio: Blob, durationMs: number) => void;
+  /** Resolves to what was heard, which lands in the field to be checked before sending. */
+  onAudio: (audio: Blob, durationMs: number) => Promise<string | null>;
   onVoiceError: (kind: RecorderError) => void;
 }
 
-/** Bottom dock, always within thumb reach. Hold the mic to talk, or tap to start and tap again to stop. */
+/**
+ * Bottom dock, always within thumb reach. Hold the mic to talk, or tap to start and tap again to stop.
+ * What was heard is written into the field, so it can be corrected before it is sent.
+ */
 export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
   const { t } = useI18n();
   const [text, setText] = useState("");
@@ -26,12 +30,15 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
   const startPoint = useRef({ x: 0, y: 0 });
   const downAt = useRef(0);
   const pointerDown = useRef(false);
+  const field = useRef<HTMLTextAreaElement>(null);
 
   const rec = useRecorder({
     onRecorded: (blob, ms) => {
       setTapMode(false);
       setArmed(false);
-      onAudio(blob, ms);
+      void onAudio(blob, ms).then((heard) => {
+        if (heard) setText((was) => (was.trim() ? `${was.trimEnd()}\n${heard}` : heard));
+      });
     },
     onError: (kind) => {
       setTapMode(false);
@@ -63,6 +70,22 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [active, cancel]);
+
+  // The field starts at one line and grows with the text, up to its max height; then it scrolls.
+  useLayoutEffect(() => {
+    const el = field.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [text, active]);
+
+  /** With a keyboard, Enter sends and Shift+Enter breaks the line. On a phone Enter breaks the line. */
+  function onFieldKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    e.preventDefault();
+    e.currentTarget.form?.requestSubmit();
+  }
 
   function submit(e: FormEvent) {
     e.preventDefault();
@@ -130,7 +153,9 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-4">
       <form
         onSubmit={submit}
-        className="glass safe-bottom pointer-events-auto mb-3 flex w-full max-w-xl items-center gap-2 rounded-[28px] p-2"
+        className={`glass safe-bottom pointer-events-auto mb-3 flex w-full max-w-xl gap-2 rounded-[28px] p-2 ${
+          active ? "items-center" : "items-end"
+        }`}
       >
         {active ? (
           <>
@@ -168,15 +193,18 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
             <label className="sr-only" htmlFor="quick-add">
               {t("dock.inputLabel")}
             </label>
-            <input
+            <textarea
+              ref={field}
               id="quick-add"
               data-bidi
+              rows={1}
               value={text}
               onChange={(e) => setText(e.target.value)}
+              onKeyDown={onFieldKeyDown}
               placeholder={busy ? t("dock.processing") : t("dock.placeholder")}
               autoComplete="off"
-              enterKeyHint="send"
-              className="placeholder:text-ink-2 min-w-0 flex-1 bg-transparent px-3 py-3 outline-none"
+              enterKeyHint="enter"
+              className="placeholder:text-ink-2 my-1 max-h-36 min-w-0 flex-1 resize-none overflow-y-auto bg-transparent px-3 py-3 outline-none"
             />
           </>
         )}
@@ -185,7 +213,7 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
           <button
             type="submit"
             aria-label={t("dock.send")}
-            className="bg-ink text-paper grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--t-fast)] active:scale-90"
+            className="bg-ink text-paper mb-1 grid size-12 shrink-0 place-items-center rounded-full transition-transform duration-[var(--t-fast)] active:scale-90"
           >
             <ArrowUpIcon />
           </button>

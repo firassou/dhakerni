@@ -20,4 +20,6 @@ export function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 }
 
+export const isAndroid = () => /Android/.test(navigator.userAgent);
+
 export const isFirefox = () => /Firefox\//.test(navigator.userAgent);
