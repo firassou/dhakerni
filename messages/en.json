@@ -59,9 +59,12 @@
     "privacy": {
       "title": "Privacy",
       "local": "Your tasks and what Dhakerni learns about you stay on this device.",
-      "server": "For reminders when the app is closed, our server keeps only your push address, an anonymous ID, the reminder time and a short title. It is encrypted and deleted right after the reminder fires."
+      "server": "For reminders when the app is closed, our server keeps only: your push address, an anonymous ID, the time each reminder fires, and a short title (cut to 80 characters). All of it is encrypted, each reminder is deleted right after it is sent, and turning notifications off deletes the rest."
     },
-    "anonymousId": "Anonymous ID"
+    "anonymousId": "Anonymous ID",
+    "version": "Version",
+    "madeBy": "Made with love ❤️ by Firas",
+    "reminders": "Reminders"
   },
   "time": {
     "today": "Today",
@@ -101,7 +104,8 @@
     "timeSet": "Time set",
     "learned": "Saved: {fact}. Change anytime.",
     "resurfaced": "Still need a time for “{title}”.",
-    "unclear": "Couldn't tell the time. Pick one of the options."
+    "unclear": "Couldn't tell the time. Pick one of the options.",
+    "triggered": "Reminders sent"
   },
   "voice": {
     "denied": "Microphone is blocked. Allow it in your browser settings, or type instead.",
@@ -153,5 +157,54 @@
   "facts": {
     "vague": "“{word}” = {n} min",
     "anchor": "{label} ≈ {time}"
+  },
+  "reminders": {
+    "label": "Reminders due",
+    "done": "Done",
+    "snooze": "Snooze {n} min",
+    "open": "Open"
+  },
+  "notify": {
+    "done": "Done",
+    "snooze": "Snooze {n}'",
+    "open": "Open",
+    "body": "Reminder",
+    "test": "Test reminder",
+    "testBody": "This is how a reminder looks."
+  },
+  "push": {
+    "title": "Notifications",
+    "status": {
+      "enabled": "On. Reminders arrive even when the app is closed.",
+      "default": "Off. Reminders only show while the app is open.",
+      "denied": "Blocked in your browser. Allow notifications for this site in the browser's site settings, then try again.",
+      "unsupported": "This browser can't receive background reminders. They show while the app is open.",
+      "serverOff": "Background reminders aren't set up on this server. They show while the app is open.",
+      "iosInstall": "On iPhone and iPad, reminders need the app on your Home Screen."
+    },
+    "enable": "Turn on",
+    "disable": "Turn off",
+    "test": "Send a test",
+    "testSent": "Test sent",
+    "ios": {
+      "title": "Add Dhakerni to your Home Screen",
+      "step1": "Tap the Share button in Safari.",
+      "step2": "Choose “Add to Home Screen”.",
+      "step3": "Open Dhakerni from the Home Screen, then turn on notifications here."
+    },
+    "banner": "Get reminders even when the app is closed.",
+    "bannerAction": "Turn on",
+    "bannerDismiss": "Not now",
+    "firefox": "Desktop Firefox shows no buttons on notifications. Click the notification to open the app, then use Done or Snooze there."
+  },
+  "trigger": {
+    "label": "Triggers",
+    "leave_work": "I'm leaving work",
+    "arrive_home": "I'm home",
+    "leave_home": "I'm leaving home",
+    "wake_up": "I'm up",
+    "after_breakfast": "I had breakfast",
+    "after_lunch": "I had lunch",
+    "after_dinner": "I had dinner"
   }
 }

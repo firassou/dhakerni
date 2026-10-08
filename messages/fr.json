@@ -59,9 +59,12 @@
     "privacy": {
       "title": "Confidentialité",
       "local": "Vos tâches et ce que Dhakerni apprend sur vous restent sur cet appareil.",
-      "server": "Pour vous rappeler quand l'app est fermée, notre serveur garde seulement votre adresse push, un identifiant anonyme, l'heure du rappel et un titre court. Tout est chiffré et supprimé juste après l'envoi."
+      "server": "Pour les rappels quand l'app est fermée, notre serveur garde seulement : votre adresse push, un identifiant anonyme, l'heure de chaque rappel et un titre court (coupé à 80 caractères). Tout est chiffré, chaque rappel est supprimé juste après l'envoi, et désactiver les notifications supprime le reste."
     },
-    "anonymousId": "Identifiant anonyme"
+    "anonymousId": "Identifiant anonyme",
+    "version": "Version",
+    "madeBy": "Fait avec amour ❤️ par Firas",
+    "reminders": "Rappels"
   },
   "time": {
     "today": "Aujourd'hui",
@@ -101,7 +104,8 @@
     "timeSet": "Heure définie",
     "learned": "Enregistré : {fact}. Modifiable à tout moment.",
     "resurfaced": "Il manque encore une heure pour « {title} ».",
-    "unclear": "Je n'ai pas compris l'heure. Choisissez une option."
+    "unclear": "Je n'ai pas compris l'heure. Choisissez une option.",
+    "triggered": "Rappels envoyés"
   },
   "voice": {
     "denied": "Le micro est bloqué. Autorisez-le dans les réglages du navigateur, ou écrivez.",
@@ -153,5 +157,54 @@
   "facts": {
     "vague": "« {word} » = {n} min",
     "anchor": "{label} ≈ {time}"
+  },
+  "reminders": {
+    "label": "Rappels à traiter",
+    "done": "Terminé",
+    "snooze": "Reporter {n} min",
+    "open": "Ouvrir"
+  },
+  "notify": {
+    "done": "Terminé",
+    "snooze": "Reporter {n}'",
+    "open": "Ouvrir",
+    "body": "Rappel",
+    "test": "Rappel de test",
+    "testBody": "Voici à quoi ressemble un rappel."
+  },
+  "push": {
+    "title": "Notifications",
+    "status": {
+      "enabled": "Activées. Les rappels arrivent même quand l'app est fermée.",
+      "default": "Désactivées. Les rappels s'affichent seulement quand l'app est ouverte.",
+      "denied": "Bloquées dans votre navigateur. Autorisez les notifications pour ce site dans ses réglages, puis réessayez.",
+      "unsupported": "Ce navigateur ne peut pas recevoir de rappels en arrière-plan. Ils s'affichent quand l'app est ouverte.",
+      "serverOff": "Les rappels en arrière-plan ne sont pas configurés sur ce serveur. Ils s'affichent quand l'app est ouverte.",
+      "iosInstall": "Sur iPhone et iPad, les rappels demandent que l'app soit sur l'écran d'accueil."
+    },
+    "enable": "Activer",
+    "disable": "Désactiver",
+    "test": "Envoyer un test",
+    "testSent": "Test envoyé",
+    "ios": {
+      "title": "Ajoutez Dhakerni à l'écran d'accueil",
+      "step1": "Touchez le bouton Partager dans Safari.",
+      "step2": "Choisissez « Sur l'écran d'accueil ».",
+      "step3": "Ouvrez Dhakerni depuis l'écran d'accueil, puis activez les notifications ici."
+    },
+    "banner": "Recevez les rappels même quand l'app est fermée.",
+    "bannerAction": "Activer",
+    "bannerDismiss": "Pas maintenant",
+    "firefox": "Firefox sur ordinateur n'affiche pas de boutons sur les notifications. Cliquez sur la notification pour ouvrir l'app, puis utilisez Terminé ou Reporter."
+  },
+  "trigger": {
+    "label": "Déclencheurs",
+    "leave_work": "Je quitte le travail",
+    "arrive_home": "Je suis rentré",
+    "leave_home": "Je sors de chez moi",
+    "wake_up": "Je suis réveillé",
+    "after_breakfast": "J'ai pris le petit-déj",
+    "after_lunch": "J'ai déjeuné",
+    "after_dinner": "J'ai dîné"
   }
 }
