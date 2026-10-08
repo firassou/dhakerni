@@ -2,6 +2,30 @@
 
 All notable changes to this project are documented here. Format: Keep a Changelog; versions: SemVer.
 
+## [0.8.0] - 2026-10-08
+
+### Added
+
+- A smarter parser: clean short titles with the full idea in the description, quantities and checkable items
+  ("two juice" becomes Buy juice, 2x juice), grouping of things bought together, optional suggested steps for big
+  goals, and decision help with a clearly labelled suggestion you can disagree with.
+- Items, steps, suggestions and decisions on the task card and in the editor (check items off straight from the card).
+- A casual time hint on upcoming tasks: "in 25 minutes", "tomorrow", "in 3 days".
+- An opening animation: the list-and-bell icon draws itself, the bell rings, the blue collapses toward the mic.
+  Once per session, tap or any key skips it, off for reduced motion. The installed app's launch colour matches it.
+- The "Dhakerni" header links home (and returns to Today), on Home, Settings and Memory.
+- Clear feedback for dragging: lifted card, placeholder, gliding neighbours, drop highlight, vibration and spoken
+  announcements. Deleted and completed cards now animate out.
+
+### Fixed
+
+- The favicon: production served the framework's default icon first. Now the real icon, with cache-busting URLs.
+- A crash ("task.items is undefined") on tasks saved by older versions.
+- Dragging only snapped at the end because an entrance animation overrode the drag movement.
+- Settings could reset a just-chosen city or learning switch (a stale read landing late).
+- The parser sometimes translated Derja titles, dropped Latin-letter time words like "ghodwa", and merged two
+  actions into one task.
+
 ## [0.7.0] - 2026-10-08
 
 ### Added

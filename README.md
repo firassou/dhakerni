@@ -3,8 +3,9 @@
 Voice-first todo and reminder app for Tunisian Arabic (Derja), French and English. You speak or type;
 it turns what you said into tasks and reminders.
 
-Status: **v0.7.0**: tasks, voice and typed capture, clarifying questions, reminders with Web Push, a visible
-learned profile, backup, prayer-time words, accessibility checks. See [CHANGELOG](CHANGELOG.md). See [CHANGELOG](CHANGELOG.md).
+Status: **v0.8.0**: voice and typed capture that understands the idea (clean titles, descriptions, quantities,
+checklists, steps, decision help), clarifying questions, reminders with Web Push, a visible learned profile,
+backup, prayer-time words, an opening animation, accessibility checks. See [CHANGELOG](CHANGELOG.md). See [CHANGELOG](CHANGELOG.md).
 
 ## Setup
 
@@ -24,7 +25,7 @@ npm run eval                 # parser accuracy on evals/cases.json (uses real AP
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm test`                         | Unit tests: time resolution, learning rules, reminders, encryption, backup, prayer times                                                  |
 | `npm run test:e2e`                 | Playwright on a phone and a desktop browser: voice (fake microphone), questions, memory, push settings, keyboard, WCAG AA with axe, speed |
-| `npm run eval`                     | Parser accuracy on 52 utterances (real API calls)                                                                                         |
+| `npm run eval`                     | Parser accuracy on 68 utterances (real API calls)                                                                                         |
 | `node scripts/live-push-check.mjs` | Real Web Push round trip in Google Chrome (needs `npm run dev:cron`)                                                                      |
 
 ## Environment variables

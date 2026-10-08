@@ -47,7 +47,8 @@
   },
   "nav": {
     "settings": "الإعدادات",
-    "back": "رجوع"
+    "back": "رجوع",
+    "home": "الرئيسية"
   },
   "settings": {
     "title": "الإعدادات",
@@ -126,18 +127,50 @@
       "normal": "عادية",
       "high": "مهمة برشا"
     },
-    "assumedHint": "تعلّمتها منك. اضغط باش تبدّل."
+    "assumedHint": "تعلّمتها منك. اضغط باش تبدّل.",
+    "checkItem": "علّم {item}",
+    "uncheckItem": "شيل العلامة من {item}",
+    "moreItems": "+{n} أخرين",
+    "stepsProgress": "{done}/{total} خطوات",
+    "decisionBadge": "قرار",
+    "suggestionLabel": "اقتراح",
+    "chosenLabel": "اخترت: {option}",
+    "drag": {
+      "pickedUp": "شدّيت {title}. المكان {pos} من {total}.",
+      "movedTo": "{title} تحرّكت للمكان {pos} من {total}.",
+      "dropped": "{title} تحطّت في المكان {pos} من {total}.",
+      "cancelled": "تلغات الحركة. {title} رجعت للمكان {pos}."
+    }
   },
   "editor": {
     "title": "المهمة",
     "name": "العنوان",
-    "notes": "ملاحظات",
+    "notes": "الوصف",
     "due": "الوقت",
     "clearTime": "امسح الوقت",
     "priority": "الأولوية",
     "list": "القائمة",
     "delete": "امسح المهمة",
-    "close": "سكّر"
+    "close": "سكّر",
+    "items": "الحاجات",
+    "addItem": "زيد حاجة",
+    "itemName": "الحاجة",
+    "qty": "الكمية",
+    "removeItem": "شيل {item}",
+    "steps": "الخطوات",
+    "addStep": "زيد خطوة",
+    "stepTitle": "الخطوة",
+    "removeStep": "شيل الخطوة: {step}",
+    "suggestions": "خطوات مقترحة",
+    "suggestionsHelp": "أفكار من الذكاء الاصطناعي. زيد اللي تحبهم.",
+    "addSuggestion": "زيد الخطوة: {text}",
+    "dismissSuggestion": "تجاهل: {text}",
+    "dismissAll": "تجاهل الكل",
+    "decision": "قرار",
+    "options": "الخيارات",
+    "pick": "اختار {option}",
+    "picked": "مختار: {option}",
+    "add": "زيد"
   },
   "toast": {
     "added": "تزادت المهمة",

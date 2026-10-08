@@ -102,7 +102,29 @@ export function toTasks(
     return Task.parse({
       id: crypto.randomUUID(),
       title: t.title.trim(),
-      notes: t.notes ?? "",
+      notes: t.description?.trim() ?? "",
+      items: (t.items ?? [])
+        .filter((it) => it.name.trim())
+        .map((it) => ({
+          id: crypto.randomUUID(),
+          name: it.name.trim(),
+          qty: it.qty ?? null,
+          unit: it.unit?.trim() || null,
+          done: false,
+        })),
+      suggestions: (t.suggestedSteps ?? [])
+        .map((x) => x.trim())
+        .filter(Boolean)
+        .slice(0, 4),
+      decision:
+        t.decision && t.decision.options.length >= 2
+          ? {
+              options: t.decision.options.map((o) => o.trim()),
+              recommendation: t.decision.recommendation?.trim() || null,
+              reason: t.decision.reason?.trim() || null,
+              chosen: null,
+            }
+          : null,
       dueAt,
       reminders: dueAt ? [dueAt] : [],
       priority: t.priority ?? opts.categoryPriority?.[list] ?? "normal",
@@ -114,7 +136,11 @@ export function toTasks(
             byWeekday: t.recurrence.byWeekday ?? undefined,
           }
         : null,
-      subtasks: t.subtasks.map((title) => ({ id: crypto.randomUUID(), title, done: false })),
+      subtasks: (t.subtasks ?? []).map((title) => ({
+        id: crypto.randomUUID(),
+        title,
+        done: false,
+      })),
       uncertain,
       needs,
       assumed,

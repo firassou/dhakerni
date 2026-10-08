@@ -49,9 +49,61 @@ export const When = z.object({
 });
 export type When = z.infer<typeof When>;
 
+export const ParsedItem = z.object({
+  name: z
+    .string()
+    .min(1)
+    .describe("The thing, singular, in the language spoken. No quantity in it."),
+  qty: z
+    .number()
+    .positive()
+    .nullable()
+    .describe("How many, as a number. null when no quantity was said."),
+  unit: z
+    .string()
+    .nullable()
+    .describe("kg, litre, bottle, box... in the language spoken. null for plain counts."),
+});
+
+export const ParsedDecision = z.object({
+  options: z.array(z.string().min(1)).min(2).max(4).describe("The choices, each a short phrase."),
+  recommendation: z
+    .string()
+    .nullable()
+    .describe(
+      "One of the options, only when what the person said is enough to lean one way. Else null.",
+    ),
+  reason: z
+    .string()
+    .nullable()
+    .describe("One short sentence of reasoning that uses only what they said."),
+});
+
 export const ParsedTask = z.object({
-  title: z.string().min(1).describe("Short task text in the language spoken. Never translate."),
-  notes: z.string().nullable(),
+  title: z
+    .string()
+    .min(1)
+    .describe(
+      "Short, clear action (verb + object, at most about 6 words), in the person's own language and script. No time words, filler or quantities. Never translate or formalize.",
+    ),
+  description: z
+    .string()
+    .nullable()
+    .describe(
+      "A clear restatement of the whole idea in the person's language and script, keeping every detail they gave: order, conditions, people, places, reasons. Adds nothing they did not say. null only when the title already says everything.",
+    ),
+  items: z
+    .array(ParsedItem)
+    .describe(
+      "Things with quantities or a list of things (shopping, packing). Empty for ordinary tasks.",
+    ),
+  suggestedSteps: z
+    .array(z.string().min(1))
+    .max(4)
+    .describe("Optional next steps for a big goal (a trip, an event). Empty for ordinary tasks."),
+  decision: ParsedDecision.nullable().describe(
+    "Only when the person is undecided between options or asks what to do.",
+  ),
   priority: z
     .enum(["low", "normal", "high"])
     .nullable()

@@ -769,6 +769,321 @@
           }
         ]
       }
+    },
+    {
+      "id": "sm01",
+      "category": "smart",
+      "text": "j'achète deux bouteilles d'eau et un pain",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "items": [
+            {
+              "name": ["eau", "water"],
+              "qty": 2
+            },
+            {
+              "name": ["pain"],
+              "qty": 1
+            }
+          ],
+          "titleExcludes": ["deux", "2"]
+        }
+      }
+    },
+    {
+      "id": "sm02",
+      "category": "smart",
+      "text": "nheb nechri 3 kilo tofe7 w zouz 7lib",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "items": [
+            {
+              "name": ["tofe7", "tof7", "pomme", "apple", "تفاح", "tufe7", "tuf7", "tfe7"],
+              "qty": 3
+            },
+            {
+              "name": ["7lib", "lait", "milk", "حليب"],
+              "qty": 2
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sm03",
+      "category": "smart",
+      "text": "buy 6 eggs",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "items": [
+            {
+              "name": ["egg"],
+              "qty": 6
+            }
+          ],
+          "titleExcludes": ["6", "six"]
+        }
+      }
+    },
+    {
+      "id": "sm04",
+      "category": "smart",
+      "text": "نشري اتنين كوكا كولا",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "items": [
+            {
+              "name": ["كوكا", "coca", "cola", "كولا"],
+              "qty": 2
+            }
+          ],
+          "titleExcludes": ["اتنين", "2"]
+        }
+      }
+    },
+    {
+      "id": "sm05",
+      "category": "smart",
+      "text": "lazem nechri el 7lib wel khobz wel bidh",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "itemCount": 3,
+          "maxTasks": 1
+        }
+      }
+    },
+    {
+      "id": "sm06",
+      "category": "smart",
+      "text": "n3adi 3al post w nechri el khobz",
+      "expect": {
+        "titles": [[""], [""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "twoTasks": true,
+          "timeAny": true
+        }
+      }
+    },
+    {
+      "id": "sm07",
+      "category": "smart",
+      "text": "nrawah mel khedma nakhdh douch w ba3ed nwalli l'ami 9bal ma ykoun el 3cha jehez",
+      "expect": {
+        "titles": [[""], [""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ],
+        "smart": {
+          "descDistinct": true,
+          "descHas": [["douch", "dush", "دوش"]],
+          "timeAny": true,
+          "anyTaskCount": true
+        }
+      }
+    },
+    {
+      "id": "sm08",
+      "category": "smart",
+      "text": "9bal ma yjini sami nbadel 7wayji",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ],
+        "smart": {
+          "descHas": [["sami", "سامي"]],
+          "titleShorter": false,
+          "descMin": true
+        }
+      }
+    },
+    {
+      "id": "sm09",
+      "category": "smart",
+      "text": "ma n3rafch nakhtar bin tlifoun jdid wala iPhone 15 mel 9dim, kol 7aja ghalya",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "decision": true,
+          "decisionOptions": 2
+        }
+      }
+    },
+    {
+      "id": "sm10",
+      "category": "smart",
+      "text": "Should I take the train or drive to Sfax? It's a 3 hour drive and I'm tired",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "decision": true,
+          "decisionOptions": 2,
+          "recommendation": true
+        }
+      }
+    },
+    {
+      "id": "sm11",
+      "category": "smart",
+      "text": "Je dois organiser l'anniversaire de ma fille samedi",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-10T08:00"
+          }
+        ],
+        "smart": {
+          "minSuggestions": 2
+        }
+      }
+    },
+    {
+      "id": "sm12",
+      "category": "smart",
+      "text": "nsakker el dhaw",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "noExtras": true
+        }
+      }
+    },
+    {
+      "id": "sm13",
+      "category": "smart",
+      "text": "Appeler le plombier",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "noExtras": true
+        }
+      }
+    },
+    {
+      "id": "sm14",
+      "category": "smart",
+      "text": "d'abord réserver l'hôtel puis acheter les billets puis faire les valises",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "minSteps": 2,
+          "maxTasks": 1
+        }
+      }
+    },
+    {
+      "id": "sm15",
+      "category": "smart",
+      "text": "should I take antibiotics or wait for the flu to pass",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "smart": {
+          "decision": true,
+          "decisionOptions": 2,
+          "noRecommendation": true
+        }
+      }
+    },
+    {
+      "id": "sm16",
+      "category": "smart",
+      "text": "lazem nkhalles el facture STEG ghodwa sinon yaqt3ou el courant",
+      "expect": {
+        "titles": [[""]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          }
+        ],
+        "priority": "high",
+        "smart": {}
+      }
     }
   ]
 }

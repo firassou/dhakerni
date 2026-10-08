@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { deleteFact, forgetAll, isUsable, listFacts, updateFactValue } from "@/lib/memory/profile";
 import { describeFact } from "@/lib/questions/describe";
 import type { ProfileFact } from "@/lib/schemas";
+import { Brand } from "./Brand";
 import { BackIcon, CloseIcon, PencilIcon } from "./Icon";
 import { LearningSwitch } from "./LearningSwitch";
 import { useToast } from "./Toast";
@@ -98,6 +99,7 @@ export function MemoryScreen() {
           <BackIcon />
         </Link>
         <h1 className="t-lead">{t("memory.title")}</h1>
+        <Brand className="ms-auto" />
       </header>
 
       <p className="text-ink-2 mb-4">{t("memory.intro")}</p>

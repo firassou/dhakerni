@@ -47,7 +47,8 @@
   },
   "nav": {
     "settings": "Réglages",
-    "back": "Retour"
+    "back": "Retour",
+    "home": "Accueil"
   },
   "settings": {
     "title": "Réglages",
@@ -126,18 +127,50 @@
       "normal": "Normale",
       "high": "Haute"
     },
-    "assumedHint": "Appris de vous. Touchez pour modifier."
+    "assumedHint": "Appris de vous. Touchez pour modifier.",
+    "checkItem": "Cocher {item}",
+    "uncheckItem": "Décocher {item}",
+    "moreItems": "+{n} de plus",
+    "stepsProgress": "{done}/{total} étapes",
+    "decisionBadge": "Décision",
+    "suggestionLabel": "Suggestion",
+    "chosenLabel": "Vous avez choisi : {option}",
+    "drag": {
+      "pickedUp": "{title} saisie. Position {pos} sur {total}.",
+      "movedTo": "{title} déplacée en position {pos} sur {total}.",
+      "dropped": "{title} déposée en position {pos} sur {total}.",
+      "cancelled": "Déplacement annulé. {title} est revenue en position {pos}."
+    }
   },
   "editor": {
     "title": "Tâche",
     "name": "Titre",
-    "notes": "Notes",
+    "notes": "Description",
     "due": "Échéance",
     "clearTime": "Effacer l'heure",
     "priority": "Priorité",
     "list": "Liste",
     "delete": "Supprimer la tâche",
-    "close": "Fermer"
+    "close": "Fermer",
+    "items": "Articles",
+    "addItem": "Ajouter un article",
+    "itemName": "Article",
+    "qty": "Quantité",
+    "removeItem": "Retirer {item}",
+    "steps": "Étapes",
+    "addStep": "Ajouter une étape",
+    "stepTitle": "Étape",
+    "removeStep": "Retirer l'étape : {step}",
+    "suggestions": "Étapes suggérées",
+    "suggestionsHelp": "Des idées de l'IA. Ajoutez celles que vous voulez.",
+    "addSuggestion": "Ajouter l'étape : {text}",
+    "dismissSuggestion": "Ignorer : {text}",
+    "dismissAll": "Tout ignorer",
+    "decision": "Décision",
+    "options": "Options",
+    "pick": "Choisir {option}",
+    "picked": "Choisi : {option}",
+    "add": "Ajouter"
   },
   "toast": {
     "added": "Tâche ajoutée",

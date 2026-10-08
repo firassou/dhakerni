@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { toTasks } from "./apply";
-import type { ParseResult, When } from "./schema";
+import type { ParsedTask, ParseResult, When } from "./schema";
 
 const now = new Date(2026, 9, 8, 10, 0);
 const when = (p: Partial<When>): When => ({
@@ -16,9 +16,12 @@ const when = (p: Partial<When>): When => ({
   confidence: 0.9,
   ...p,
 });
-const task = (title: string, reminderId: string | null) => ({
+const task = (title: string, reminderId: string | null): ParsedTask => ({
   title,
-  notes: null,
+  description: null,
+  items: [],
+  suggestedSteps: [],
+  decision: null,
   priority: null,
   list: null,
   reminderId,
@@ -88,5 +91,113 @@ describe("toTasks", () => {
     expect(a.dueAt).toBe(new Date(2026, 9, 8, 17, 0).toISOString());
     expect(a.assumed).toEqual({ key: "anchor.leave_work", value: "17:00" });
     expect(a.needs).toBeNull();
+  });
+});
+
+describe("smarter tasks", () => {
+  const withReminder = (t: ParsedTask): ParseResult => ({ tasks: [t], reminders: [] });
+
+  it("keeps the title short and puts the full idea in the description", () => {
+    const [a] = toTasks(
+      withReminder({ ...task("nbadel 7wayji", null), description: "nbadel 7wayji 9bal ma tji x" }),
+      now,
+      [],
+    );
+    expect(a.title).toBe("nbadel 7wayji");
+    expect(a.notes).toBe("nbadel 7wayji 9bal ma tji x");
+  });
+
+  it("turns 'two juice' into a quantity, not part of the title", () => {
+    const [a] = toTasks(
+      withReminder({ ...task("Buy juice", null), items: [{ name: "juice", qty: 2, unit: null }] }),
+      now,
+      [],
+    );
+    expect(a.title).toBe("Buy juice");
+    expect(a.items).toMatchObject([{ name: "juice", qty: 2, unit: null, done: false }]);
+    expect(a.items[0].id).toBeTruthy();
+  });
+
+  it("drops empty items and keeps units", () => {
+    const [a] = toTasks(
+      withReminder({
+        ...task("اشري", null),
+        items: [
+          { name: "  ", qty: 1, unit: null },
+          { name: "حليب", qty: 2, unit: " ليتر " },
+        ],
+      }),
+      now,
+      [],
+    );
+    expect(a.items).toHaveLength(1);
+    expect(a.items[0]).toMatchObject({ name: "حليب", qty: 2, unit: "ليتر" });
+  });
+
+  it("keeps suggestions separate from real steps, capped at 4", () => {
+    const [a] = toTasks(
+      withReminder({
+        ...task("Travel to Sfax", null),
+        subtasks: ["Pack"],
+        suggestedSteps: ["Book transport", "Book hotel", "Check weather", "Tell family", "Extra"],
+      }),
+      now,
+      [],
+    );
+    expect(a.subtasks.map((x) => x.title)).toEqual(["Pack"]);
+    expect(a.suggestions).toEqual(["Book transport", "Book hotel", "Check weather", "Tell family"]);
+  });
+
+  it("carries a decision with its suggestion, nothing chosen yet", () => {
+    const [a] = toTasks(
+      withReminder({
+        ...task("Decide: new phone or repair", null),
+        decision: {
+          options: ["New phone", "Repair"],
+          recommendation: "Repair",
+          reason: "It is only a screen.",
+        },
+      }),
+      now,
+      [],
+    );
+    expect(a.decision).toEqual({
+      options: ["New phone", "Repair"],
+      recommendation: "Repair",
+      reason: "It is only a screen.",
+      chosen: null,
+    });
+  });
+
+  it("ignores a decision with fewer than two options", () => {
+    const [a] = toTasks(
+      withReminder({
+        ...task("x", null),
+        decision: { options: ["only one"], recommendation: null, reason: null } as never,
+      }),
+      now,
+      [],
+    );
+    expect(a.decision).toBeNull();
+  });
+
+  it("still accepts an older-style response without the new fields", () => {
+    const old = {
+      tasks: [
+        {
+          title: "x",
+          notes: null,
+          priority: null,
+          list: null,
+          reminderId: null,
+          recurrence: null,
+          subtasks: [],
+          uncertain: [],
+        },
+      ],
+      reminders: [],
+    } as unknown as ParseResult;
+    const [a] = toTasks(old, now, []);
+    expect(a).toMatchObject({ title: "x", notes: "", items: [], suggestions: [], decision: null });
   });
 });

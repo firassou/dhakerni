@@ -8,7 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#f2f5f4",
+    // The blue of the intro: the phone's own launch screen uses this colour, so the two flow into each other.
+    background_color: "#2152d1",
     theme_color: "#f2f5f4",
     lang: "en",
     icons: [
