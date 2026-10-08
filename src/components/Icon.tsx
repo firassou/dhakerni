@@ -77,3 +77,9 @@ export const CloseIcon = (p: P) => (
     <path d="M6 6l12 12M18 6L6 18" />
   </svg>
 );
+
+export const StopIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="6" y="6" width="12" height="12" rx="2.5" fill="currentColor" />
+  </svg>
+);

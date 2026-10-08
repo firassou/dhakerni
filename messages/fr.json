@@ -36,7 +36,12 @@
     "talk": "Maintenir pour parler",
     "inputLabel": "Ajouter une tâche",
     "placeholder": "Ou écrivez ici…",
-    "send": "Ajouter"
+    "send": "Ajouter",
+    "release": "Relâchez pour envoyer",
+    "listening": "J'écoute…",
+    "stop": "Arrêter et envoyer",
+    "cancel": "Annuler l'enregistrement",
+    "processing": "Je comprends…"
   },
   "nav": {
     "settings": "Réglages",
@@ -92,5 +97,19 @@
     "deleted": "Tâche supprimée",
     "done": "Marquée comme terminée",
     "undo": "Annuler"
+  },
+  "voice": {
+    "denied": "Le micro est bloqué. Autorisez-le dans les réglages du navigateur, ou écrivez.",
+    "unsupported": "La voix demande une connexion sécurisée (https) et un micro. Vous pouvez écrire.",
+    "failed": "Impossible de démarrer le micro. Réessayez ou écrivez.",
+    "tooShort": "Trop court. Maintenez le micro pendant que vous parlez.",
+    "empty": "Rien entendu. Réessayez.",
+    "noTask": "Aucune tâche trouvée. Essayez de reformuler."
+  },
+  "capture": {
+    "fallback": "Je n'ai pas compris, la tâche est enregistrée telle quelle.",
+    "rateLimited": "Trop de demandes. Attendez une minute et réessayez.",
+    "transcribeFailed": "Impossible de traiter l'enregistrement. Réessayez ou écrivez.",
+    "addedMany": "{count} tâches ajoutées"
   }
 }
