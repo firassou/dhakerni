@@ -1,0 +1,718 @@
+{
+  "now": "2026-10-08T10:00:00+01:00",
+  "timeZone": "Africa/Tunis",
+  "cases": [
+    {
+      "id": "t01",
+      "category": "time-derja",
+      "text": "غدوة الصباح نمشي للطبيب",
+      "expect": {
+        "titles": [["طبيب"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t02",
+      "category": "time-derja",
+      "text": "فكرني نهار الجمعة العشية نشري الخبز",
+      "expect": {
+        "titles": [["خبز"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T17:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t03",
+      "category": "time-derja",
+      "text": "بعد غدوة نخلص الفاتورة",
+      "expect": {
+        "titles": [["فاتور"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-10T08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t04",
+      "category": "time-derja",
+      "text": "نهار الإثنين الصباح عندي rendez-vous مع المحامي",
+      "expect": {
+        "titles": [["rendez-vous", "rdv", "محامي"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-12T08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t05",
+      "category": "time-derja",
+      "text": "اليوم الساعة 5 عشية نعدي على بنتي",
+      "expect": {
+        "titles": [["بنت"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T17:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t06",
+      "category": "time-derja",
+      "text": "غدوة الساعة 7 و نص نفيق الصغير",
+      "expect": {
+        "titles": [["نفيق", "صغير"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T07:30"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t07",
+      "category": "time-derja",
+      "text": "الليلة نكلم خويا",
+      "expect": {
+        "titles": [["خوي", "نكلم"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T21:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t08",
+      "category": "time-derja",
+      "text": "بعد 10 دقايق نطفي الفرن",
+      "expect": {
+        "titles": [["فرن"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T10:10"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t09",
+      "category": "time-derja",
+      "text": "بعد ساعة نتفقد الخبز",
+      "expect": {
+        "titles": [["خبز"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T11:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "t10",
+      "category": "time-derja",
+      "text": "بعد نص ساعة نعيط لماما",
+      "expect": {
+        "titles": [["ماما", "نعيط"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T10:30"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f01",
+      "category": "time-french",
+      "text": "Rappelle-moi d'appeler le plombier demain à 14h",
+      "expect": {
+        "titles": [["plombier"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T14:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f02",
+      "category": "time-french",
+      "text": "Dans 20 minutes sortir le linge",
+      "expect": {
+        "titles": [["linge"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T10:20"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f03",
+      "category": "time-french",
+      "text": "Vendredi matin payer le loyer",
+      "expect": {
+        "titles": [["loyer"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f04",
+      "category": "time-french",
+      "text": "Le 25 décembre à 9h appeler mamie",
+      "expect": {
+        "titles": [["mamie"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-12-25T09:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f05",
+      "category": "vague",
+      "text": "Tout à l'heure envoyer le rapport",
+      "expect": {
+        "titles": [["rapport"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "vague"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f06",
+      "category": "no-time",
+      "text": "Acheter du lait",
+      "expect": {
+        "titles": [["lait"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e01",
+      "category": "time-english",
+      "text": "Remind me to call mom in ten minutes",
+      "expect": {
+        "titles": [["mom"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T10:10"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e02",
+      "category": "time-english",
+      "text": "Tomorrow at 3pm dentist appointment",
+      "expect": {
+        "titles": [["dentist"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T15:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e03",
+      "category": "vague",
+      "text": "Later I need to water the plants",
+      "expect": {
+        "titles": [["plant"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "vague"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e04",
+      "category": "time-english",
+      "text": "Submit the report by Monday morning",
+      "expect": {
+        "titles": [["report"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-12T08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e05",
+      "category": "no-time",
+      "text": "Buy groceries",
+      "expect": {
+        "titles": [["grocer"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m01",
+      "category": "mixed",
+      "text": "نحضّر le rapport غدوة الصباح",
+      "expect": {
+        "titles": [["rapport"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m02",
+      "category": "mixed",
+      "text": "غدوة à 9h عندي réunion مع الفريق",
+      "expect": {
+        "titles": [["réunion", "reunion"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T09:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m03",
+      "category": "mixed",
+      "text": "فكرني نهار السبت نعيط للـ plombier",
+      "expect": {
+        "titles": [["plombier"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-10T08:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "m04",
+      "category": "mixed",
+      "text": "بعد 15 دقيقة نبعث le mail لل client",
+      "expect": {
+        "titles": [["mail"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T10:15"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v01",
+      "category": "vague",
+      "text": "بعد شوية باش نعمل réunion و نبعث الميل",
+      "expect": {
+        "titles": [
+          ["réunion", "reunion"],
+          ["ميل", "mail"]
+        ],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "vague"
+          }
+        ],
+        "shared": true
+      }
+    },
+    {
+      "id": "v02",
+      "category": "vague",
+      "text": "شوية نشري الحليب",
+      "expect": {
+        "titles": [["حليب"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "vague"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v03",
+      "category": "vague",
+      "text": "بعدين نرد على الميساج",
+      "expect": {
+        "titles": [["ميساج", "رد"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "vague"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v04",
+      "category": "vague",
+      "text": "Remind me later to call John",
+      "expect": {
+        "titles": [["john"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "vague"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a01",
+      "category": "anchor",
+      "text": "بعد كي نروح مالخدمة نعدي على السوبرمارشي",
+      "expect": {
+        "titles": [["سوبرمارشي"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a02",
+      "category": "anchor",
+      "text": "كي نوصل للدار نشعل الغسالة",
+      "expect": {
+        "titles": [["غسال"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a03",
+      "category": "anchor",
+      "text": "بعد الفطور نشرب الدوا",
+      "expect": {
+        "titles": [["دوا"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a04",
+      "category": "anchor",
+      "text": "بعد المغرب نعيط لخالتي",
+      "expect": {
+        "titles": [["خالت"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a05",
+      "category": "anchor",
+      "text": "Quand je rentre à la maison, appeler le médecin",
+      "expect": {
+        "titles": [["médecin", "medecin"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "x01",
+      "category": "multi",
+      "text": "غدوة الصباح نشري الخبز و نعدي على البوسطة",
+      "expect": {
+        "titles": [["خبز"], ["بوسط"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          }
+        ],
+        "shared": true
+      }
+    },
+    {
+      "id": "x02",
+      "category": "multi",
+      "text": "بعد 10 دقايق نطفي الفرن و نكلم ماما",
+      "expect": {
+        "titles": [["فرن"], ["ماما"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T10:10"
+          }
+        ],
+        "shared": true
+      }
+    },
+    {
+      "id": "x03",
+      "category": "multi",
+      "text": "غدوة نشري الخبز و نهار السبت نخلص الفاتورة",
+      "expect": {
+        "titles": [["خبز"], ["فاتور"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          },
+          {
+            "status": "resolved",
+            "at": "2026-10-10T08:00"
+          }
+        ],
+        "shared": false
+      }
+    },
+    {
+      "id": "p01",
+      "category": "priority",
+      "text": "لازم نخلص الفاتورة اليوم، مهم برشا",
+      "expect": {
+        "titles": [["فاتور"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "priority": "high"
+      }
+    },
+    {
+      "id": "p02",
+      "category": "priority",
+      "text": "URGENT appeler le médecin demain à 8h",
+      "expect": {
+        "titles": [["médecin", "medecin"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          }
+        ],
+        "priority": "high"
+      }
+    },
+    {
+      "id": "p03",
+      "category": "priority",
+      "text": "Si j'ai le temps, ranger le garage",
+      "expect": {
+        "titles": [["garage"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "none"
+          }
+        ],
+        "priority": "low"
+      }
+    },
+    {
+      "id": "r01",
+      "category": "recurrence",
+      "text": "كل يوم الصباح نشرب الدوا",
+      "expect": {
+        "titles": [["دوا"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          }
+        ],
+        "recurrence": "daily"
+      }
+    },
+    {
+      "id": "r02",
+      "category": "recurrence",
+      "text": "Chaque lundi à 9h réunion d'équipe",
+      "expect": {
+        "titles": [["réunion", "reunion"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-12T09:00"
+          }
+        ],
+        "recurrence": "weekly"
+      }
+    },
+    {
+      "id": "fu01",
+      "category": "follow-up",
+      "text": "نص ساعة",
+      "expect": {
+        "titles": [["réunion", "reunion"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T10:30"
+          }
+        ]
+      },
+      "followUp": {
+        "taskTitle": "نعمل réunion",
+        "question": "إمتى تحب نذكرك؟"
+      }
+    },
+    {
+      "id": "fu02",
+      "category": "follow-up",
+      "text": "الليلة",
+      "expect": {
+        "titles": [["خبز"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T21:00"
+          }
+        ]
+      },
+      "followUp": {
+        "taskTitle": "نشري الخبز",
+        "question": "إمتى تحب نذكرك؟"
+      }
+    },
+    {
+      "id": "fu03",
+      "category": "follow-up",
+      "text": "ساعة",
+      "expect": {
+        "titles": [["ميل", "mail"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T11:00"
+          }
+        ]
+      },
+      "followUp": {
+        "taskTitle": "نبعث الميل",
+        "question": "إمتى تحب نذكرك؟"
+      }
+    },
+    {
+      "id": "fu04",
+      "category": "follow-up",
+      "text": "الساعة 5 و نص",
+      "expect": {
+        "titles": [["سوبرمارشي"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T17:30"
+          }
+        ]
+      },
+      "followUp": {
+        "taskTitle": "نعدي على السوبرمارشي",
+        "question": "وقتاش تخرج من الخدمة عادة؟"
+      }
+    },
+    {
+      "id": "fu05",
+      "category": "follow-up",
+      "text": "dans une heure",
+      "expect": {
+        "titles": [["rapport"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-08T11:00"
+          }
+        ]
+      },
+      "followUp": {
+        "taskTitle": "envoyer le rapport",
+        "question": "Dans combien de temps ?"
+      }
+    },
+    {
+      "id": "fu06",
+      "category": "follow-up",
+      "text": "tomorrow morning",
+      "expect": {
+        "titles": [["john"]],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          }
+        ]
+      },
+      "followUp": {
+        "taskTitle": "call John",
+        "question": "When should I remind you?"
+      }
+    }
+  ]
+}
