@@ -199,8 +199,9 @@
     transform: none;
   }
 }
+/* "backwards", not "both": keeping the end state would pin transform and fight the drag movement. */
 .card-in {
-  animation: card-in var(--t-base) var(--ease-spring) both;
+  animation: card-in var(--t-base) var(--ease-spring) backwards;
 }
 
 @keyframes toast-in {
@@ -289,4 +290,239 @@
 }
 .alert-in {
   animation: alert-in var(--t-slow) var(--ease-spring) both;
+}
+
+/*
+ * Intro. Hidden unless the script in <head> sets data-intro="on" on <html>, so a failure there can
+ * never leave the app covered. Timeline: frame draws, rows pop in, the bell drops and swings with two
+ * ripples, the name rises, then the blue collapses toward the mic.
+ */
+.intro {
+  display: none;
+}
+html[data-intro="on"] .intro {
+  display: grid;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  place-items: center;
+  background: #2152d1;
+  color: #fff;
+  cursor: pointer;
+  touch-action: none;
+  clip-path: circle(150% at 50% 92%);
+  animation: intro-leave 0.55s var(--ease-out) 1.5s forwards;
+}
+.intro-stage {
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+}
+.intro-mark {
+  width: 120px;
+  height: 120px;
+  overflow: visible;
+}
+.i-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: intro-draw 0.5s var(--ease-out) forwards;
+}
+.i-frame {
+  animation-duration: 0.75s;
+  animation-delay: 0.1s;
+}
+.i-row {
+  animation-duration: 0.3s;
+  animation-delay: calc(0.45s + var(--i) * 0.09s);
+}
+.i-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+  animation: intro-pop 0.35s var(--ease-spring) forwards;
+  animation-delay: calc(0.4s + var(--i) * 0.09s);
+}
+.i-bell {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  opacity: 0;
+  animation: intro-bell 1.05s var(--ease-out) 0.8s forwards;
+}
+.i-clapper,
+.i-ripple {
+  stroke: var(--sun);
+}
+.i-ripple {
+  stroke-width: 1.4;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: intro-ripple 0.95s ease-out forwards;
+}
+.i-r1 {
+  animation-delay: 1s;
+}
+.i-r2 {
+  animation-delay: 1.22s;
+}
+.intro-word {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: intro-rise 0.5s var(--ease-out) 1.05s forwards;
+}
+:lang(ar) .intro-word {
+  letter-spacing: 0;
+}
+html[data-intro="on"] .intro.intro-leaving {
+  animation: intro-leave 0.38s var(--ease-out) 0s forwards;
+}
+
+@keyframes intro-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes intro-pop {
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes intro-bell {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px) rotate(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+  35% {
+    transform: rotate(-18deg);
+  }
+  50% {
+    transform: rotate(14deg);
+  }
+  65% {
+    transform: rotate(-8deg);
+  }
+  80% {
+    transform: rotate(4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0);
+  }
+}
+@keyframes intro-ripple {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.8);
+  }
+}
+@keyframes intro-rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes intro-leave {
+  to {
+    clip-path: circle(0% at 50% 92%);
+  }
+}
+
+/* Once the intro lifts, the mic gives one small pulse: this is where you talk. */
+html[data-intro-done] .mic:not(.mic-live) {
+  animation: mic-wake 0.8s var(--ease-spring) 0.1s both;
+}
+@keyframes mic-wake {
+  0% {
+    transform: scale(0.8);
+  }
+  55% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---- Drag to reorder: always show what is happening ---- */
+
+/* Where the card will land: a dashed, faded placeholder in the list. */
+.drag-ghost {
+  opacity: 0.45;
+  outline: 2px dashed color-mix(in srgb, var(--door) 60%, transparent);
+  outline-offset: -2px;
+}
+.drag-ghost > * {
+  opacity: 0.5;
+}
+
+/* The card in your hand: lifted, a little bigger, tilted, with a deep shadow. */
+.drag-lift {
+  cursor: grabbing;
+  box-shadow:
+    0 2px 0 rgb(255 255 255 / 0.5) inset,
+    0 18px 40px rgb(17 22 29 / 0.28),
+    0 0 0 2px var(--door);
+  animation: drag-pickup 0.18s var(--ease-spring) both;
+}
+@keyframes drag-pickup {
+  from {
+    transform: scale(1) rotate(0);
+  }
+  to {
+    transform: scale(1.03) rotate(-0.8deg);
+  }
+}
+
+/* After dropping: the card flashes a ring that fades, so you see where it ended up. */
+.drop-settle {
+  animation: drop-settle 0.9s var(--ease-out) both;
+}
+@keyframes drop-settle {
+  0% {
+    box-shadow: 0 0 0 3px var(--door);
+    background-color: var(--door-soft);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* Leaving the list: deleted cards shrink away; finished cards fade out as the check lands. */
+.card-out {
+  animation: card-out 0.22s var(--ease-out) forwards;
+}
+@keyframes card-out {
+  to {
+    opacity: 0;
+    transform: translateX(24px) scale(0.96);
+  }
+}
+html[dir="rtl"] .card-out {
+  animation-name: card-out-rtl;
+}
+@keyframes card-out-rtl {
+  to {
+    opacity: 0;
+    transform: translateX(-24px) scale(0.96);
+  }
+}
+.card-done-out {
+  animation: card-done-out 0.2s var(--ease-out) 0.26s forwards;
+}
+@keyframes card-done-out {
+  to {
+    opacity: 0;
+  }
 }

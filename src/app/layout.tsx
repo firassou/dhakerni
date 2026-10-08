@@ -3,6 +3,7 @@ import { Readex_Pro } from "next/font/google";
 import { I18nProvider } from "@/lib/i18n";
 import { NO_FLASH_SCRIPT } from "@/lib/i18n/locales";
 import { ToastProvider } from "@/components/Toast";
+import { Intro } from "@/components/Intro";
 import { RegisterSW } from "@/components/RegisterSW";
 import "./globals.css";
 
@@ -17,7 +18,6 @@ export const metadata: Metadata = {
   description: "Voice-first tasks and reminders.",
   applicationName: "Dhakerni",
   appleWebApp: { capable: true, title: "Dhakerni", statusBarStyle: "default" },
-  icons: { icon: "/icons/favicon.png", apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -38,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <I18nProvider>
+          <Intro />
           <ToastProvider>{children}</ToastProvider>
         </I18nProvider>
         <RegisterSW />

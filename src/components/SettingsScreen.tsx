@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import { LOCALES } from "@/lib/i18n/locales";
+import { Brand } from "./Brand";
 import { BackIcon } from "./Icon";
 import { BackupControls } from "./BackupControls";
 import { LearningSwitch } from "./LearningSwitch";
@@ -34,6 +35,7 @@ export function SettingsScreen() {
           <BackIcon />
         </Link>
         <h1 className="t-lead">{t("settings.title")}</h1>
+        <Brand className="ms-auto" />
       </header>
 
       <section aria-labelledby="lang-h" className="mt-6">

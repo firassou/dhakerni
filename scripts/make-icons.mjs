@@ -1,5 +1,6 @@
 // Builds the app icons from assets/icon-source.png (white glyph on a purple field).
 // The glyph is lifted out by its distance from the purple, then drawn white on the app's door-blue.
+import { writeFileSync, copyFileSync } from "node:fs";
 import sharp from "sharp";
 
 const BLUE = { r: 0x21, g: 0x52, b: 0xd1 };
@@ -36,3 +37,34 @@ await render(512, 1, "icon-512.png");
 await render(180, 1, "apple-touch-icon.png");
 await render(512, 0.7, "icon-maskable-512.png"); // glyph kept inside the maskable safe zone
 await render(64, 1, "favicon.png");
+
+/**
+ * App Router icon files. Next.js links these itself, with a content hash in the URL so browsers and CDNs
+ * pick up a new icon immediately:
+ *   src/app/favicon.ico   what browsers request by default (16, 32, 48 px)
+ *   src/app/icon.png      the tab icon for modern browsers
+ *   src/app/apple-icon.png  the iPhone/iPad Home Screen icon
+ */
+copyFileSync(`${out}/icon-512.png`, "src/app/icon.png");
+copyFileSync(`${out}/apple-touch-icon.png`, "src/app/apple-icon.png");
+
+const sizes = [16, 32, 48];
+const pngs = await Promise.all(
+  sizes.map((n) => sharp(`${out}/icon-512.png`).resize(n, n).png().toBuffer()),
+);
+const header = Buffer.alloc(6);
+header.writeUInt16LE(1, 2); // type: icon
+header.writeUInt16LE(sizes.length, 4);
+let offset = 6 + 16 * sizes.length;
+const entries = pngs.map((png, i) => {
+  const e = Buffer.alloc(16);
+  e.writeUInt8(sizes[i], 0); // width
+  e.writeUInt8(sizes[i], 1); // height
+  e.writeUInt16LE(1, 4); // colour planes
+  e.writeUInt16LE(32, 6); // bits per pixel
+  e.writeUInt32LE(png.length, 8);
+  e.writeUInt32LE(offset, 12);
+  offset += png.length;
+  return e;
+});
+writeFileSync("src/app/favicon.ico", Buffer.concat([header, ...entries, ...pngs]));
