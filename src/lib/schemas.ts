@@ -46,6 +46,10 @@ export const Task = z.object({
   uncertain: Uncertain,
   /** Why the task has no time yet. Drives the clarifying question (v0.4). */
   needs: Needs.nullable().default(null),
+  /** Event this task waits for ("leave_work"), kept so a one-tap trigger can fire it early. */
+  anchor: z.string().nullable().default(null),
+  /** When the reminder was shown, so it is never shown twice. */
+  notifiedAt: z.iso.datetime({ offset: true }).nullable().default(null),
   /** Set when the time came from something the app learned, so the card can show an editable chip. */
   assumed: z.object({ key: z.string(), value: z.string() }).nullable().default(null),
   done: z.boolean().default(false),
