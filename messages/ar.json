@@ -41,7 +41,9 @@
     "listening": "نسمعك…",
     "stop": "وقّف وابعث",
     "cancel": "ألغي التسجيل",
-    "processing": "نفهم…"
+    "processing": "نفهم…",
+    "releaseCancel": "طلّق باش تلغي",
+    "slideCancel": "اسحب بعيد باش تلغي"
   },
   "nav": {
     "settings": "الإعدادات",
@@ -65,7 +67,47 @@
     "version": "النسخة",
     "madeBy": "صُنع بحب ❤️ من فراس",
     "reminders": "التذكيرات",
-    "learning": "التعلّم"
+    "learning": "التعلّم",
+    "prayer": {
+      "title": "أوقات الصلاة",
+      "help": "اختار مدينتك باش كلمات كيما العصر والمغرب تولّي وقت حقيقي. الأوقات تتحسب في تليفونك. مدينتك عمرها ما تتكشف ولا تتبعث.",
+      "city": "المدينة",
+      "none": "موش محدّدة",
+      "today": "اليوم",
+      "names": {
+        "fajr": "الفجر",
+        "dhuhr": "الظهر",
+        "asr": "العصر",
+        "maghrib": "المغرب",
+        "isha": "العشاء"
+      },
+      "cities": {
+        "tunis": "تونس",
+        "ariana": "أريانة",
+        "ben_arous": "بن عروس",
+        "manouba": "منوبة",
+        "nabeul": "نابل",
+        "zaghouan": "زغوان",
+        "bizerte": "بنزرت",
+        "beja": "باجة",
+        "jendouba": "جندوبة",
+        "le_kef": "الكاف",
+        "siliana": "سليانة",
+        "sousse": "سوسة",
+        "monastir": "المنستير",
+        "mahdia": "المهدية",
+        "sfax": "صفاقس",
+        "kairouan": "القيروان",
+        "kasserine": "القصرين",
+        "sidi_bouzid": "سيدي بوزيد",
+        "gabes": "قابس",
+        "medenine": "مدنين",
+        "tataouine": "تطاوين",
+        "gafsa": "قفصة",
+        "tozeur": "توزر",
+        "kebili": "قبلي"
+      }
+    }
   },
   "time": {
     "today": "اليوم",
@@ -145,7 +187,8 @@
       "after_lunch": "وقتاش تتغدى عادة؟",
       "after_dinner": "وقتاش تتعشى عادة؟"
     },
-    "show": "وريني"
+    "show": "وريني",
+    "prayerCity": "استعمل أوقات الصلاة لمدينتي"
   },
   "anchors": {
     "leave_work": "بعد الخدمة",
@@ -154,7 +197,17 @@
     "wake_up": "كي تفيق",
     "after_breakfast": "بعد الفطور",
     "after_lunch": "بعد الغداء",
-    "after_dinner": "بعد العشاء"
+    "after_dinner": "بعد العشاء",
+    "prayer_fajr": "عند الفجر",
+    "after_prayer_fajr": "بعد الفجر",
+    "prayer_dhuhr": "عند الظهر",
+    "after_prayer_dhuhr": "بعد الظهر",
+    "prayer_asr": "عند العصر",
+    "after_prayer_asr": "بعد العصر",
+    "prayer_maghrib": "عند المغرب",
+    "after_prayer_maghrib": "بعد المغرب",
+    "prayer_isha": "عند العشاء",
+    "after_prayer_isha": "بعد العشاء"
   },
   "facts": {
     "vague": "«{word}» = {n} دقيقة",
