@@ -164,9 +164,10 @@ self.addEventListener("push", (event) => {
 async function markDone(taskId) {
   const db = await openDb();
   const task = await getTask(db, taskId);
-  if (!task) return;
-  const now = new Date().toISOString();
-  await putTask(db, { ...task, done: true, doneAt: now, updatedAt: now });
+  if (task) {
+    const now = new Date().toISOString();
+    await putTask(db, { ...task, done: true, doneAt: now, updatedAt: now });
+  }
   // Tell the server to stop repeating this reminder.
   try {
     const sub = await self.registration.pushManager.getSubscription();
@@ -218,6 +219,35 @@ async function snooze(taskId) {
     /* in-app timer still covers it when the app is open */
   }
 }
+
+// The browser replaced the push address (it does, now and then). The server still holds the old one, and
+// every reminder would go nowhere until the app is next opened. Subscribe again and tell the server now.
+self.addEventListener("pushsubscriptionchange", (event) => {
+  event.waitUntil(
+    (async () => {
+      try {
+        const options = event.oldSubscription && event.oldSubscription.options;
+        const sub =
+          event.newSubscription ||
+          (options &&
+            (await self.registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: options.applicationServerKey,
+            })));
+        if (!sub) return;
+        const sid = await getMeta(await openDb(), "sessionId");
+        if (!sid) return;
+        await fetch("/api/reminders", {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-session-id": sid },
+          body: JSON.stringify({ subscription: sub.toJSON(), mode: "upsert", reminders: [] }),
+        });
+      } catch {
+        /* the app repairs it the next time it is opened */
+      }
+    })(),
+  );
+});
 
 self.addEventListener("notificationclick", (event) => {
   const { taskId } = event.notification.data || {};

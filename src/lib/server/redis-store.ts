@@ -53,5 +53,29 @@ export function redisStore(redis: Redis): ReminderStore {
       }
       return claimed;
     },
+    async dueTimes(fromMs, toMs, limit) {
+      const rows = await redis.zrange<(string | number)[]>(DUE, fromMs, toMs, {
+        byScore: true,
+        offset: 0,
+        count: limit,
+        withScores: true,
+      });
+      const times: number[] = [];
+      for (let i = 1; i < rows.length; i += 2) times.push(Number(rows[i]));
+      return times;
+    },
+    async markOnce(key, ttl) {
+      return (await redis.set(key, 1, { nx: true, ex: ttl })) === "OK";
+    },
+    async unmark(key) {
+      await redis.del(key);
+    },
+    async beat(nowMs) {
+      await redis.set("cron:last", nowMs);
+    },
+    async lastBeat() {
+      const v = await redis.get<number | string>("cron:last");
+      return v === null ? null : Number(v);
+    },
   };
 }

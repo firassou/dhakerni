@@ -289,7 +289,7 @@
     "enable": "Turn on",
     "disable": "Turn off",
     "test": "Send a test",
-    "testSent": "Test sent",
+    "testSent": "Test sent. A second one comes through the server in about a minute: lock your phone now and wait for it.",
     "ios": {
       "title": "Add Dhakerni to your Home Screen",
       "step1": "Tap the Share button in Safari.",
@@ -300,8 +300,10 @@
     "bannerAction": "Turn on",
     "bannerDismiss": "Not now",
     "firefox": "Desktop Firefox shows no buttons on notifications. Click the notification to open the app, then use Done or Snooze there.",
-    "repeats": "A reminder you don't answer is sent again twice, 3 minutes apart.",
-    "android": "Not getting reminders while the phone is locked? In Android Settings open Apps, Chrome, Battery and choose Unrestricted."
+    "repeats": "A reminder you don't answer is sent again twice, 3 minutes apart, until you tap Done or Snooze.",
+    "android": "Not getting reminders while the phone is locked? In Android Settings open Apps, Chrome, Battery and choose Unrestricted.",
+    "testLocalOnly": "Test shown, but the server did not take the second one. Background reminders may not be working.",
+    "stalled": "Background reminders are not being sent right now: nothing is triggering the server. Until that is fixed, reminders only show while the app is open."
   },
   "trigger": {
     "label": "Triggers",
@@ -377,5 +379,21 @@
   },
   "install": {
     "action": "Install"
+  },
+  "native": {
+    "channel": "Reminders",
+    "status": {
+      "on": "On. Reminders ring from this phone itself, even with the app closed, the phone asleep or no internet.",
+      "denied": "Blocked. Allow notifications for Dhakerni in Android Settings, Apps, Dhakerni, Notifications."
+    },
+    "testSent": "A test reminder rings in 20 seconds. Lock your phone now.",
+    "exactOff": "Android is not letting Dhakerni ring at the exact time, so reminders can be several minutes late.",
+    "allowExact": "Allow exact alarms",
+    "battery": "If a reminder ever comes late: in Android Settings, Apps, Dhakerni, Battery, choose Unrestricted. Some phones (Xiaomi, Oppo, Huawei) also need Autostart allowed.",
+    "get": {
+      "title": "Android app",
+      "body": "Reminders that ring on time with the phone asleep, with no server in between. It updates itself: install it once.",
+      "action": "Download the Android app"
+    }
   }
 }

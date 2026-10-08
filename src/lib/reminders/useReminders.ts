@@ -17,8 +17,9 @@ interface Deps {
 }
 
 /**
- * Shows due reminders inside the app, and as a system notification when the tab is in the background.
- * (With the app closed, the server's push does this instead.)
+ * Shows due reminders inside the app, and always as a system notification too, so the reminder is in the
+ * phone's notification list whether or not anyone is looking at the app. The server sends its own push for
+ * the same reminder (same tag, so one entry): this copy is the one that works with no server at all.
  */
 export function useReminders({ tasks, getTasks, ready, upsert, toggle, snoozeMinutes }: Deps) {
   const { t } = useI18n();
@@ -36,7 +37,7 @@ export function useReminders({ tasks, getTasks, ready, upsert, toggle, snoozeMin
       save({ ...task, notifiedAt: now.toISOString() });
       if (isStale(task, now)) continue; // long past: mark it, don't interrupt
       fresh.push(task.id);
-      if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+      if ("Notification" in window && Notification.permission === "granted") {
         void navigator.serviceWorker?.ready.then((reg) =>
           reg.showNotification(task.title, {
             body: tr("notify.body"),

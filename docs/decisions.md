@@ -247,3 +247,71 @@ providers. Voice answers to a clarifying question are unchanged.
 
 Finished tasks are deleted 24 hours after they were completed (`DONE_KEEP_MS`), checked on load and every 30
 seconds while the app is open. There is no setting for the length yet.
+
+## D18. Why reminders did not arrive with the app closed, and what guarantees them now
+
+**Found on 2026-10-08, with evidence.** Reminders due 5 to 7 minutes earlier were still sitting in the
+production store, and stayed there while watched. Calling `/api/cron/fire` once by hand sent them at once
+(`sent: 2, failed: 0`). So push worked; nothing was calling the endpoint. The every-minute pinger the design
+relied on (cron-job.org, set up by hand) was not running, and nothing in the app said so: Settings showed
+"On. Reminders arrive even when the app is closed."
+
+What changed:
+
+- **Callers that need no manual setup.** A GitHub Actions workflow calls once a minute; a daily Vercel cron is
+  a safety net; every app sync also sends whatever is due. With `QSTASH_TOKEN` set, the server books a call
+  for the exact minute of each reminder (`src/lib/server/schedule.ts`), including repeats and retries.
+- **No silent failure.** `/api/push/key` reports `background: "stalled"` when a reminder has waited more than
+  2 minutes, or when nothing has triggered the server lately and QStash is not set up. Settings shows it in red.
+- **A real test.** "Send a test" also books a reminder through the whole server path one minute later. If it
+  arrives with the phone locked, background reminders work.
+- **A due reminder is never deleted by a sync.** The app lists only future reminders, so a reminder that had
+  just become due looked "no longer wanted" and was removed: with the app alive in the background, it was gone
+  before the server sent it. Now a due reminder ends only by itself (after its last repeat) or when the
+  person answers (Done sends `cancel`, Snooze replaces it).
+- **A failed send is retried** a minute later, up to 5 times, instead of the reminder being deleted.
+- **The app does not let go of a sync.** It retries failed syncs, re-syncs every 10 minutes, and syncs at
+  once when the page is hidden or closed (`keepalive`), so "add a task, lock the phone" still reaches the
+  server.
+- **A replaced push address is reported at once** by the service worker (`pushsubscriptionchange`).
+- **The page always posts a system notification** for a due reminder, visible or not, so it is in the
+  notification list even with no server.
+
+Still true: a web app cannot make Android deliver a push to a browser it has put to sleep. That is what the
+Android app (D19) is for.
+
+## D19. The Android app: a thin shell around the live site
+
+**Why.** A browser app cannot schedule anything on the phone. Its reminders depend on a server, a scheduler, a
+push service and Android letting a sleeping browser receive the push. The Android app removes all four.
+
+**What it is.** A Capacitor shell (`android/`, `capacitor.config.ts`) whose web view loads
+`https://dhakerni.vercel.app`. All the app's code is still the website:
+
+- **Updates need no reinstall.** A deploy reaches every phone the next time the app is opened. A new APK is
+  needed only when something native changes: `android/`, `capacitor.config.ts`, or a Capacitor plugin.
+- **Reminders are Android alarms** (`src/lib/native/`). Inside the shell the app hands each future reminder to
+  `@capacitor/local-notifications`, which uses the system alarm clock (exact, allowed while idle). They ring
+  with the phone asleep, the app closed and no internet, and Android restores them after a restart. Web push
+  and the server store are not used at all in the app.
+- **Done and Snooze** on the notification open the app, which applies them. Finishing, deleting or moving a
+  task cancels or moves its alarm.
+- The same web code runs in browsers: `isNativeApp()` picks the path. Desktop, iPhone and the Chrome PWA keep
+  web push (D18).
+
+**Verified on an emulator (Android 17), 2026-10-08:** the app reports native mode; a task due 75 seconds later
+appeared in `dumpsys alarm` as an exact `RTC_WAKEUP` alarm; with the app in the background, the screen off and
+the device forced into deep idle, the notification was posted 3 ms after its time, with Done and Snooze; tapping
+Done marked the task done in the app. The microphone works in the web view. Not verified: a real phone, and
+phone makers that stop background apps aggressively (Xiaomi, Oppo, Huawei); Settings explains the battery
+setting for those.
+
+**Known limits.** One notification per reminder (no repeats: the alarm itself is reliable). Exporting a backup
+file does not work inside the app yet (the web view does not handle the download); use the browser for that.
+Tasks are stored per app: the Chrome version and the Android app do not share them (use Export in Chrome, then
+Import in the app).
+
+**Building and publishing.** `npm run android:apk` (needs JDK 21 and the Android SDK: `JAVA_HOME`,
+`ANDROID_HOME`) writes `dhakerni.apk`. It is signed with the key in `~/dhakerni-keystore/`, which is not in the
+repository. **Back that folder up**: an update signed with any other key cannot be installed over the app.
+Publish by attaching `dhakerni.apk` to a GitHub release; Settings links to the latest one for Android browsers.

@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- Never shown in normal use: the Android app loads the live site (see capacitor.config.ts). This page is
+     only what Capacitor needs to exist, and what appears if the site cannot be reached on the very first
+     launch, before anything is cached. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dhakerni</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #2152d1;
+        color: #fff;
+        font:
+          18px system-ui,
+          sans-serif;
+        text-align: center;
+      }
+      button {
+        margin-top: 16px;
+        padding: 12px 24px;
+        border: 0;
+        border-radius: 999px;
+        font: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Dhakerni needs the internet the first time it opens.</p>
+      <button onclick="location.href = 'https://dhakerni.vercel.app/'">Try again</button>
+    </main>
+  </body>
+</html>

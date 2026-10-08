@@ -24,14 +24,15 @@ import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import { toggleItem } from "@/lib/tasks/items";
 import { useCapture } from "@/lib/ai/useCapture";
-import { usePush, syncToServer } from "@/lib/push/usePush";
+import { usePush } from "@/lib/push/usePush";
+import { useReminderSync } from "@/lib/push/useReminderSync";
+import { useNativeReminders } from "@/lib/native/useNativeReminders";
 import { ANCHOR_CHOICES } from "@/lib/questions/answers";
 import {
   anchorsWaiting,
   DEFAULT_SNOOZE_MIN,
   roundedClock,
   triggerable,
-  upcomingReminders,
 } from "@/lib/reminders/engine";
 import { useReminders } from "@/lib/reminders/useReminders";
 import { observeCreated, observeEdit, observeSnooze } from "@/lib/memory/learning";
@@ -219,15 +220,17 @@ export function HomeScreen() {
   }, [ready, focusReminder]);
 
   // Keep the server's copy of future reminders in step with the tasks (only when notifications are on).
-  useEffect(() => {
-    if (!ready || push.state !== "enabled") return;
-    const id = setTimeout(() => {
-      syncToServer(upcomingReminders(tasks, new Date())).catch((e) =>
-        console.error("reminder sync failed", e),
-      );
-    }, 1000);
-    return () => clearTimeout(id);
-  }, [ready, push.state, tasks]);
+  useReminderSync({ enabled: ready && push.state === "enabled", tasks, getTasks });
+  // In the Android app the phone's own alarm clock does it instead, with no server.
+  useNativeReminders({
+    enabled: push.state === "native",
+    ready,
+    tasks,
+    snoozeMinutes,
+    onDone: reminders.done,
+    onSnooze: reminders.snooze,
+    onOpen: focusReminder,
+  });
 
   const handleTrigger = useCallback(
     (anchor: string) => {

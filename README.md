@@ -46,13 +46,30 @@ Keys are read only in server routes and never sent to the client.
    reminders are off and Settings says so.
 2. Deploy from `main`. Use the production domain: preview deployments sit behind Vercel Authentication, which blocks
    the manifest and service worker.
-3. **Scheduler.** Vercel Cron on the free Hobby plan runs once a day at most, so use a free external pinger. On
-   cron-job.org create a job: URL `https://YOUR-DOMAIN/api/cron/fire`, every 1 minute, with the header
-   `Authorization: Bearer <your CRON_SECRET>`. (On Vercel Pro you can use a cron entry instead; Vercel sends the
-   same header automatically when `CRON_SECRET` is set.)
+3. **Scheduler.** The app is serverless: nothing sends a reminder unless something calls
+   `/api/cron/fire` when it is due. Without a caller, reminders only show while the app is open (Settings then
+   shows a red warning). There are three callers, and any one is enough:
+   - **GitHub Actions** (`.github/workflows/reminders.yml`): calls once a minute. Set the repository secret
+     `CRON_SECRET` to the same value as in Vercel (`gh secret set CRON_SECRET`). GitHub can start a run a few
+     minutes late, so reminders may be a few minutes late with this alone.
+   - **Upstash QStash** (recommended, exact to the second): in the Upstash console open QStash, copy
+     `QSTASH_TOKEN` (and `QSTASH_URL` if it shows one) into Vercel's environment variables, and redeploy. The
+     server then books a call for the exact minute of every reminder. Free plan: 1,000 calls a day.
+   - **The daily Vercel cron** (`vercel.json`): a safety net that needs no setup.
+
+   cron-job.org (a job on `https://YOUR-DOMAIN/api/cron/fire` every minute with the header
+   `Authorization: Bearer <CRON_SECRET>`) also works as a caller.
+
 4. Open the site on each device, Settings, Notifications, Turn on. On iPhone, add it to the Home Screen first.
 
 Check a deployment end to end with real Chrome: `APP_URL=https://YOUR-DOMAIN node scripts/live-push-check.mjs`.
+
+## Android app
+
+`android/` is a Capacitor shell that loads the live site, so a deploy updates every installed app with no new
+APK. Inside it, reminders are scheduled on the phone with Android alarms. Build with `npm run android:apk`
+(JDK 21 and the Android SDK; see [docs/decisions.md](docs/decisions.md) D19, including the signing key you
+must back up), then attach `dhakerni.apk` to a GitHub release.
 
 ## Architecture
 
