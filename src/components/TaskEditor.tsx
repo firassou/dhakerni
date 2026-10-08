@@ -5,6 +5,13 @@ import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import { fromLocalInput, toLocalInput } from "@/lib/time/format";
 import { CloseIcon, TrashIcon } from "./Icon";
+import {
+  DecisionSection,
+  ItemsSection,
+  StepsSection,
+  SuggestionsSection,
+  type Edit,
+} from "./TaskDetails";
 
 const PRIORITIES = ["low", "normal", "high"] as const;
 
@@ -23,6 +30,18 @@ interface Props {
 /** Edits apply live: nothing to confirm, so nothing to lose. */
 export function TaskEditor({ task, onClose, onChange, onDelete, onCloseAutoFocus }: Props) {
   const { t } = useI18n();
+
+  /** Each section computes the next task; we save only the parts those sections own. */
+  const edit: Edit = (fn) => {
+    if (!task) return;
+    const next = fn(task);
+    onChange(task.id, {
+      items: next.items,
+      subtasks: next.subtasks,
+      suggestions: next.suggestions,
+      decision: next.decision,
+    });
+  };
 
   return (
     <Dialog.Root open={task !== null} onOpenChange={(open) => !open && onClose()}>
@@ -123,6 +142,11 @@ export function TaskEditor({ task, onClose, onChange, onDelete, onCloseAutoFocus
                     onChange={(e) => onChange(task.id, { notes: e.target.value })}
                   />
                 </label>
+
+                <DecisionSection task={task} edit={edit} />
+                <ItemsSection task={task} edit={edit} />
+                <StepsSection task={task} edit={edit} />
+                <SuggestionsSection task={task} edit={edit} />
 
                 <button
                   onClick={() => onDelete(task)}

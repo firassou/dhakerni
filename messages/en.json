@@ -47,7 +47,8 @@
   },
   "nav": {
     "settings": "Settings",
-    "back": "Back"
+    "back": "Back",
+    "home": "Home"
   },
   "settings": {
     "title": "Settings",
@@ -126,18 +127,50 @@
       "normal": "Normal",
       "high": "High"
     },
-    "assumedHint": "Learned from you. Tap to change."
+    "assumedHint": "Learned from you. Tap to change.",
+    "checkItem": "Check off {item}",
+    "uncheckItem": "Uncheck {item}",
+    "moreItems": "+{n} more",
+    "stepsProgress": "{done}/{total} steps",
+    "decisionBadge": "Decision",
+    "suggestionLabel": "Suggestion",
+    "chosenLabel": "You chose: {option}",
+    "drag": {
+      "pickedUp": "Picked up {title}. Position {pos} of {total}.",
+      "movedTo": "{title} moved to position {pos} of {total}.",
+      "dropped": "{title} dropped at position {pos} of {total}.",
+      "cancelled": "Move cancelled. {title} is back at position {pos}."
+    }
   },
   "editor": {
     "title": "Task",
     "name": "Title",
-    "notes": "Notes",
+    "notes": "Description",
     "due": "Due",
     "clearTime": "Clear time",
     "priority": "Priority",
     "list": "List",
     "delete": "Delete task",
-    "close": "Close"
+    "close": "Close",
+    "items": "Items",
+    "addItem": "Add an item",
+    "itemName": "Item",
+    "qty": "Quantity",
+    "removeItem": "Remove {item}",
+    "steps": "Steps",
+    "addStep": "Add a step",
+    "stepTitle": "Step",
+    "removeStep": "Remove step: {step}",
+    "suggestions": "Suggested steps",
+    "suggestionsHelp": "Ideas from the AI. Add the ones you want.",
+    "addSuggestion": "Add step: {text}",
+    "dismissSuggestion": "Dismiss: {text}",
+    "dismissAll": "Dismiss all",
+    "decision": "Decision",
+    "options": "Options",
+    "pick": "Choose {option}",
+    "picked": "Chosen: {option}",
+    "add": "Add"
   },
   "toast": {
     "added": "Task added",
