@@ -374,5 +374,8 @@
     "count": "{n} sélectionnées",
     "delete": "Supprimer",
     "cancel": "Annuler la sélection"
+  },
+  "install": {
+    "action": "Installer"
   }
 }

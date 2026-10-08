@@ -45,6 +45,7 @@ import { useTasks } from "@/lib/tasks/useTasks";
 import { Brand } from "./Brand";
 import { Dock } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
+import { InstallButton } from "./InstallButton";
 import { CloseIcon, SlidersIcon, TrashIcon } from "./Icon";
 import { PushBanner } from "./PushBanner";
 import { QuestionCard } from "./QuestionCard";
@@ -419,6 +420,7 @@ export function HomeScreen() {
             }}
           />
         </h1>
+        <InstallButton className="ms-auto me-1" />
         <Link
           href="/settings"
           aria-label={t("nav.settings")}
@@ -499,6 +501,11 @@ export function HomeScreen() {
                     selected={selected.has(task.id)}
                     onLongPress={toggleSelected}
                     onSelect={toggleSelected}
+                    onSwipe={(id, action) => {
+                      if (action === "toggle") return handleToggle(id);
+                      const gone = getTasks().find((x) => x.id === id);
+                      if (gone) handleDelete([gone]);
+                    }}
                     leaving={leaving.has(task.id)}
                     settled={droppedId === task.id}
                     finishing={task.done && filter !== "done"}

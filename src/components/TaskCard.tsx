@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useI18n } from "@/lib/i18n";
@@ -10,7 +10,7 @@ import { describeFact } from "@/lib/questions/describe";
 import { formatDue } from "@/lib/time/format";
 import { formatRemaining } from "@/lib/time/remaining";
 import { formatItem, stepsDone } from "@/lib/tasks/items";
-import { CheckIcon, GripIcon } from "./Icon";
+import { CheckIcon, GripIcon, TrashIcon } from "./Icon";
 
 interface BodyProps {
   task: Task;
@@ -39,10 +39,19 @@ interface Props extends Omit<BodyProps, "grip"> {
   /** Held down for a moment: starts picking, with this card. */
   onLongPress?: (id: string) => void;
   onSelect?: (id: string) => void;
+  /** Swiped with a finger: right finishes the task (or reopens it in the Done list), left deletes it. */
+  onSwipe?: (id: string, action: SwipeAction) => void;
 }
+
+export type SwipeAction = "toggle" | "delete";
 
 const LONG_PRESS_MS = 500;
 const LONG_PRESS_SLOP_PX = 10; // moving further than this is a scroll or a drag, not a press
+const SWIPE_START_PX = 12; // sideways travel before the card starts to follow the finger
+const SWIPE_COMMIT = 0.33; // share of the card's width that must be crossed to act
+const FLICK_PX = 48; // a quick flick acts sooner: at least this far...
+const FLICK_SPEED = 0.6; // ...at this many px per ms
+const FLING_MS = 180;
 
 const MAX_CHIPS = 4;
 
@@ -212,6 +221,7 @@ export function TaskCard({
   selected,
   onLongPress,
   onSelect,
+  onSwipe,
   ...body
 }: Props) {
   const { t } = useI18n();
@@ -219,6 +229,30 @@ export function TaskCard({
   const press = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number } | null>(null);
   const longPressed = useRef(false);
   const touch = useRef(false);
+  const swipe = useRef<{ x: number; y: number; at: number; width: number; on: boolean } | null>(
+    null,
+  );
+  /** How far the card has been pulled sideways, in px. Positive is to the right, in every language. */
+  const [dx, setDx] = useState(0);
+  /** Let go past the commit point: the card flies off that side before the action runs. */
+  const [flung, setFlung] = useState<-1 | 0 | 1>(0);
+  const [width, setWidth] = useState(1);
+  const flingTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => {
+    const pending = flingTimers.current;
+    return () => pending.forEach(clearTimeout);
+  }, []);
+  const past = Math.abs(dx) > width * SWIPE_COMMIT;
+  // Swiped to done, then the list changed under it (straight to the Done tab): the same card is now
+  // staying, so it must not remain off to the side.
+  const [wasFinishing, setWasFinishing] = useState(finishing);
+  if (wasFinishing !== finishing) {
+    setWasFinishing(finishing);
+    if (!finishing) {
+      setFlung(0);
+      setDx(0);
+    }
+  }
 
   const cancelPress = () => {
     if (press.current) clearTimeout(press.current.timer);
@@ -230,8 +264,16 @@ export function TaskCard({
     touch.current = e.pointerType === "touch";
     longPressed.current = false;
     // The grip is for dragging; a second finger or a right click is not a press.
-    if (!onLongPress || selecting || e.button > 0 || !e.isPrimary) return;
-    if ((e.target as HTMLElement).closest("[data-grip]")) return;
+    if (selecting || e.button > 0 || !e.isPrimary) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("[data-grip]")) return;
+    // Swiping is for fingers, and not across the question below the card (it has its own controls).
+    if (onSwipe && touch.current && !flung && !target.closest("[role=group]")) {
+      const w = e.currentTarget.getBoundingClientRect().width;
+      swipe.current = { x: e.clientX, y: e.clientY, at: e.timeStamp, width: w, on: false };
+      setWidth(w);
+    }
+    if (!onLongPress) return;
     cancelPress();
     press.current = {
       x: e.clientX,
@@ -248,6 +290,53 @@ export function TaskCard({
   function onPointerMove(e: React.PointerEvent) {
     const p = press.current;
     if (p && Math.hypot(e.clientX - p.x, e.clientY - p.y) > LONG_PRESS_SLOP_PX) cancelPress();
+
+    const s = swipe.current;
+    if (!s) return;
+    const mx = e.clientX - s.x;
+    const my = e.clientY - s.y;
+    if (!s.on) {
+      // Mostly up or down is a scroll: leave it to the page.
+      if (Math.abs(my) > SWIPE_START_PX && Math.abs(my) >= Math.abs(mx)) return void endSwipe();
+      if (Math.abs(mx) < SWIPE_START_PX || Math.abs(mx) < Math.abs(my) * 1.5) return;
+      s.on = true;
+      cancelPress();
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        /* the pointer is already gone: the card just stops following */
+      }
+    }
+    const wasPast = Math.abs(dx) > s.width * SWIPE_COMMIT;
+    if (Math.abs(mx) > s.width * SWIPE_COMMIT !== wasPast) navigator.vibrate?.(10); // crossing the line
+    setDx(mx);
+  }
+
+  function endSwipe() {
+    swipe.current = null;
+    setDx(0);
+  }
+
+  function onPointerUp(e: React.PointerEvent) {
+    cancelPress();
+    const s = swipe.current;
+    if (!s?.on) return void (swipe.current = null);
+    longPressed.current = true; // swallow the click that follows the finger lifting
+    const mx = e.clientX - s.x;
+    const quick =
+      Math.abs(mx) > FLICK_PX && Math.abs(mx) / Math.max(1, e.timeStamp - s.at) > FLICK_SPEED;
+    if (Math.abs(mx) <= s.width * SWIPE_COMMIT && !quick) return endSwipe(); // springs back
+    swipe.current = null;
+    setFlung(mx > 0 ? 1 : -1);
+    // Act at once (the card lingers long enough to be seen flying off): a delayed action could be lost.
+    onSwipe?.(id, mx > 0 ? "toggle" : "delete");
+    flingTimers.current.push(
+      // If the card is still here afterwards (the action was undone), it is back in place.
+      setTimeout(() => {
+        setFlung(0);
+        setDx(0);
+      }, FLING_MS + 600),
+    );
   }
 
   // Runs before the buttons inside: while picking, the whole card is one target.
@@ -304,8 +393,11 @@ export function TaskCard({
       data-selected={selected || undefined}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerUp={cancelPress}
-      onPointerCancel={cancelPress}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => {
+        cancelPress();
+        endSwipe();
+      }}
       onPointerLeave={cancelPress}
       onContextMenu={(e) => {
         // On a phone a long press also asks for the context menu; the press already has a meaning here.
@@ -313,13 +405,44 @@ export function TaskCard({
       }}
       onClickCapture={onClickCapture}
       onClick={onClick}
-      className={`${cardClass(body.task)} card-in cursor-pointer select-none [-webkit-touch-callout:none] ${
+      className={`${cardClass(body.task)} card-in relative cursor-pointer touch-pan-y overflow-hidden select-none [-webkit-touch-callout:none] ${
         isDragging ? "drag-ghost" : ""
       } ${leaving ? "card-out" : finishing ? "card-done-out" : ""} ${
         settled ? "drop-settle" : ""
       } ${selected ? "ring-door ring-2" : ""}`}
     >
-      <TaskCardBody {...body} grip={grip} />
+      {(dx !== 0 || flung !== 0) && (
+        // What letting go will do, shown behind the card. Laid out left-to-right in every language:
+        // the directions of the gesture do not flip.
+        <div
+          aria-hidden
+          dir="ltr"
+          data-swipe={dx > 0 || flung > 0 ? "toggle" : "delete"}
+          className={`absolute inset-0 flex items-center px-6 ${
+            dx > 0 || flung > 0
+              ? "bg-door text-door-ink justify-start"
+              : "bg-danger text-paper justify-end"
+          }`}
+        >
+          <span
+            className={`transition-transform duration-[var(--t-fast)] ease-[var(--ease-spring)] ${
+              past || flung ? "scale-125" : "scale-90 opacity-70"
+            }`}
+          >
+            {dx > 0 || flung > 0 ? <CheckIcon className="size-6" /> : <TrashIcon />}
+          </span>
+        </div>
+      )}
+      <div
+        className="bg-surface relative"
+        style={{
+          transform: flung ? `translateX(${flung * 110}%)` : dx ? `translateX(${dx}px)` : undefined,
+          // Follows the finger exactly; glides only when let go (off the side, or back into place).
+          transition: flung || dx === 0 ? `transform ${FLING_MS}ms var(--ease-out)` : undefined,
+        }}
+      >
+        <TaskCardBody {...body} grip={grip} />
+      </div>
     </li>
   );
 }
