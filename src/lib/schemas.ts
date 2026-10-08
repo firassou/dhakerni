@@ -32,6 +32,24 @@ export const Needs = z.object({
 });
 export type Needs = z.infer<typeof Needs>;
 
+export const Item = z.object({
+  id: z.string(),
+  name: z.string().min(1),
+  qty: z.number().positive().nullable().default(null),
+  unit: z.string().nullable().default(null),
+  done: z.boolean().default(false),
+});
+export type Item = z.infer<typeof Item>;
+
+/** The AI's help with a choice. A suggestion, never an instruction: the person picks. */
+export const Decision = z.object({
+  options: z.array(z.string()).min(2),
+  recommendation: z.string().nullable().default(null),
+  reason: z.string().nullable().default(null),
+  chosen: z.string().nullable().default(null),
+});
+export type Decision = z.infer<typeof Decision>;
+
 export const Task = z.object({
   id: z.string(),
   title: z.string().min(1),
@@ -43,6 +61,11 @@ export const Task = z.object({
   list: z.string().default("inbox"),
   recurrence: Recurrence.nullable().default(null),
   subtasks: z.array(Subtask).default([]),
+  /** Things to get or bring, with quantities. */
+  items: z.array(Item).default([]),
+  /** Steps the AI proposed for a big goal. They become subtasks only if the person accepts them. */
+  suggestions: z.array(z.string()).default([]),
+  decision: Decision.nullable().default(null),
   uncertain: Uncertain,
   /** Why the task has no time yet. Drives the clarifying question (v0.4). */
   needs: Needs.nullable().default(null),

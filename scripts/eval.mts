@@ -25,6 +25,28 @@ interface Case {
     shared?: boolean;
     priority?: string;
     recurrence?: string;
+    smart?: {
+      items?: { name: string[]; qty: number | null }[];
+      itemCount?: number;
+      titleExcludes?: string[];
+      maxTasks?: number;
+      twoTasks?: boolean;
+      descHas?: string[][];
+      titleShorter?: boolean;
+      descDistinct?: boolean;
+      /** The structure of the reminders is not what this case tests. */
+      timeAny?: boolean;
+      /** One task or two are both fine: the case tests descriptions, not how the idea is split. */
+      anyTaskCount?: boolean;
+      descMin?: boolean;
+      decision?: boolean;
+      decisionOptions?: number;
+      recommendation?: boolean;
+      noRecommendation?: boolean;
+      minSuggestions?: number;
+      minSteps?: number;
+      noExtras?: boolean;
+    };
   };
 }
 
@@ -59,14 +81,76 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   }
 }
 
-type Checks = { count: boolean; titles: boolean; time: boolean; shared: boolean; extras: boolean };
+type Checks = {
+  count: boolean;
+  titles: boolean;
+  time: boolean;
+  shared: boolean;
+  extras: boolean;
+  smart: boolean;
+};
+
+const words = (x: string) => x.trim().split(/\s+/).filter(Boolean).length;
+const has = (text: string | null | undefined, alts: string[]) =>
+  alts.some((a) => norm(text ?? "").includes(norm(a)));
+
+/**
+ * The "smart" checks. Cases without any smart expectation are still held to a quiet default: an ordinary
+ * task must not come back with invented steps, a decision, or more than a single item.
+ */
+function scoreSmart(sm: Case["expect"]["smart"], out: ParseResult): boolean {
+  const first = out.tasks[0];
+  if (!first) return false;
+  if (!sm || Object.keys(sm).length === 0) {
+    return out.tasks.every(
+      (t) => t.suggestedSteps.length === 0 && !t.decision && t.items.length <= 1,
+    );
+  }
+  const ok: boolean[] = [];
+  if (sm.noExtras)
+    ok.push(
+      out.tasks.every((t) => t.suggestedSteps.length === 0 && !t.decision && t.items.length === 0),
+    );
+  if (sm.maxTasks) ok.push(out.tasks.length <= sm.maxTasks);
+  if (sm.twoTasks) ok.push(out.tasks.length === 2);
+  if (sm.items) {
+    ok.push(
+      sm.items.every((want) =>
+        first.items.some(
+          (it) => has(it.name, want.name) && (want.qty === null || it.qty === want.qty),
+        ),
+      ),
+    );
+  }
+  if (sm.itemCount) ok.push(first.items.length === sm.itemCount);
+  if (sm.titleExcludes)
+    ok.push(!sm.titleExcludes.some((w) => norm(first.title).split(/\s+/).includes(norm(w))));
+  if (sm.descHas)
+    ok.push(!!first.description && sm.descHas.every((alts) => has(first.description, alts)));
+  if (sm.descDistinct)
+    ok.push(new Set(out.tasks.map((t) => norm(t.description ?? ""))).size === out.tasks.length);
+  if (sm.titleShorter)
+    ok.push(!!first.description && words(first.title) < words(first.description));
+  if (sm.descMin) ok.push(!!first.description && words(first.description) >= words(first.title));
+  if (sm.decision) {
+    const d = first.decision;
+    ok.push(!!d && d.options.length >= (sm.decisionOptions ?? 2));
+    if (sm.recommendation) ok.push(!!d?.recommendation);
+    if (sm.noRecommendation) ok.push(!d?.recommendation);
+  }
+  if (sm.minSuggestions) ok.push(first.suggestedSteps.length >= sm.minSuggestions);
+  if (sm.minSteps) ok.push(first.subtasks.length >= sm.minSteps);
+  return ok.every(Boolean);
+}
 
 function score(c: Case, out: ParseResult) {
   const e = c.expect;
-  const count = out.tasks.length === e.titles.length;
+  const any = e.smart?.anyTaskCount === true;
+  const count = any || out.tasks.length === e.titles.length;
   const titles =
-    count &&
-    e.titles.every((alts, i) => alts.some((a) => norm(out.tasks[i].title).includes(norm(a))));
+    any ||
+    (count &&
+      e.titles.every((alts, i) => alts.some((a) => norm(out.tasks[i].title).includes(norm(a)))));
 
   const byId = new Map(out.reminders.map((r) => [r.id, r.when]));
   const got = out.tasks.map((t) => (t.reminderId ? byId.get(t.reminderId) : undefined));
@@ -76,12 +160,13 @@ function score(c: Case, out: ParseResult) {
   if (!distinct.length) resolutions.push({ status: "needs_time", reason: "none", word: null });
 
   const time =
-    resolutions.length === e.reminders.length &&
-    e.reminders.every((exp, i) => {
-      const r = resolutions[i];
-      if (exp.status === "resolved") return r.status === "resolved" && fmt(r.at) === exp.at;
-      return r.status === "needs_time" && r.reason === exp.reason;
-    });
+    e.smart?.timeAny === true ||
+    (resolutions.length === e.reminders.length &&
+      e.reminders.every((exp, i) => {
+        const r = resolutions[i];
+        if (exp.status === "resolved") return r.status === "resolved" && fmt(r.at) === exp.at;
+        return r.status === "needs_time" && r.reason === exp.reason;
+      }));
 
   const ids = new Set(out.tasks.map((t) => t.reminderId).filter(Boolean));
   const shared =
@@ -93,7 +178,8 @@ function score(c: Case, out: ParseResult) {
   const extras =
     (e.priority === undefined || out.tasks[0]?.priority === e.priority) &&
     (e.recurrence === undefined || out.tasks[0]?.recurrence?.freq === e.recurrence);
-  const checks: Checks = { count, titles, time, shared, extras };
+  const smart = scoreSmart(e.smart, out);
+  const checks: Checks = { count, titles, time, shared, extras, smart };
   return { checks, pass: Object.values(checks).every(Boolean), resolutions };
 }
 
@@ -158,7 +244,7 @@ for (const cat of [...new Set(rs.map((r) => r.category))]) {
   );
 }
 console.log("\n=== By check (cases where that field was right) ===");
-for (const k of ["count", "titles", "time", "shared", "extras"] as const) {
+for (const k of ["count", "titles", "time", "shared", "extras", "smart"] as const) {
   const g = rs.filter((r) => r.checks);
   console.log(`${k.padEnd(8)} ${pct(g.filter((r) => r.checks![k]).length, g.length)}`);
 }
