@@ -2,12 +2,15 @@
 
 import {
   DndContext,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
+  type Modifier,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -19,6 +22,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
+import { toggleItem } from "@/lib/tasks/items";
 import { useCapture } from "@/lib/ai/useCapture";
 import { usePush, syncToServer } from "@/lib/push/usePush";
 import { ANCHOR_CHOICES } from "@/lib/questions/answers";
@@ -38,18 +42,24 @@ import { isQuestionOpen } from "@/lib/questions/ask";
 import { useAnswers } from "@/lib/questions/useAnswers";
 import { matchesFilter, selectTasks, type Filter } from "@/lib/tasks/filters";
 import { useTasks } from "@/lib/tasks/useTasks";
+import { Brand } from "./Brand";
 import { Dock } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
-import { Mark, SlidersIcon } from "./Icon";
+import { SlidersIcon } from "./Icon";
 import { PushBanner } from "./PushBanner";
 import { QuestionCard } from "./QuestionCard";
 import { ReminderAlerts } from "./ReminderAlerts";
-import { TaskCard } from "./TaskCard";
+import { TaskCard, TaskCardOverlay } from "./TaskCard";
 import { TaskEditor } from "./TaskEditor";
 import { TriggerBar } from "./TriggerBar";
 import { useToast, useUndoToast } from "./Toast";
 
 const LINGER_MS = 450;
+const EXIT_MS = 220; // how long a deleted card takes to leave before it is removed
+
+/** Keep the lifted card on the vertical axis: it is a list, not a free canvas. */
+const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
+const buzz = (ms: number) => navigator.vibrate?.(ms);
 
 export function HomeScreen() {
   const { t } = useI18n();
@@ -62,6 +72,10 @@ export function HomeScreen() {
   const [filter, setFilter] = useState<Filter>("today");
   const [editingId, setEditingId] = useState<string | null>(null);
   const editSnapshot = useRef<Task | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const justPicked = useRef(false);
+  const [droppedId, setDroppedId] = useState<string | null>(null);
+  const [leaving, setLeaving] = useState<ReadonlySet<string>>(new Set());
   const opener = useRef<HTMLElement | null>(null);
   const [now, setNow] = useState(() => new Date());
   // Tasks just completed stay visible briefly so the check animation can play.
@@ -243,8 +257,26 @@ export function HomeScreen() {
   const handleDelete = useCallback(
     (task: Task) => {
       setEditingId(null);
-      remove(task.id);
-      undoToast(t("toast.deleted"), () => upsert(task));
+      // Show it leaving first, then remove it. The Undo is offered straight away.
+      setLeaving((s) => new Set(s).add(task.id));
+      undoToast(t("toast.deleted"), () => {
+        setLeaving((s) => {
+          const n = new Set(s);
+          n.delete(task.id);
+          return n;
+        });
+        upsert(task);
+      });
+      timers.current.push(
+        setTimeout(() => {
+          remove(task.id);
+          setLeaving((s) => {
+            const n = new Set(s);
+            n.delete(task.id);
+            return n;
+          });
+        }, EXIT_MS),
+      );
     },
     [remove, upsert, undoToast, t],
   );
@@ -254,12 +286,72 @@ export function HomeScreen() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
+  const position = (id: string | number | undefined) => visible.findIndex((x) => x.id === id) + 1;
+  const titleOf = (id: string | number | undefined) =>
+    visible.find((x) => x.id === id)?.title ?? "";
+
+  function onDragStart({ active }: DragStartEvent) {
+    setActiveId(String(active.id));
+    justPicked.current = true;
+    buzz(12); // a small tick in the hand: it was picked up
+  }
+
   function onDragEnd({ active, over }: DragEndEvent) {
+    setActiveId(null);
     if (!over || active.id === over.id) return;
     const from = visible.findIndex((x) => x.id === active.id);
     const to = visible.findIndex((x) => x.id === over.id);
-    if (from >= 0 && to >= 0) move(visible, from, to);
+    if (from < 0 || to < 0) return;
+    move(visible, from, to);
+    buzz(8);
+    // Highlight where it landed, briefly.
+    const id = String(active.id);
+    setDroppedId(id);
+    timers.current.push(setTimeout(() => setDroppedId((cur) => (cur === id ? null : cur)), 900));
   }
+
+  const announcements = {
+    onDragStart: ({ active }: { active: { id: string | number } }) =>
+      t("task.drag.pickedUp", {
+        title: titleOf(active.id),
+        pos: position(active.id),
+        total: visible.length,
+      }),
+    onDragOver: ({
+      active,
+      over,
+    }: {
+      active: { id: string | number };
+      over: { id: string | number } | null;
+    }) => {
+      // The library reports "over itself" right after pick-up; keep the "Picked up" message instead.
+      if (justPicked.current) {
+        justPicked.current = false;
+        return undefined;
+      }
+      return over
+        ? t("task.drag.movedTo", {
+            title: titleOf(active.id),
+            pos: position(over.id),
+            total: visible.length,
+          })
+        : undefined;
+    },
+    onDragEnd: ({
+      active,
+      over,
+    }: {
+      active: { id: string | number };
+      over: { id: string | number } | null;
+    }) =>
+      t("task.drag.dropped", {
+        title: titleOf(active.id),
+        pos: position(over?.id ?? active.id),
+        total: visible.length,
+      }),
+    onDragCancel: ({ active }: { active: { id: string | number } }) =>
+      t("task.drag.cancelled", { title: titleOf(active.id), pos: position(active.id) }),
+  };
 
   useEffect(() => {
     resurfaceRef.current = resurface;
@@ -287,10 +379,15 @@ export function HomeScreen() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-4 pt-[max(16px,env(safe-area-inset-top))] pb-44">
       <header className="flex items-center justify-between py-3">
-        <div className="text-door flex items-center gap-2">
-          <Mark className="size-8" />
-          <h1 className="t-lead text-ink">{t("app.name")}</h1>
-        </div>
+        <h1>
+          <Brand
+            onClick={() => {
+              // Already home: tapping the name takes you back to the top of Today.
+              setFilter("today");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
+        </h1>
         <Link
           href="/settings"
           aria-label={t("nav.settings")}
@@ -341,8 +438,14 @@ export function HomeScreen() {
             id="tasks-dnd"
             sensors={sensors}
             collisionDetection={closestCenter}
+            modifiers={[verticalOnly]}
+            onDragStart={onDragStart}
             onDragEnd={onDragEnd}
-            accessibility={{ screenReaderInstructions: { draggable: t("task.reorderHelp") } }}
+            onDragCancel={() => setActiveId(null)}
+            accessibility={{
+              announcements,
+              screenReaderInstructions: { draggable: t("task.reorderHelp") },
+            }}
           >
             <SortableContext
               items={visible.map((x) => x.id)}
@@ -355,8 +458,14 @@ export function HomeScreen() {
                     task={task}
                     now={now}
                     draggable={filter !== "done"}
+                    leaving={leaving.has(task.id)}
+                    settled={droppedId === task.id}
                     onToggle={handleToggle}
                     onOpen={openEditor}
+                    onItemToggle={(taskId, itemId) => {
+                      const tk = getTasks().find((x) => x.id === taskId);
+                      if (tk) upsert(toggleItem(tk, itemId));
+                    }}
                     onAsk={(id) => {
                       const tk = tasks.find((x) => x.id === id);
                       if (tk) askAgain(tk);
@@ -366,6 +475,21 @@ export function HomeScreen() {
                 ))}
               </ul>
             </SortableContext>
+            {/* The card in your hand. It eases into its new slot when you let go. */}
+            <DragOverlay
+              dropAnimation={{ duration: 260, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }}
+            >
+              {activeId && visible.find((x) => x.id === activeId) ? (
+                <TaskCardOverlay
+                  task={visible.find((x) => x.id === activeId)!}
+                  now={now}
+                  onToggle={handleToggle}
+                  onOpen={openEditor}
+                  onAsk={() => {}}
+                  onItemToggle={() => {}}
+                />
+              ) : null}
+            </DragOverlay>
           </DndContext>
         ) : (
           ready &&
