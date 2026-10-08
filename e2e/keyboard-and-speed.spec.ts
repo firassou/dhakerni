@@ -56,9 +56,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("everything works with the keyboard alone", async ({ page }) => {
-  // add a task: focus the field, type, Enter
+  // add a task: focus the field, type, Tab to Send, Enter (Enter in the field is a new line on a phone)
   await page.locator("#quick-add").focus();
   await page.keyboard.type("water plants");
+  await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
   await expect(page.getByText("water plants")).toBeVisible();
 
@@ -108,7 +109,7 @@ test("focus is always visible", async ({ page }) => {
 
 test("the Escape key closes dialogs and returns focus to where you were", async ({ page }) => {
   await page.locator("#quick-add").fill("a task");
-  await page.locator("#quick-add").press("Enter");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
   const edit = page.getByRole("button", { name: /^Edit task/ });
   await edit.click();
   await page.keyboard.press("Escape");
@@ -147,7 +148,7 @@ test.describe("interactions feel instant (optimistic updates, under 100 ms)", ()
 
   test("completing a task and opening the editor", async ({ page }) => {
     await page.locator("#quick-add").fill("one");
-    await page.locator("#quick-add").press("Enter");
+    await page.getByRole("button", { name: "Add", exact: true }).click();
     await expect(page.getByText("one", { exact: true })).toBeVisible();
 
     const done = await measure(
@@ -170,7 +171,7 @@ test.describe("interactions feel instant (optimistic updates, under 100 ms)", ()
       page,
       async () => {
         await page.locator("#quick-add").fill("soon task");
-        await page.locator("#quick-add").press("Enter");
+        await page.getByRole("button", { name: "Add", exact: true }).click();
       },
       '[aria-label="Edit task: soon task"], button[aria-label^="Edit task: soon"]',
     );

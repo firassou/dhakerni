@@ -40,12 +40,12 @@ import { describeFact } from "@/lib/questions/describe";
 import { useProfile } from "@/lib/memory/useProfile";
 import { isQuestionOpen } from "@/lib/questions/ask";
 import { useAnswers } from "@/lib/questions/useAnswers";
-import { matchesFilter, selectTasks, type Filter } from "@/lib/tasks/filters";
+import { expiredDone, matchesFilter, selectTasks, type Filter } from "@/lib/tasks/filters";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { Brand } from "./Brand";
 import { Dock } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
-import { SlidersIcon } from "./Icon";
+import { CloseIcon, SlidersIcon, TrashIcon } from "./Icon";
 import { PushBanner } from "./PushBanner";
 import { QuestionCard } from "./QuestionCard";
 import { ReminderAlerts } from "./ReminderAlerts";
@@ -76,6 +76,9 @@ export function HomeScreen() {
   const justPicked = useRef(false);
   const [droppedId, setDroppedId] = useState<string | null>(null);
   const [leaving, setLeaving] = useState<ReadonlySet<string>>(new Set());
+  // Cards picked with a long press, to delete together.
+  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  const selecting = selected.size > 0;
   const opener = useRef<HTMLElement | null>(null);
   const [now, setNow] = useState(() => new Date());
   // Tasks just completed stay visible briefly so the check animation can play.
@@ -138,7 +141,7 @@ export function HomeScreen() {
     [refresh, show, t],
   );
 
-  const { pending, submitText, submitAudio } = useCapture({
+  const { pending, submitText, hear } = useCapture({
     getTasks,
     insert,
     remove,
@@ -255,31 +258,59 @@ export function HomeScreen() {
   }, [ready, resurface]);
 
   const handleDelete = useCallback(
-    (task: Task) => {
+    (gone: Task[]) => {
+      if (!gone.length) return;
       setEditingId(null);
-      // Show it leaving first, then remove it. The Undo is offered straight away.
-      setLeaving((s) => new Set(s).add(task.id));
-      undoToast(t("toast.deleted"), () => {
-        setLeaving((s) => {
-          const n = new Set(s);
-          n.delete(task.id);
-          return n;
-        });
-        upsert(task);
-      });
+      const without = (s: ReadonlySet<string>) => {
+        const n = new Set(s);
+        gone.forEach((x) => n.delete(x.id));
+        return n;
+      };
+      // Show them leaving first, then remove them. The Undo is offered straight away.
+      setLeaving((s) => new Set([...s, ...gone.map((x) => x.id)]));
+      undoToast(
+        gone.length === 1 ? t("toast.deleted") : t("toast.deletedMany", { count: gone.length }),
+        () => {
+          setLeaving(without);
+          gone.forEach(upsert);
+        },
+      );
       timers.current.push(
         setTimeout(() => {
-          remove(task.id);
-          setLeaving((s) => {
-            const n = new Set(s);
-            n.delete(task.id);
-            return n;
-          });
+          gone.forEach((x) => remove(x.id));
+          setLeaving(without);
         }, EXIT_MS),
       );
     },
     [remove, upsert, undoToast, t],
   );
+
+  const toggleSelected = useCallback(
+    (id: string) =>
+      setSelected((s) => {
+        const n = new Set(s);
+        if (!n.delete(id)) n.add(id);
+        return n;
+      }),
+    [],
+  );
+  const clearSelected = useCallback(() => setSelected(new Set()), []);
+
+  // Escape leaves picking mode.
+  useEffect(() => {
+    if (!selecting) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") clearSelected();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selecting, clearSelected]);
+
+  // Finished tasks are only kept for a day.
+  useEffect(() => {
+    if (!ready) return;
+    for (const old of expiredDone(tasks, now)) remove(old.id);
+  }, [ready, now, tasks, remove]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -419,7 +450,13 @@ export function HomeScreen() {
       />
       <TriggerBar anchors={anchorsWaiting(tasks, now)} onTrigger={handleTrigger} />
 
-      <FilterTabs value={filter} onChange={setFilter} />
+      <FilterTabs
+        value={filter}
+        onChange={(f) => {
+          clearSelected(); // never delete cards that are no longer on screen
+          setFilter(f);
+        }}
+      />
 
       <main className="mt-3 flex flex-1 flex-col">
         {pending && (
@@ -457,9 +494,14 @@ export function HomeScreen() {
                     key={task.id}
                     task={task}
                     now={now}
-                    draggable={filter !== "done"}
+                    draggable={filter !== "done" && !selecting}
+                    selecting={selecting}
+                    selected={selected.has(task.id)}
+                    onLongPress={toggleSelected}
+                    onSelect={toggleSelected}
                     leaving={leaving.has(task.id)}
                     settled={droppedId === task.id}
+                    finishing={task.done && filter !== "done"}
                     onToggle={handleToggle}
                     onOpen={openEditor}
                     onItemToggle={(taskId, itemId) => {
@@ -500,14 +542,50 @@ export function HomeScreen() {
             </div>
           )
         )}
+        {filter === "done" && visible.length > 0 && (
+          <p className="t-micro text-ink-2 mt-3 text-center">{t("task.doneKeep")}</p>
+        )}
       </main>
 
-      <Dock
-        busy={pending !== null}
-        onSubmitText={submitText}
-        onAudio={submitAudio}
-        onVoiceError={(kind) => show({ message: t(`voice.${kind}`) })}
-      />
+      {selecting ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-4">
+          <div
+            role="toolbar"
+            aria-label={t("select.label")}
+            className="glass safe-bottom pointer-events-auto mb-3 flex w-full max-w-xl items-center gap-2 rounded-[28px] p-2"
+          >
+            <button
+              onClick={clearSelected}
+              aria-label={t("select.cancel")}
+              className="text-ink-2 hover:bg-surface-2 grid size-12 shrink-0 place-items-center rounded-full"
+            >
+              <CloseIcon />
+            </button>
+            <p className="min-w-0 flex-1 font-medium" role="status" aria-live="polite">
+              {t("select.count", { n: selected.size })}
+            </p>
+            <button
+              onClick={() => {
+                handleDelete(tasks.filter((x) => selected.has(x.id)));
+                clearSelected();
+              }}
+              className="bg-danger flex h-12 shrink-0 items-center gap-2 rounded-full px-5 font-medium text-white transition-transform duration-[var(--t-fast)] active:scale-95"
+            >
+              <TrashIcon />
+              {t("select.delete")}
+            </button>
+          </div>
+        </div>
+      ) : null}
+      {/* Hidden, not removed, while picking: a half-typed task must survive. */}
+      <div hidden={selecting}>
+        <Dock
+          busy={pending !== null}
+          onSubmitText={submitText}
+          onAudio={hear}
+          onVoiceError={(kind) => show({ message: t(`voice.${kind}`) })}
+        />
+      </div>
       <TaskEditor
         task={editing}
         onClose={closeEditor}
@@ -527,7 +605,7 @@ export function HomeScreen() {
               : patch,
           )
         }
-        onDelete={handleDelete}
+        onDelete={(task) => handleDelete([task])}
       />
     </div>
   );

@@ -29,7 +29,7 @@
     },
     "done": {
       "title": "Rien de terminé",
-      "body": "Les tâches terminées arrivent ici."
+      "body": "Les tâches terminées restent ici un jour."
     }
   },
   "dock": {
@@ -62,7 +62,7 @@
     "privacy": {
       "title": "Confidentialité",
       "local": "Vos tâches et ce que Dhakerni apprend sur vous restent sur cet appareil.",
-      "server": "Pour les rappels quand l'app est fermée, notre serveur garde seulement : votre adresse push, un identifiant anonyme, l'heure de chaque rappel et un titre court (coupé à 80 caractères). Tout est chiffré, chaque rappel est supprimé juste après l'envoi, et désactiver les notifications supprime le reste."
+      "server": "Pour les rappels quand l'app est fermée, notre serveur garde seulement : votre adresse push, un identifiant anonyme, l'heure de chaque rappel et un titre court (coupé à 80 caractères). Tout est chiffré, chaque rappel est supprimé dès que vous y répondez ou après sa dernière répétition, et désactiver les notifications supprime le reste."
     },
     "anonymousId": "Identifiant anonyme",
     "version": "Version",
@@ -108,6 +108,13 @@
         "tozeur": "Tozeur",
         "kebili": "Kébili"
       }
+    },
+    "reset": {
+      "title": "Réinitialiser",
+      "action": "Tout réinitialiser",
+      "confirm": "Supprimer toutes les tâches, tout ce que Dhakerni a appris et tous les réglages sur cet appareil, et désactiver les notifications ? C'est définitif.",
+      "yes": "Oui, tout supprimer",
+      "cancel": "Annuler"
     }
   },
   "time": {
@@ -140,7 +147,8 @@
       "movedTo": "{title} déplacée en position {pos} sur {total}.",
       "dropped": "{title} déposée en position {pos} sur {total}.",
       "cancelled": "Déplacement annulé. {title} est revenue en position {pos}."
-    }
+    },
+    "doneKeep": "Les tâches terminées sont supprimées après un jour."
   },
   "editor": {
     "title": "Tâche",
@@ -182,7 +190,8 @@
     "resurfaced": "Il manque encore une heure pour « {title} ».",
     "unclear": "Je n'ai pas compris l'heure. Choisissez une option.",
     "triggered": "Rappels envoyés",
-    "noticed": "Remarqué : {fact}. Modifiable à tout moment."
+    "noticed": "Remarqué : {fact}. Modifiable à tout moment.",
+    "deletedMany": "{count} tâches supprimées"
   },
   "voice": {
     "denied": "Le micro est bloqué. Autorisez-le dans les réglages du navigateur, ou écrivez.",
@@ -190,7 +199,8 @@
     "failed": "Impossible de démarrer le micro. Réessayez ou écrivez.",
     "tooShort": "Trop court. Maintenez le micro pendant que vous parlez.",
     "empty": "Rien entendu. Réessayez.",
-    "noTask": "Aucune tâche trouvée. Essayez de reformuler."
+    "noTask": "Aucune tâche trouvée. Essayez de reformuler.",
+    "review": "Vérifiez ce que j'ai entendu, corrigez si besoin, puis envoyez."
   },
   "capture": {
     "fallback": "Je n'ai pas compris, la tâche est enregistrée telle quelle.",
@@ -289,7 +299,9 @@
     "banner": "Recevez les rappels même quand l'app est fermée.",
     "bannerAction": "Activer",
     "bannerDismiss": "Pas maintenant",
-    "firefox": "Firefox sur ordinateur n'affiche pas de boutons sur les notifications. Cliquez sur la notification pour ouvrir l'app, puis utilisez Terminé ou Reporter."
+    "firefox": "Firefox sur ordinateur n'affiche pas de boutons sur les notifications. Cliquez sur la notification pour ouvrir l'app, puis utilisez Terminé ou Reporter.",
+    "repeats": "Un rappel sans réponse est renvoyé deux fois, à 3 minutes d'intervalle.",
+    "android": "Pas de rappels quand le téléphone est verrouillé ? Dans les Paramètres Android, ouvrez Applications, Chrome, Batterie et choisissez Sans restriction."
   },
   "trigger": {
     "label": "Déclencheurs",
@@ -356,5 +368,11 @@
       "too_new": "Cette sauvegarde vient d'une version plus récente de Dhakerni.",
       "too_large": "Ce fichier est trop volumineux."
     }
+  },
+  "select": {
+    "label": "Tâches sélectionnées",
+    "count": "{n} sélectionnées",
+    "delete": "Supprimer",
+    "cancel": "Annuler la sélection"
   }
 }

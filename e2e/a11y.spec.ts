@@ -85,7 +85,7 @@ for (const scheme of ["light", "dark"] as const) {
       // tasks, an open question, and a push banner
       const add = page.locator("#quick-add");
       await add.fill("بعد شوية باش نعمل réunion و Appeler maman");
-      await add.press("Enter");
+      await page.locator('button[type="submit"]').click(); // its label follows the language
       await page.getByRole("group", { name: /[?؟]$/ }).waitFor();
       await page.waitForTimeout(500);
       await scan(page, `home with question (${scheme}, ${lang})`);
@@ -103,7 +103,7 @@ test("the task editor sheet has no violations", async ({ page }) => {
   await seed(page);
   await page.goto("/");
   await page.locator("#quick-add").fill("x y z");
-  await page.locator("#quick-add").press("Enter");
+  await page.getByRole("button", { name: "Add", exact: true }).click();
   await page
     .getByRole("button", { name: /^Edit task/ })
     .first()

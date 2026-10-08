@@ -7,6 +7,7 @@ const CACHE = "dhakerni-shell-v2";
 const SHELL = ["/", "/settings", "/manifest.webmanifest"];
 const DB_NAME = "dhakerni";
 const DEFAULT_SNOOZE_MIN = 10;
+const VIBRATE = [400, 200, 400, 200, 800]; // long enough to feel in a pocket
 
 const TEXT = {
   en: { done: "Done", snooze: "Snooze", open: "Open", body: "Reminder", dir: "ltr", lang: "en" },
@@ -127,6 +128,9 @@ async function show(title, taskId, minutes) {
     dir: L.dir,
     icon: "/icons/icon-192.png",
     requireInteraction: true,
+    // The server repeats an unanswered reminder: each copy must buzz again, not replace the first in silence.
+    renotify: true,
+    vibrate: VIBRATE,
   });
 }
 
@@ -163,6 +167,24 @@ async function markDone(taskId) {
   if (!task) return;
   const now = new Date().toISOString();
   await putTask(db, { ...task, done: true, doneAt: now, updatedAt: now });
+  // Tell the server to stop repeating this reminder.
+  try {
+    const sub = await self.registration.pushManager.getSubscription();
+    const sid = await getMeta(db, "sessionId");
+    if (!sub || !sid) return;
+    await fetch("/api/reminders", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-session-id": sid },
+      body: JSON.stringify({
+        subscription: sub.toJSON(),
+        mode: "upsert",
+        reminders: [],
+        cancel: [taskId],
+      }),
+    });
+  } catch {
+    /* offline: it repeats at most twice more */
+  }
 }
 
 async function snooze(taskId) {

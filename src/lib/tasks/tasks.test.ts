@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Task } from "../schemas";
-import { selectTasks } from "./filters";
+import { expiredDone, selectTasks } from "./filters";
 import { newTask, reorderVisible, toggleDone } from "./ops";
 import { fromLocalInput, toLocalInput } from "../time/format";
 
@@ -47,6 +47,15 @@ describe("ops", () => {
     expect(t.order).toBe(-3);
     expect(t.dueAt).toBeNull();
   });
+  it("finished tasks expire a day after they were completed", () => {
+    const list = [
+      mk("open-old", 1, { dueAt: at(1) }),
+      mk("done-fresh", 2, { done: true, doneAt: at(7, 13) }), // 23 h ago
+      mk("done-old", 3, { done: true, doneAt: at(7, 11) }), // 25 h ago
+    ];
+    expect(ids(expiredDone(list, now))).toEqual(["done-old"]);
+  });
+
   it("toggleDone sets and clears doneAt", () => {
     const done = toggleDone(mk("a", 1), now);
     expect(done.done).toBe(true);

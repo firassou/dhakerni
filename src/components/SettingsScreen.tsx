@@ -11,6 +11,7 @@ import { BackupControls } from "./BackupControls";
 import { LearningSwitch } from "./LearningSwitch";
 import { PrayerSettings } from "./PrayerSettings";
 import { PushControls } from "./PushControls";
+import { ResetControls } from "./ResetControls";
 
 export function SettingsScreen() {
   const { t, preference, setPreference } = useI18n();
@@ -123,6 +124,13 @@ export function SettingsScreen() {
             </span>
           </p>
         </div>
+      </section>
+
+      <section aria-labelledby="reset-h" className="mt-10">
+        <h2 id="reset-h" className="t-small text-ink-2 mb-2 font-medium">
+          {t("settings.reset.title")}
+        </h2>
+        <ResetControls />
       </section>
 
       <footer className="text-ink-2 mt-12 space-y-1 text-center">

@@ -44,6 +44,8 @@ export function useReminders({ tasks, getTasks, ready, upsert, toggle, snoozeMin
             data: { taskId: task.id },
             icon: "/icons/icon-192.png",
             requireInteraction: true,
+            renotify: true,
+            vibrate: [400, 200, 400, 200, 800],
             actions: [
               { action: "done", title: tr("notify.done") },
               { action: "snooze", title: tr("notify.snooze", { n: minutes }) },

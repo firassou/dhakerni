@@ -219,3 +219,31 @@ drop, and spoken announcements for screen readers. Deleting: the card slides awa
 Completing: the check draws, then the card fades. Adding: the card springs in. Recording: live waveform, a running
 clock, a cancel button. A bug found here: an entrance animation that kept its end state overrode the drag library's
 movement, so cards only snapped at the end. Entrance animations must not keep `transform` after they finish.
+
+## D15. Reminders that are hard to miss, without a native app
+
+The app stays a PWA installed from Chrome (no APK). A web app cannot ring like an alarm: no full-screen wake, no
+alarm sound, no scheduling on the device. A push can also be delayed or dropped while the phone sleeps, most
+often when Android restricts Chrome's battery use. What is done instead:
+
+- **Repeat until answered.** After sending, the server schedules the same reminder again 3 minutes later, twice
+  (`REPEATS`, `REPEAT_MS` in `src/lib/server/reminders.ts`). Done on the notification sends `cancel`; Snooze
+  replaces the record; opening the app syncs a list that no longer contains it. Any of these stops the repeats.
+- **Each copy buzzes** (`renotify` and a long `vibrate` pattern), instead of silently replacing the first.
+- **Settings tells Android users** to set Chrome's battery use to Unrestricted. The app cannot change that.
+
+Not verified on a real phone: where the missed reminders were lost (Chrome restricted, or the every-minute
+scheduler skipping runs). If reminders are still missed with Chrome unrestricted, check the scheduler first.
+
+## D16. Voice is checked before it is understood
+
+Typed sentences are understood well; spoken Derja often is not, because the speech-to-text step gets words wrong
+and the person never saw what was heard. The transcript now goes into the text field (a toast says to check it)
+and nothing is created until it is sent. This costs one tap and makes every speech-to-text mistake visible and
+fixable. It does not make the speech-to-text itself more accurate; `/dev/stt` is still the place to compare
+providers. Voice answers to a clarifying question are unchanged.
+
+## D17. The Done list is a short look back
+
+Finished tasks are deleted 24 hours after they were completed (`DONE_KEEP_MS`), checked on load and every 30
+seconds while the app is open. There is no setting for the length yet.
