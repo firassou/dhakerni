@@ -8,6 +8,7 @@ import { LOCALES } from "@/lib/i18n/locales";
 import { Brand } from "./Brand";
 import { BackIcon } from "./Icon";
 import { BackupControls } from "./BackupControls";
+import { DigestSwitch } from "./DigestSwitch";
 import { LearningSwitch } from "./LearningSwitch";
 import { PrayerSettings } from "./PrayerSettings";
 import { PushControls } from "./PushControls";
@@ -78,6 +79,7 @@ export function SettingsScreen() {
           {t("push.title")}
         </h2>
         <PushControls />
+        <DigestSwitch />
       </section>
 
       <section id="prayer" aria-labelledby="prayer-h" className="mt-10">

@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getMeta } from "../db";
 import { isCity, type CityKey } from "../prayer/cities";
+import { anchorAliases, isRamadanMode, type RamadanMode } from "../prayer/ramadan";
 import { nextPrayerMoment } from "../prayer/times";
 import type { ProfileFact } from "../schemas";
+import { applyHeard, heardFixes } from "./heard";
 import {
   learnFact,
   listFacts,
@@ -19,6 +21,7 @@ export function useProfile() {
   const [facts, setFacts] = useState<ProfileFact[]>([]);
   const ref = useRef<ProfileFact[]>([]);
   const cityRef = useRef<CityKey | null>(null);
+  const ramadanRef = useRef<RamadanMode>("auto");
 
   useEffect(() => {
     listFacts()
@@ -34,6 +37,11 @@ export function useProfile() {
     getMeta<string>("city")
       .then((c) => {
         cityRef.current = isCity(c) ? c : null;
+      })
+      .catch(() => {});
+    getMeta<string>("ramadan")
+      .then((m) => {
+        ramadanRef.current = isRamadanMode(m) ? m : "auto";
       })
       .catch(() => {});
   }, []);
@@ -75,9 +83,13 @@ export function useProfile() {
     getResolveOptions: () => ({
       ...toResolveOptions(ref.current),
       prayerMoment: cityRef.current
-        ? (anchor: string, now: Date) => nextPrayerMoment(cityRef.current!, anchor, now)
+        ? (anchor: string, now: Date, minutes?: number | null) =>
+            nextPrayerMoment(cityRef.current!, anchor, now, minutes)
         : undefined,
+      anchorAliases: anchorAliases(ramadanRef.current, new Date()),
     }),
+    /** A fresh transcript with the person's known fixes already made. */
+    fixHeard: (text: string) => applyHeard(text, heardFixes(ref.current)),
     /** The few facts worth sending with this sentence. */
     hintsFor: (text: string) => sliceForParse(ref.current, text),
   };

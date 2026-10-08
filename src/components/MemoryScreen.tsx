@@ -14,10 +14,15 @@ import { useToast } from "./Toast";
 
 type Group = "words" | "routine" | "habits";
 const groupOf = (key: string): Group =>
-  key.startsWith("vague.") ? "words" : key.startsWith("anchor.") ? "routine" : "habits";
+  key.startsWith("vague.") || key.startsWith("heard.")
+    ? "words"
+    : key.startsWith("anchor.")
+      ? "routine"
+      : "habits";
 
 /** How a fact can be edited: a number of minutes, a clock time, a choice, or not at all. */
-function editorKind(key: string): "minutes" | "time" | "priority" | null {
+function editorKind(key: string): "minutes" | "time" | "priority" | "text" | null {
+  if (key.startsWith("heard.")) return "text";
   if (key.startsWith("vague.") || key === "snooze.default") return "minutes";
   if (key.startsWith("anchor.") || key.startsWith("usual.time.")) return "time";
   if (key.startsWith("priority.")) return "priority";
@@ -131,7 +136,7 @@ export function MemoryScreen() {
                             {t(`memory.source.${f.source}`)} ·{" "}
                             {t("memory.updated", { when: ago(f.updatedAt) })}
                           </p>
-                          {!isUsable(f) && (
+                          {!isUsable(f) && !f.key.startsWith("frequent.") && (
                             <p className="t-micro text-ink-2 mt-0.5">{t("memory.notYet")}</p>
                           )}
                         </div>
@@ -167,6 +172,15 @@ export function MemoryScreen() {
                               value={draft}
                               onChange={(e) => setDraft(e.target.value)}
                               className={`${field} w-28`}
+                            />
+                          )}
+                          {kind === "text" && (
+                            <input
+                              data-bidi
+                              aria-label={t("memory.value")}
+                              value={draft}
+                              onChange={(e) => setDraft(e.target.value)}
+                              className={`${field} min-w-0 flex-1`}
                             />
                           )}
                           {kind === "time" && (

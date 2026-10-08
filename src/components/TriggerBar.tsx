@@ -6,9 +6,12 @@ import { useI18n } from "@/lib/i18n";
 export function TriggerBar({
   anchors,
   onTrigger,
+  wordsFor,
 }: {
   anchors: string[];
   onTrigger: (anchor: string) => void;
+  /** The person's own words for an event the app has no name for ("tji Sami"). */
+  wordsFor: (anchor: string) => string;
 }) {
   const { t } = useI18n();
   if (!anchors.length) return null;
@@ -22,7 +25,11 @@ export function TriggerBar({
             onClick={() => onTrigger(a)}
             className="t-small bg-door-soft text-door hover:bg-door/20 rounded-full px-4 py-2 font-medium transition-transform duration-[var(--t-fast)] ease-[var(--ease-spring)] active:scale-95"
           >
-            {label === `trigger.${a}` ? a : label}
+            {label === `trigger.${a}` ? (
+              <span data-bidi>{t("trigger.custom", { event: wordsFor(a) })}</span>
+            ) : (
+              label
+            )}
           </button>
         );
       })}

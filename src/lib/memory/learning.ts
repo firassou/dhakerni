@@ -1,5 +1,6 @@
 import { getMeta, setMeta } from "../db";
 import type { Task } from "../schemas";
+import { corrections, heardKey } from "./heard";
 import { correctFact, isLearningOn, learnFact, OBS, type LearnResult } from "./profile";
 import {
   countScripts,
@@ -37,6 +38,41 @@ async function save(out: LearnResult[], r: Promise<LearnResult | null>) {
   if (result) out.push(result);
 }
 
+const FREQUENT_FROM = 3;
+const TEMPLATES = `${OBS}templates`;
+const MAX_TEMPLATES = 40;
+
+/** A task added often, as it looked the last time: its title, category and checklist. */
+export interface Template {
+  title: string;
+  list: string;
+  items: { name: string; qty: number | null; unit: string | null }[];
+}
+
+async function rememberTemplate(key: string, task: Task) {
+  const all = { ...((await getMeta<Record<string, Template>>(TEMPLATES)) ?? {}) };
+  delete all[key]; // re-inserted last, so the oldest are the first to go
+  all[key] = {
+    title: task.title,
+    list: task.list,
+    items: task.items.map(({ name, qty, unit }) => ({ name, qty, unit })),
+  };
+  const keys = Object.keys(all);
+  for (const old of keys.slice(0, Math.max(0, keys.length - MAX_TEMPLATES))) delete all[old];
+  await setMeta(TEMPLATES, all);
+}
+
+export const loadTemplates = async () => (await getMeta<Record<string, Template>>(TEMPLATES)) ?? {};
+
+/** The transcript as heard against what the person sent: each word they fixed is worth remembering. */
+export async function observeHeard(heard: string, sent: string): Promise<LearnResult[]> {
+  const out: LearnResult[] = [];
+  if (!(await isLearningOn())) return out;
+  for (const [from, to] of corrections(heard, sent).slice(0, 5))
+    await save(out, learnFact(heardKey(from), to, "behavior"));
+  return out;
+}
+
 /** New tasks: how often a title repeats, language mix, and the time of day chosen per category. */
 export async function observeCreated(tasks: readonly Task[]): Promise<LearnResult[]> {
   const out: LearnResult[] = [];
@@ -48,6 +84,8 @@ export async function observeCreated(tasks: readonly Task[]): Promise<LearnResul
     await setMeta(`${OBS}freq`, freq);
     const f = frequentTitle(task.title, freq[title]);
     if (f) await save(out, learnFact(f.key, f.value, "behavior"));
+    // From the third time on, keep how the task looked, so one tap can add it again.
+    if (freq[title] >= FREQUENT_FROM) await rememberTemplate(title, task);
 
     const counts = countScripts(await getMeta<ScriptCounts>(`${OBS}scripts`), task.title);
     await setMeta(`${OBS}scripts`, counts);

@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import { isOverdue } from "@/lib/tasks/filters";
 import { describeFact } from "@/lib/questions/describe";
-import { formatDue } from "@/lib/time/format";
+import { formatDue, leadLabel } from "@/lib/time/format";
 import { formatRemaining } from "@/lib/time/remaining";
 import { formatItem, stepsDone } from "@/lib/tasks/items";
 import { CheckIcon, GripIcon, TrashIcon } from "./Icon";
@@ -179,6 +179,14 @@ function TaskCardBody({
             {remaining && (
               <span data-testid="remaining" data-bidi>
                 {remaining}
+              </span>
+            )}
+            {task.recurrence && !task.done && (
+              <span data-testid="repeats">{t(`task.repeat.${task.recurrence.freq}`)}</span>
+            )}
+            {task.remindBefore && task.dueAt && !task.done && (
+              <span data-testid="remind-before">
+                {t("task.remindBefore", { when: leadLabel(task.remindBefore, t) })}
               </span>
             )}
             {task.assumed && task.dueAt && (

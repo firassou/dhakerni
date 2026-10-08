@@ -19,22 +19,35 @@ import {
 } from "@dnd-kit/sortable";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getSessionId } from "@/lib/db";
+import { getMeta, getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import { toggleItem } from "@/lib/tasks/items";
+import { newTask } from "@/lib/tasks/ops";
+import { isRepeating } from "@/lib/tasks/recur";
+import { formatDue } from "@/lib/time/format";
 import { useCapture } from "@/lib/ai/useCapture";
 import { usePush } from "@/lib/push/usePush";
 import { useReminderSync } from "@/lib/push/useReminderSync";
 import { ANCHOR_CHOICES } from "@/lib/questions/answers";
 import {
   anchorsWaiting,
+  anchorWords,
   DEFAULT_SNOOZE_MIN,
+  type DigestCounts,
   roundedClock,
   triggerable,
 } from "@/lib/reminders/engine";
 import { useReminders } from "@/lib/reminders/useReminders";
-import { observeCreated, observeEdit, observeSnooze } from "@/lib/memory/learning";
+import {
+  loadTemplates,
+  observeCreated,
+  observeEdit,
+  observeHeard,
+  observeSnooze,
+  type Template,
+} from "@/lib/memory/learning";
+import { normalizeTitle } from "@/lib/memory/observe";
 import { isUsable, type LearnResult } from "@/lib/memory/profile";
 import { describeFact } from "@/lib/questions/describe";
 import { useProfile } from "@/lib/memory/useProfile";
@@ -43,12 +56,13 @@ import { useAnswers } from "@/lib/questions/useAnswers";
 import { expiredDone, matchesFilter, selectTasks, type Filter } from "@/lib/tasks/filters";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { Brand } from "./Brand";
-import { Dock } from "./Dock";
+import { Dock, type DockHandle } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
 import { InstallButton } from "./InstallButton";
 import { CloseIcon, SlidersIcon, TrashIcon } from "./Icon";
 import { PushBanner } from "./PushBanner";
 import { QuestionCard } from "./QuestionCard";
+import { QuickAdd } from "./QuickAdd";
 import { ReminderAlerts } from "./ReminderAlerts";
 import { TaskCard, TaskCardOverlay } from "./TaskCard";
 import { TaskEditor } from "./TaskEditor";
@@ -61,14 +75,18 @@ const EXIT_MS = 220; // how long a deleted card takes to leave before it is remo
 /** Keep the lifted card on the vertical axis: it is a list, not a free canvas. */
 const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
 const buzz = (ms: number) => navigator.vibrate?.(ms);
+const MAX_QUICK = 3; // tasks offered for one-tap adding
 
 export function HomeScreen() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const undoToast = useUndoToast();
   const { tasks, ready, reload, insert, getTasks, update, toggle, remove, upsert, move } =
     useTasks();
   const { show } = useToast();
-  const { facts, learn, refresh, getResolveOptions, hintsFor } = useProfile();
+  const { facts, learn, refresh, getResolveOptions, hintsFor, fixHeard } = useProfile();
+  const dock = useRef<DockHandle>(null);
+  const [templates, setTemplates] = useState<Record<string, Template>>({});
+  const [digestOn, setDigestOn] = useState(false);
   const push = usePush();
   const [filter, setFilter] = useState<Filter>("today");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -112,7 +130,8 @@ export function HomeScreen() {
 
   const handleToggle = useCallback(
     (id: string) => {
-      const wasDone = tasks.find((x) => x.id === id)?.done ?? false;
+      const before = tasks.find((x) => x.id === id);
+      const wasDone = before?.done ?? false;
       setLingering((s) => new Set(s).add(id));
       timers.current.push(
         setTimeout(
@@ -126,9 +145,16 @@ export function HomeScreen() {
         ),
       );
       toggle(id);
-      if (!wasDone) undoToast(t("toast.done"), () => toggle(id));
+      if (wasDone || !before) return;
+      // A repeating task has moved on to its next date: say when, and Undo puts it back as it was.
+      const after = isRepeating(before) ? getTasks().find((x) => x.id === id) : undefined;
+      if (after?.dueAt && !after.done)
+        undoToast(t("toast.repeats", { when: formatDue(after.dueAt, locale, new Date(), t) }), () =>
+          upsert(before),
+        );
+      else undoToast(t("toast.done"), () => toggle(id));
     },
-    [tasks, toggle, undoToast, t],
+    [tasks, toggle, undoToast, t, getTasks, locale, upsert],
   );
 
   // Passive learning saves quietly. Only when something has become trusted enough to use do we say so.
@@ -146,6 +172,7 @@ export function HomeScreen() {
     getTasks,
     insert,
     remove,
+    upsert,
     getResolveOptions,
     hintsFor,
     // Jump to the view where the first new task lives, so it is visible straight away.
@@ -157,9 +184,82 @@ export function HomeScreen() {
       if (view) setFilter(view);
       void observeCreated(created)
         .then(notice)
+        .then(loadTemplates)
+        .then(setTemplates)
         .catch((e) => console.error("learning failed", e));
     },
   });
+
+  // What was learned to offer for one-tap adding, and whether the evening summary is on.
+  useEffect(() => {
+    loadTemplates()
+      .then(setTemplates)
+      .catch(() => {});
+    getMeta<boolean>("digest")
+      .then((on) => setDigestOn(on === true))
+      .catch(() => {});
+  }, []);
+
+  // Opened by sharing text from another app: it lands in the field, to be checked and sent.
+  useEffect(() => {
+    const q = new URLSearchParams(location.search);
+    const shared = ["title", "text", "url"]
+      .map((k) => q.get(k)?.trim())
+      .filter(Boolean)
+      .join("\n");
+    if (!shared) return;
+    dock.current?.fill(shared.slice(0, 2000));
+    history.replaceState(null, "", "/");
+  }, []);
+
+  /**
+   * Tasks added often, most frequent first, unless one is already waiting. Three additions are the
+   * repetition here, so the fact is used as soon as it exists.
+   */
+  const quick = useMemo(() => {
+    const open = new Set(tasks.filter((x) => !x.done).map((x) => normalizeTitle(x.title)));
+    return facts
+      .filter((f) => f.key.startsWith("frequent."))
+      .sort((a, b) => Number(b.value) - Number(a.value))
+      .map((f) => f.key.slice("frequent.".length))
+      .filter((key) => templates[key] && !open.has(key))
+      .slice(0, MAX_QUICK)
+      .map((key) => templates[key]);
+  }, [facts, tasks, templates]);
+
+  const addAgain = useCallback(
+    (tpl: Template) => {
+      const task = newTask(tpl.title, getTasks(), new Date(), {
+        list: tpl.list,
+        items: tpl.items.map((i) => ({ ...i, id: crypto.randomUUID(), done: false })),
+        needs: {
+          reason: "none",
+          word: null,
+          group: null,
+          openedAt: null,
+          dismissed: true,
+          resurfaced: false,
+        },
+      });
+      insert([task]);
+      setFilter("needsTime");
+      undoToast(t("toast.added"), () => remove(task.id));
+      void observeCreated([task])
+        .then(notice)
+        .catch((e) => console.error("learning failed", e));
+    },
+    [getTasks, insert, notice, remove, t, undoToast],
+  );
+
+  const digestTitle = useCallback(
+    (c: DigestCounts) =>
+      c.tomorrow && c.needsTime
+        ? t("digest.both", { n: c.tomorrow, m: c.needsTime })
+        : c.tomorrow
+          ? t("digest.tomorrow", { n: c.tomorrow })
+          : t("digest.needsTime", { m: c.needsTime }),
+    [t],
+  );
 
   const { answer, answerByVoice, dismissGroup, askAgain, resurface, answering } = useAnswers({
     getTasks,
@@ -219,7 +319,12 @@ export function HomeScreen() {
   }, [ready, focusReminder]);
 
   // Keep the server's copy of future reminders in step with the tasks (only when notifications are on).
-  useReminderSync({ enabled: ready && push.state === "enabled", tasks, getTasks });
+  useReminderSync({
+    enabled: ready && push.state === "enabled",
+    tasks,
+    getTasks,
+    digest: digestOn ? digestTitle : null,
+  });
 
   const handleTrigger = useCallback(
     (anchor: string) => {
@@ -438,7 +543,12 @@ export function HomeScreen() {
           openEditor(id);
         }}
       />
-      <TriggerBar anchors={anchorsWaiting(tasks, now)} onTrigger={handleTrigger} />
+      <TriggerBar
+        anchors={anchorsWaiting(tasks, now)}
+        onTrigger={handleTrigger}
+        wordsFor={(anchor) => anchorWords(tasks, anchor)}
+      />
+      <QuickAdd templates={quick} onAdd={addAgain} />
 
       <FilterTabs
         value={filter}
@@ -575,9 +685,20 @@ export function HomeScreen() {
       {/* Hidden, not removed, while picking: a half-typed task must survive. */}
       <div hidden={selecting}>
         <Dock
+          ref={dock}
           busy={pending !== null}
-          onSubmitText={submitText}
-          onAudio={hear}
+          onSubmitText={(text, heard) => {
+            void submitText(text);
+            // Words fixed in the transcript before sending are how the app learns what was really said.
+            if (heard)
+              void observeHeard(heard, text)
+                .then(notice)
+                .catch((e) => console.error("learning failed", e));
+          }}
+          onAudio={async (audio, ms) => {
+            const heard = await hear(audio, ms);
+            return heard ? fixHeard(heard) : heard;
+          }}
           onVoiceError={(kind) => show({ message: t(`voice.${kind}`) })}
         />
       </div>

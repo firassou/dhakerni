@@ -17,6 +17,7 @@ export function describeFact(fact: Pick<ProfileFact, "key" | "value">, t: T): st
     });
   if (fact.key === "snooze.default") return t("facts.snooze", { n: fact.value });
   if (fact.key === "language.mix") return t("facts.languageMix");
+  if (kind === "heard") return t("facts.heard", { from: name, to: fact.value });
   if (kind === "frequent") return t("facts.frequent", { title: name, n: fact.value });
   const label = t(`anchors.${name}`);
   // prayer.<anchor> (a time worked out from the chosen city) reads like an anchor fact: "After Asr ≈ 16:12"

@@ -48,8 +48,12 @@ describe("prayer times (Tunis, 8 Oct 2026)", () => {
 
 describe("prayer anchors", () => {
   it("parses at/after anchors and rejects others", () => {
-    expect(parsePrayerAnchor("prayer_asr")).toEqual({ prayer: "asr", after: false });
-    expect(parsePrayerAnchor("after_prayer_maghrib")).toEqual({ prayer: "maghrib", after: true });
+    expect(parsePrayerAnchor("prayer_asr")).toMatchObject({ prayer: "asr", after: false });
+    expect(parsePrayerAnchor("after_prayer_maghrib")).toMatchObject({
+      prayer: "maghrib",
+      after: true,
+    });
+    expect(parsePrayerAnchor("before_prayer_fajr")).toMatchObject({ prayer: "fajr", before: true });
     expect(parsePrayerAnchor("leave_work")).toBeNull();
     expect(parsePrayerAnchor("prayer_nope")).toBeNull();
   });
@@ -76,6 +80,8 @@ describe("prayer anchors", () => {
       offsetMinutes: null,
       vagueWord: null,
       anchor: "after_prayer_asr",
+      anchorLabel: null,
+      leadMinutes: null,
       confidence: 1,
     };
     const now = new Date(Date.UTC(2026, 9, 8, 6, 0));

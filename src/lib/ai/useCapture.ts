@@ -5,9 +5,11 @@ import { useToast, useUndoToast } from "@/components/Toast";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import type { LearnedOptions } from "@/lib/memory/profile";
+import { mergeIntoOpenLists, openListHint } from "@/lib/tasks/items";
 import { newTask } from "@/lib/tasks/ops";
 import { ApiError, parse, transcribe } from "./client";
 import { toTasks } from "./apply";
+import { applyEdits, editCandidates, toOpenTasks } from "./edits";
 
 const MIN_AUDIO_MS = 500;
 
@@ -15,6 +17,7 @@ interface Deps {
   getTasks: () => Task[];
   insert: (tasks: Task[]) => void;
   remove: (id: string) => void;
+  upsert: (task: Task) => void;
   onCreated: (tasks: Task[]) => void;
   /** Learned meanings, so known words resolve silently. */
   getResolveOptions: () => LearnedOptions;
@@ -26,6 +29,7 @@ export function useCapture({
   getTasks,
   insert,
   remove,
+  upsert,
   onCreated,
   getResolveOptions,
   hintsFor,
@@ -35,15 +39,30 @@ export function useCapture({
   const undoToast = useUndoToast();
   const [pending, setPending] = useState<{ text: string | null } | null>(null);
 
+  /**
+   * `changed` are tasks the person already had that this sentence altered (finished, moved, a list that
+   * grew); `before` is how they looked, so one Undo puts everything back.
+   */
   const finish = useCallback(
-    (created: Task[]) => {
-      insert(created);
-      onCreated(created);
-      const message =
-        created.length === 1 ? t("toast.added") : t("capture.addedMany", { count: created.length });
-      undoToast(message, () => created.forEach((c) => remove(c.id)));
+    (created: Task[], changed: Task[] = [], before: Task[] = []) => {
+      if (created.length) {
+        insert(created);
+        onCreated(created);
+      }
+      changed.forEach(upsert);
+      const message = created.length
+        ? created.length === 1
+          ? t("toast.added")
+          : t("capture.addedMany", { count: created.length })
+        : changed.length === 1
+          ? t("capture.updated", { title: changed[0].title })
+          : t("capture.updatedMany", { count: changed.length });
+      undoToast(message, () => {
+        created.forEach((c) => remove(c.id));
+        before.forEach(upsert);
+      });
     },
-    [insert, onCreated, remove, t, undoToast],
+    [insert, onCreated, remove, t, undoToast, upsert],
   );
 
   const submitText = useCallback(
@@ -52,10 +71,36 @@ export function useCapture({
       if (!clean) return;
       setPending({ text: clean });
       try {
-        const result = await parse({ text: clean, locale, hints: hintsFor(clean) });
-        const created = toTasks(result, new Date(), getTasks(), getResolveOptions());
-        if (created.length === 0) show({ message: t("voice.noTask") });
-        else finish(created);
+        // Open tasks that share a word with the sentence: it may be about one of them, not a new task.
+        const candidates = editCandidates(clean, getTasks());
+        const listHint = openListHint(getTasks());
+        const result = await parse({
+          text: clean,
+          locale,
+          hints: [...hintsFor(clean), ...(listHint ? [listHint] : [])].slice(0, 6),
+          openTasks: toOpenTasks(candidates),
+        });
+        const now = new Date();
+        const options = getResolveOptions();
+        const edited = applyEdits(result, candidates, now, options);
+        const editedById = new Map(edited.map((e) => [e.id, e]));
+        const current = getTasks().map((x) => editedById.get(x.id) ?? x);
+        // Things named for a list that is already open go onto that list.
+        const { grown, fresh } = mergeIntoOpenLists(
+          toTasks(result, now, current, options),
+          current,
+        );
+        grown.forEach((g) => editedById.set(g.id, g));
+        const changed = [...editedById.values()];
+        if (fresh.length === 0 && changed.length === 0) show({ message: t("voice.noTask") });
+        else {
+          const ids = new Set(changed.map((c) => c.id));
+          finish(
+            fresh,
+            changed,
+            getTasks().filter((x) => ids.has(x.id)),
+          );
+        }
       } catch (e) {
         // Keep the words: save them as a plain task with no time.
         finish([newTask(clean, getTasks(), new Date())]);

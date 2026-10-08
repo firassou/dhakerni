@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type Ref,
+} from "react";
 import { useI18n } from "@/lib/i18n";
 import { useRecorder, type RecorderError } from "@/lib/voice/useRecorder";
 import { ArrowUpIcon, CloseIcon, MicIcon, StopIcon } from "./Icon";
@@ -9,9 +17,16 @@ import { Waveform } from "./Waveform";
 const HOLD_MS = 350; // shorter than this counts as a tap: keep recording until Stop
 const CANCEL_DRAG_PX = 90; // dragging the held mic this far away cancels instead of sending
 
+export interface DockHandle {
+  /** Put words in the field from outside (text shared from another app), to be checked and sent. */
+  fill: (text: string) => void;
+}
+
 interface Props {
+  ref?: Ref<DockHandle>;
   busy: boolean;
-  onSubmitText: (text: string) => void;
+  /** `heard` is what the microphone gave, when part of the text came from it: the fixes teach the app. */
+  onSubmitText: (text: string, heard?: string) => void;
   /** Resolves to what was heard, which lands in the field to be checked before sending. */
   onAudio: (audio: Blob, durationMs: number) => Promise<string | null>;
   onVoiceError: (kind: RecorderError) => void;
@@ -21,7 +36,7 @@ interface Props {
  * Bottom dock, always within thumb reach. Hold the mic to talk, or tap to start and tap again to stop.
  * What was heard is written into the field, so it can be corrected before it is sent.
  */
-export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
+export function Dock({ ref, busy, onSubmitText, onAudio, onVoiceError }: Props) {
   const { t } = useI18n();
   const [text, setText] = useState("");
   const [tapMode, setTapMode] = useState(false);
@@ -31,13 +46,19 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
   const downAt = useRef(0);
   const pointerDown = useRef(false);
   const field = useRef<HTMLTextAreaElement>(null);
+  const heardText = useRef("");
+  const append = (more: string) =>
+    setText((was) => (was.trim() ? `${was.trimEnd()}\n${more}` : more));
+  useImperativeHandle(ref, () => ({ fill: append }), []);
 
   const rec = useRecorder({
     onRecorded: (blob, ms) => {
       setTapMode(false);
       setArmed(false);
       void onAudio(blob, ms).then((heard) => {
-        if (heard) setText((was) => (was.trim() ? `${was.trimEnd()}\n${heard}` : heard));
+        if (!heard) return;
+        heardText.current = heardText.current ? `${heardText.current}\n${heard}` : heard;
+        append(heard);
       });
     },
     onError: (kind) => {
@@ -91,7 +112,8 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
     e.preventDefault();
     const value = text.trim();
     if (!value) return;
-    onSubmitText(value);
+    onSubmitText(value, heardText.current || undefined);
+    heardText.current = "";
     setText("");
   }
 
@@ -199,7 +221,11 @@ export function Dock({ busy, onSubmitText, onAudio, onVoiceError }: Props) {
               data-bidi
               rows={1}
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                // Wiped and started over: what was heard is no longer what is being fixed.
+                if (!e.target.value.trim()) heardText.current = "";
+                setText(e.target.value);
+              }}
               onKeyDown={onFieldKeyDown}
               placeholder={busy ? t("dock.processing") : t("dock.placeholder")}
               autoComplete="off"

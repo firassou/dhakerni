@@ -146,8 +146,8 @@ replaces the old one; a different second value does not. Typing a value on the m
 **What the AI sees.** Each parse request carries only trusted facts that matter for that sentence (a vague word
 that appears in it, the language mix). Anchors, usual times, titles and everything else stay on the device.
 
-**Not done:** `frequent.<title>` is collected and shown but nothing acts on it yet; abbreviations and personal
-vocabulary beyond vague words are not learned separately.
+**Since v0.10:** `frequent.<title>` drives the "Add again" chips and `heard.<word>` holds fixed mis-hearings
+(D22). Still not learned: abbreviations and personal vocabulary beyond these.
 
 ## D10. Backup
 
@@ -294,3 +294,72 @@ The offer used to wait until a task had a reminder, as a banner, with the real s
 browser's permission prompt opens on the very first visit, once, as soon as the intro is over
 (`PushBanner`). Safari and Firefox only prompt after a tap, so the banner is also shown from the start,
 whether or not there is a reminder yet. "Not now" hides it for good; Settings still has the switch.
+
+## D21. Repeating tasks move forward; they are not copied
+
+Finishing a task that repeats and has a time moves the same task to its next date (`src/lib/tasks/recur.ts`):
+same clock time, the next day its rule allows, strictly in the future, checklist and steps cleared. One task,
+one card, one server reminder; Undo is simply the task as it was. A repeating task with no time is finished
+like any other, because there is nothing to move it to. The service worker has the same rule in plain
+JavaScript (it cannot import the app's code), so Done on a notification books the next reminder even if the
+app is never opened; the two copies must be kept in step, and the tests are on the app's copy.
+**Limits:** there is no history of past rounds (D17), and a repeating task tied to a prayer keeps the clock
+time it first resolved to instead of following the prayer through the year.
+
+## D22. An earlier reminder is a distance, not a second time
+
+"Remind me an hour before" is stored as `remindBefore` (minutes) next to `dueAt`, which stays the time of the
+thing itself. Every place that moves `dueAt` (editor, snooze, repeat, reschedule) therefore keeps the two
+consistent for free. The server holds it as a second entry, `<taskId>~early`, sent once and titled with the
+appointment's clock time. A reminder counts as shown when the task was notified up to a minute before it,
+since the server's clock and the phone's differ a little. Snoozing during the early phase shortens the
+distance and leaves `dueAt` alone.
+
+## D23. What a sentence may say about tasks that already exist, and what leaves the device for it
+
+Two mechanisms, deliberately separate:
+
+- **Edits by the AI** (`src/lib/ai/edits.ts`). The request carries at most 5 open tasks that share a word
+  with the sentence (common words like "the", "باش", "pour" do not count), under short refs: title and
+  unchecked item names. The parser may answer with `complete`, `reschedule` or `check_item` for a ref. An
+  unknown ref, an unresolvable time or an item not on the list is skipped, never guessed. This is a change
+  to the privacy model (README): before, no task text other than the sentence itself was sent.
+- **Joining an open checklist, in code** (`mergeIntoOpenLists`). A freshly parsed task that is only things
+  (has items), has no time and no repeat, and shares its category with an open checklist is merged into the
+  most recently touched one: no duplicates, a checked-off item comes back unchecked, quantities add up. The
+  parser only gets one sentence saying a checklist is open in that category, so a single thing ("add milk")
+  comes back as an item.
+
+**Limits:** matching is by shared words, so "move my appointment" will not find "طبيب الأسنان"; a wrong match
+by the model changes the wrong task (one Undo restores it). The eval set has no cases for edits yet.
+
+## D24. Fixed transcripts teach, slowly on purpose
+
+Since D16 the person corrects the transcript before sending. `corrections()` compares what was heard with what
+was sent and keeps only one-for-one word swaps where most of the word survived (edit distance at most half
+its length): that is a mis-hearing; "bread" changed to "milk" is a change of mind and teaches nothing. Each
+pair is a `heard.<word>` fact from behavior, so it is applied to new transcripts only after the same fix has
+been made three times (0.4, 0.55, 0.7 against the 0.6 threshold). Slow, but a wrong automatic replacement in
+every future transcript would be worse than fixing a word twice more.
+
+## D25. Ramadan and the prayers around it
+
+`iftar` is Maghrib and `suhoor` is shortly before Fajr all year. In Ramadan `after_breakfast` is treated as
+`after_prayer_maghrib` (`src/lib/prayer/ramadan.ts`); the question and the chip then speak of Maghrib, and a
+city is needed as for any prayer word. Ramadan is read from the Umm al-Qura calendar through `Intl`, which can
+differ by a day from the date announced in Tunisia, so Settings has Follow the calendar / On / Off.
+`before_prayer_<name>` is 15 minutes ahead unless a distance was said.
+
+## D26. Smaller choices in v0.10
+
+- **Triggers for any event.** The parser names an unknown event with its own key and returns the person's
+  words for it (`anchorLabel`), shown on the button. Events that come from the clock (prayers, iftar, suhoor)
+  get no button. Tasks saved earlier under the generic key `before_event` share one button.
+- **Add again.** A title is offered once it has been added 3 times (when its `frequent.` fact appears; three
+  additions are the repetition, so this fact is not held back by the trust threshold), from a template saved
+  at each addition after that, at most 3 chips, never for a title already open.
+- **Share target.** `GET /?title=&text=&url=` fills the field and cleans the address. Android only: iOS does
+  not support share targets for web apps.
+- **Evening summary.** Off by default. Composed during a sync and booked as one more reminder (`digest`, sent
+  once, no buttons). It says what the device knew at the last sync: tasks finished from notifications since
+  then are still counted. Fixed at 21:00.

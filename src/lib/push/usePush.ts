@@ -130,7 +130,7 @@ export async function scheduleTestReminder(title: string, inSeconds = 60): Promi
  * `leaving` is for a page that is being hidden or closed: no waiting, and the request outlives the page.
  */
 export async function syncToServer(
-  reminders: { taskId: string; fireAt: string; title: string }[],
+  reminders: { taskId: string; fireAt: string; title: string; once?: boolean }[],
   cancel: string[] = [],
   leaving = false,
 ): Promise<void> {

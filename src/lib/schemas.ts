@@ -73,6 +73,10 @@ export const Task = z.object({
   timeBy: z.enum(["said", "relative", "default", "asked", "edited"]).nullable().default(null),
   /** Event this task waits for ("leave_work"), kept so a one-tap trigger can fire it early. */
   anchor: z.string().nullable().default(null),
+  /** The event in the person's own words ("tji Sami"), for the trigger button of an event the app has no name for. */
+  anchorLabel: z.string().nullable().default(null),
+  /** Minutes before `dueAt` at which an extra, earlier reminder fires ("remind me an hour before"). */
+  remindBefore: z.number().int().positive().nullable().default(null),
   /** When the reminder was shown, so it is never shown twice. */
   notifiedAt: z.iso.datetime({ offset: true }).nullable().default(null),
   /** Set when the time came from something the app learned, so the card can show an editable chip. */
