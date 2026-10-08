@@ -713,6 +713,62 @@
         "taskTitle": "call John",
         "question": "When should I remind you?"
       }
+    },
+    {
+      "id": "pr1",
+      "category": "prayer",
+      "text": "بعد العصر نمشي نشري الخبز",
+      "expect": {
+        "titles": [["خبز"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pr2",
+      "category": "prayer",
+      "text": "عند المغرب نكلم ماما",
+      "expect": {
+        "titles": [["ماما"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pr3",
+      "category": "prayer",
+      "text": "Rappelle-moi d'appeler le médecin après la prière d'Asr",
+      "expect": {
+        "titles": [["médecin", "medecin"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pr4",
+      "category": "prayer",
+      "text": "بعد العشاء نشرب الدوا",
+      "expect": {
+        "titles": [["دوا"]],
+        "reminders": [
+          {
+            "status": "needs_time",
+            "reason": "anchor"
+          }
+        ]
+      }
     }
   ]
 }

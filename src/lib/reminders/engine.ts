@@ -1,3 +1,4 @@
+import { ANCHOR_CHOICES } from "../questions/answers";
 import type { Task } from "../schemas";
 
 export const STALE_MS = 24 * 3_600_000; // older than this is not worth interrupting for
@@ -34,7 +35,8 @@ export function triggerable(tasks: readonly Task[], anchor: string, now: Date): 
 
 export const anchorsWaiting = (tasks: readonly Task[], now: Date): string[] =>
   [...new Set(tasks.filter((t) => t.anchor).map((t) => t.anchor!))].filter(
-    (a) => triggerable(tasks, a, now).length > 0,
+    // Only events a person can announce ("I'm leaving work"); prayer times come from the clock.
+    (a) => a in ANCHOR_CHOICES && triggerable(tasks, a, now).length > 0,
   );
 
 /** "17:07" becomes "17:00": rounding keeps a learned time stable from day to day. */
