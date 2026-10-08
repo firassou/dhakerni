@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { quickAnswers, type Answer } from "@/lib/questions/answers";
@@ -75,6 +76,15 @@ export function QuestionCard({ task, busy, onAnswer, onVoice, onDismiss, onVoice
             {recording ? <StopIcon width={18} height={18} /> : <MicIcon width={20} height={20} />}
           </button>
         </div>
+      )}
+
+      {needs.reason === "anchor" && /prayer_/.test(needs.word ?? "") && !busy && (
+        <Link
+          href="/settings#prayer"
+          className="t-small text-door inline-block font-medium underline underline-offset-4"
+        >
+          {t("q.prayerCity")}
+        </Link>
       )}
 
       {other && !busy && (

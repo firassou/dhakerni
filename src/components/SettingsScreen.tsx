@@ -8,6 +8,7 @@ import { LOCALES } from "@/lib/i18n/locales";
 import { BackIcon } from "./Icon";
 import { BackupControls } from "./BackupControls";
 import { LearningSwitch } from "./LearningSwitch";
+import { PrayerSettings } from "./PrayerSettings";
 import { PushControls } from "./PushControls";
 
 export function SettingsScreen() {
@@ -74,6 +75,13 @@ export function SettingsScreen() {
           {t("push.title")}
         </h2>
         <PushControls />
+      </section>
+
+      <section id="prayer" aria-labelledby="prayer-h" className="mt-10">
+        <h2 id="prayer-h" className="t-small text-ink-2 mb-2 font-medium">
+          {t("settings.prayer.title")}
+        </h2>
+        <PrayerSettings />
       </section>
 
       <section aria-labelledby="learn-h" className="mt-10 space-y-2">
