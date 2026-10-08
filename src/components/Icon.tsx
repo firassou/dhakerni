@@ -48,3 +48,32 @@ export const Mark = (p: P) => (
     <circle cx="16" cy="19" r="2.4" fill="var(--sun)" />
   </svg>
 );
+
+export const CheckIcon = (p: P) => (
+  <svg {...base} strokeWidth={3} {...p}>
+    <path d="M5 12.5l4.5 4.5L19 7.5" pathLength={1} />
+  </svg>
+);
+
+export const GripIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <circle cx="9" cy="6" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="6" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="9" cy="12" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="9" cy="18" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="18" r="1.2" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const TrashIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12h10l1-12M9 7V4h6v3" />
+  </svg>
+);
+
+export const CloseIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+);

@@ -1,5 +1,7 @@
 {
-  "app": { "name": "Dhakerni" },
+  "app": {
+    "name": "Dhakerni"
+  },
   "filters": {
     "label": "Task filters",
     "today": "Today",
@@ -9,14 +11,26 @@
     "done": "Done"
   },
   "empty": {
-    "today": { "title": "Nothing for today", "body": "Hold the mic and say what's on your mind." },
-    "upcoming": { "title": "Nothing coming up", "body": "Tasks with a future date show up here." },
+    "today": {
+      "title": "Nothing for today",
+      "body": "Hold the mic and say what's on your mind."
+    },
+    "upcoming": {
+      "title": "Nothing coming up",
+      "body": "Tasks with a future date show up here."
+    },
     "needsTime": {
       "title": "Every task has a time",
       "body": "Tasks that still need a time wait here."
     },
-    "all": { "title": "No tasks yet", "body": "Hold the mic and say it, or type below." },
-    "done": { "title": "Nothing done yet", "body": "Finished tasks land here." }
+    "all": {
+      "title": "No tasks yet",
+      "body": "Hold the mic and say it, or type below."
+    },
+    "done": {
+      "title": "Nothing done yet",
+      "body": "Finished tasks land here."
+    }
   },
   "dock": {
     "talk": "Hold to talk",
@@ -24,7 +38,10 @@
     "placeholder": "Or type it here…",
     "send": "Add"
   },
-  "nav": { "settings": "Settings", "back": "Back" },
+  "nav": {
+    "settings": "Settings",
+    "back": "Back"
+  },
   "settings": {
     "title": "Settings",
     "language": {
@@ -40,5 +57,40 @@
       "server": "For reminders when the app is closed, our server keeps only your push address, an anonymous ID, the reminder time and a short title. It is encrypted and deleted right after the reminder fires."
     },
     "anonymousId": "Anonymous ID"
+  },
+  "time": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "overdue": "Overdue"
+  },
+  "task": {
+    "needsTime": "Needs time",
+    "markDone": "Mark as done",
+    "markUndone": "Mark as not done",
+    "reorder": "Reorder",
+    "reorderHelp": "Press space to pick up, arrow keys to move, space to drop.",
+    "edit": "Edit task",
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High"
+    }
+  },
+  "editor": {
+    "title": "Task",
+    "name": "Title",
+    "notes": "Notes",
+    "due": "Due",
+    "clearTime": "Clear time",
+    "priority": "Priority",
+    "list": "List",
+    "delete": "Delete task",
+    "close": "Close"
+  },
+  "toast": {
+    "added": "Task added",
+    "deleted": "Task deleted",
+    "done": "Marked as done",
+    "undo": "Undo"
   }
 }

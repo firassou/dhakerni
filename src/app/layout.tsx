@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Readex_Pro } from "next/font/google";
 import { I18nProvider } from "@/lib/i18n";
 import { NO_FLASH_SCRIPT } from "@/lib/i18n/locales";
+import { ToastProvider } from "@/components/Toast";
 import { RegisterSW } from "@/components/RegisterSW";
 import "./globals.css";
 
@@ -36,7 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
       </head>
       <body>
-        <I18nProvider>{children}</I18nProvider>
+        <I18nProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </I18nProvider>
         <RegisterSW />
       </body>
     </html>

@@ -178,3 +178,66 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Task completion: the check draws itself with a spring. */
+.check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset var(--t-base) var(--ease-out) 60ms;
+}
+.check-on {
+  stroke-dashoffset: 0;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.card-in {
+  animation: card-in var(--t-base) var(--ease-spring) both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.toast {
+  animation: toast-in var(--t-base) var(--ease-spring) both;
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.sheet[data-state="open"] {
+  animation: sheet-in var(--t-slow) var(--ease-out) both;
+}
+.overlay[data-state="open"] {
+  animation: fade-in var(--t-base) ease both;
+}
