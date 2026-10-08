@@ -379,21 +379,5 @@
   },
   "install": {
     "action": "Install"
-  },
-  "native": {
-    "channel": "Reminders",
-    "status": {
-      "on": "On. Reminders ring from this phone itself, even with the app closed, the phone asleep or no internet.",
-      "denied": "Blocked. Allow notifications for Dhakerni in Android Settings, Apps, Dhakerni, Notifications."
-    },
-    "testSent": "A test reminder rings in 20 seconds. Lock your phone now.",
-    "exactOff": "Android is not letting Dhakerni ring at the exact time, so reminders can be several minutes late.",
-    "allowExact": "Allow exact alarms",
-    "battery": "If a reminder ever comes late: in Android Settings, Apps, Dhakerni, Battery, choose Unrestricted. Some phones (Xiaomi, Oppo, Huawei) also need Autostart allowed.",
-    "get": {
-      "title": "Android app",
-      "body": "Reminders that ring on time with the phone asleep, with no server in between. It updates itself: install it once.",
-      "action": "Download the Android app"
-    }
   }
 }

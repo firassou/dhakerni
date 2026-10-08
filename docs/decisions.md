@@ -277,41 +277,19 @@ What changed:
 - **The page always posts a system notification** for a due reminder, visible or not, so it is in the
   notification list even with no server.
 
-Still true: a web app cannot make Android deliver a push to a browser it has put to sleep. That is what the
-Android app (D19) is for.
+Still true: a web app cannot make Android deliver a push to a browser it has put to sleep. Settings tells
+Android users to set Chrome's battery use to Unrestricted (D15).
 
-## D19. The Android app: a thin shell around the live site
+## D19. An Android app was tried and removed
 
-**Why.** A browser app cannot schedule anything on the phone. Its reminders depend on a server, a scheduler, a
-push service and Android letting a sleeping browser receive the push. The Android app removes all four.
+On 2026-10-08 a Capacitor shell around the live site was built, with reminders as Android alarms set on the
+phone. It was removed the same day, before any release: for the person using it, it was the same as the web
+notifications, and not worth a second thing to install and keep signed. The app stays a PWA (D15). The work
+is in the git history (merge `feat/android-and-reliable-reminders`) if it is ever wanted again.
 
-**What it is.** A Capacitor shell (`android/`, `capacitor.config.ts`) whose web view loads
-`https://dhakerni.vercel.app`. All the app's code is still the website:
+## D20. Notifications are asked for on the first visit
 
-- **Updates need no reinstall.** A deploy reaches every phone the next time the app is opened. A new APK is
-  needed only when something native changes: `android/`, `capacitor.config.ts`, or a Capacitor plugin.
-- **Reminders are Android alarms** (`src/lib/native/`). Inside the shell the app hands each future reminder to
-  `@capacitor/local-notifications`, which uses the system alarm clock (exact, allowed while idle). They ring
-  with the phone asleep, the app closed and no internet, and Android restores them after a restart. Web push
-  and the server store are not used at all in the app.
-- **Done and Snooze** on the notification open the app, which applies them. Finishing, deleting or moving a
-  task cancels or moves its alarm.
-- The same web code runs in browsers: `isNativeApp()` picks the path. Desktop, iPhone and the Chrome PWA keep
-  web push (D18).
-
-**Verified on an emulator (Android 17), 2026-10-08:** the app reports native mode; a task due 75 seconds later
-appeared in `dumpsys alarm` as an exact `RTC_WAKEUP` alarm; with the app in the background, the screen off and
-the device forced into deep idle, the notification was posted 3 ms after its time, with Done and Snooze; tapping
-Done marked the task done in the app. The microphone works in the web view. Not verified: a real phone, and
-phone makers that stop background apps aggressively (Xiaomi, Oppo, Huawei); Settings explains the battery
-setting for those.
-
-**Known limits.** One notification per reminder (no repeats: the alarm itself is reliable). Exporting a backup
-file does not work inside the app yet (the web view does not handle the download); use the browser for that.
-Tasks are stored per app: the Chrome version and the Android app do not share them (use Export in Chrome, then
-Import in the app).
-
-**Building and publishing.** `npm run android:apk` (needs JDK 21 and the Android SDK: `JAVA_HOME`,
-`ANDROID_HOME`) writes `dhakerni.apk`. It is signed with the key in `~/dhakerni-keystore/`, which is not in the
-repository. **Back that folder up**: an update signed with any other key cannot be installed over the app.
-Publish by attaching `dhakerni.apk` to a GitHub release; Settings links to the latest one for Android browsers.
+The offer used to wait until a task had a reminder, as a banner, with the real switch in Settings. Now the
+browser's permission prompt opens on the very first visit, once, as soon as the intro is over
+(`PushBanner`). Safari and Firefox only prompt after a tap, so the banner is also shown from the start,
+whether or not there is a reminder yet. "Not now" hides it for good; Settings still has the switch.

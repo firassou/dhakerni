@@ -1,14 +1,5 @@
 export type PushState =
-  | "loading"
-  | "unsupported"
-  | "ios-install"
-  | "server-off"
-  | "default"
-  | "denied"
-  | "enabled"
-  /** Inside the Android app: reminders are scheduled on the phone itself, with no server. */
-  | "native"
-  | "native-denied";
+  "loading" | "unsupported" | "ios-install" | "server-off" | "default" | "denied" | "enabled";
 
 export const isIos = () =>
   /iPad|iPhone|iPod/.test(navigator.userAgent) ||

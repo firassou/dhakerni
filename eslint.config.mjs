@@ -12,8 +12,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // The Android shell: Gradle output and generated files.
-    "android/**",
   ]),
 ]);
 

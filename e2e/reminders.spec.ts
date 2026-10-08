@@ -150,6 +150,28 @@ test.describe("notification settings", () => {
     await expect(page.getByRole("button", { name: "Turn on" })).toBeVisible();
   });
 
+  test("asks for notifications on the first visit, before any task exists", async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(Notification, "permission", { get: () => "default" });
+      Notification.requestPermission = async () => {
+        (window as unknown as { asked: number }).asked =
+          ((window as unknown as { asked?: number }).asked ?? 0) + 1;
+        return "default";
+      };
+    });
+    await page.route("**/api/push/key", (r) => r.fulfill({ json: { enabled: true, key: "x" } }));
+    await page.goto("/");
+    // The browser's own prompt is opened once, with no tap and no task.
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { asked?: number }).asked))
+      .toBe(1);
+    // And the banner is there for browsers that only prompt after a tap.
+    await expect(page.getByText("Get reminders even when the app is closed.")).toBeVisible();
+    await page.reload();
+    await expect(page.getByText("Get reminders even when the app is closed.")).toBeVisible();
+    expect(await page.evaluate(() => (window as unknown as { asked?: number }).asked ?? 0)).toBe(0);
+  });
+
   test("blocked notifications explain how to fix it", async ({ browser }) => {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
