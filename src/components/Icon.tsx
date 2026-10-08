@@ -94,3 +94,9 @@ export const BellIcon = (p: P) => (
     <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" />
   </svg>
 );
+
+export const PencilIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4" />
+  </svg>
+);

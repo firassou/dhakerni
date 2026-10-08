@@ -44,6 +44,7 @@ export function useAnswers({ getTasks, upsert, learn, onShowResurfaced }: Deps) 
           reminders: [at],
           needs: null,
           assumed: null,
+          timeBy: "asked",
           updatedAt: new Date().toISOString(),
         });
       }

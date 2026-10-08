@@ -117,3 +117,41 @@ Upstash Redis when configured, in memory otherwise.
 ## D6. Secrets
 
 Keys live in `.env.local` (gitignored) and are read only in server routes. `.env.example` lists names.
+
+## D9. Learning: what is learned, when it counts, how it is corrected
+
+Everything learned is a row in the `profile` store (key, value, source, confidence, updatedAt), visible and
+editable on the "What Dhakerni knows about you" screen. Nothing is learned while the learning switch is off;
+facts already saved are still used until deleted.
+
+| Fact                          | Learned from                                                                      | Used for                                   |
+| ----------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------ |
+| `vague.<word>` (minutes)      | answering a question                                                              | resolving that word silently               |
+| `anchor.<event>` (clock time) | answering a question; pressing a trigger at a repeatable time                     | resolving that event silently              |
+| `usual.time.<category>`       | 3+ clock times the person said or set for that category, mostly within 45 minutes | the time for "tomorrow" with no clock time |
+| `priority.<category>`         | 3 of the last 4 manual priority edits agree                                       | default priority when the parser gave none |
+| `snooze.default`              | the same non-default snooze chosen 3 times in a row                               | the Snooze button and notification         |
+| `language.mix`                | every 10 tasks, if both Arabic and Latin script are common                        | one hint sentence to the parser            |
+| `frequent.<title>`            | the same title added 3, 5, 10 times                                               | shown on the screen only (not used yet)    |
+
+**Trust threshold.** A first answer is saved at confidence 0.75 and used at once (the person just told us).
+Anything noticed from behavior starts at 0.4 and is ignored until it repeats and reaches 0.6 (+0.15 per
+confirmation). Times from defaults ("tomorrow morning" = 08:00) or relative phrases ("in 10 minutes") never
+teach anything, so the app cannot reinforce its own guesses.
+
+**Corrections outweigh older data.** If the person changes a time the app assumed, the learned value loses 0.25
+confidence, so it may drop below the threshold and the app asks again. The same new value twice in a row
+replaces the old one; a different second value does not. Typing a value on the memory screen sets confidence 1.
+
+**What the AI sees.** Each parse request carries only trusted facts that matter for that sentence (a vague word
+that appears in it, the language mix). Anchors, usual times, titles and everything else stay on the device.
+
+**Not done:** `frequent.<title>` is collected and shown but nothing acts on it yet; abbreviations and personal
+vocabulary beyond vague words are not learned separately.
+
+## D10. Backup
+
+Export writes one JSON file: tasks, profile facts, the observations behind them, learning switch and language.
+It leaves out the anonymous session id and the push subscription, which belong to one device. Import validates
+every item with the same Zod schemas and skips damaged ones (and says how many). Merge keeps current data and
+lets the newer copy win; Replace makes the device match the file.

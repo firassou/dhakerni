@@ -45,6 +45,7 @@ export function buildUserPrompt(req: ParseRequest): string {
       `Words this person uses, with their usual meaning: ${JSON.stringify(req.vocabulary)}.`,
     );
   }
+  if (req.hints?.length) lines.push(`About this person: ${req.hints.join(" ")}`);
   if (req.followUp) {
     lines.push(
       `followUp: question about task "${req.followUp.taskTitle}": "${req.followUp.question}".`,

@@ -46,6 +46,8 @@ export const Task = z.object({
   uncertain: Uncertain,
   /** Why the task has no time yet. Drives the clarifying question (v0.4). */
   needs: Needs.nullable().default(null),
+  /** How the time was decided. Only times the person chose ("said", "asked", "edited") teach the app. */
+  timeBy: z.enum(["said", "relative", "default", "asked", "edited"]).nullable().default(null),
   /** Event this task waits for ("leave_work"), kept so a one-tap trigger can fire it early. */
   anchor: z.string().nullable().default(null),
   /** When the reminder was shown, so it is never shown twice. */

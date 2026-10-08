@@ -9,6 +9,7 @@ import {
   type FactSource,
   type LearnResult,
 } from "./profile";
+import { sliceForParse } from "./slice";
 
 /** The learned profile, kept in memory for instant use and written through to IndexedDB. */
 export function useProfile() {
@@ -41,6 +42,25 @@ export function useProfile() {
     [],
   );
 
+  /** Re-read after something else (passive learning, the memory screen) changed the profile. */
+  const refresh = useCallback(async () => {
+    try {
+      const f = await listFacts();
+      ref.current = f;
+      setFacts(f);
+    } catch (e) {
+      console.error("refresh profile failed", e);
+    }
+  }, []);
+
   const resolveOptions = useMemo(() => toResolveOptions(facts), [facts]);
-  return { facts, learn, resolveOptions, getResolveOptions: () => toResolveOptions(ref.current) };
+  return {
+    facts,
+    learn,
+    refresh,
+    resolveOptions,
+    getResolveOptions: () => toResolveOptions(ref.current),
+    /** The few facts worth sending with this sentence. */
+    hintsFor: (text: string) => sliceForParse(ref.current, text),
+  };
 }

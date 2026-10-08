@@ -81,10 +81,10 @@ export function useReminders({ tasks, getTasks, ready, upsert, toggle, snoozeMin
     [hide, toggle],
   );
   const snooze = useCallback(
-    (id: string) => {
+    (id: string, minutes: number = snoozeMinutes) => {
       const task = getTasks().find((x) => x.id === id);
       hide(id);
-      if (task) upsert(snoozed(task, snoozeMinutes, new Date()));
+      if (task) upsert(snoozed(task, minutes, new Date()));
     },
     [getTasks, hide, snoozeMinutes, upsert],
   );

@@ -3,8 +3,8 @@
 Voice-first todo and reminder app for Tunisian Arabic (Derja), French and English. You speak or type;
 it turns what you said into tasks and reminders.
 
-Status: **v0.5.0**: tasks, voice and typed capture, clarifying questions, reminders with Web Push. The memory
-screen, export/import and polish arrive in v0.6 and v0.7. See [CHANGELOG](CHANGELOG.md).
+Status: **v0.6.0**: tasks, voice and typed capture, clarifying questions, reminders with Web Push, a visible
+learned profile, backup. Polish and prayer-time words arrive in v0.7. See [CHANGELOG](CHANGELOG.md).
 
 ## Setup
 
@@ -51,6 +51,12 @@ thin layer: an AI route (audio/text to validated JSON, rate-limited per session)
 Design: [docs/design-notes.md](docs/design-notes.md). Decisions and push strategy:
 [docs/decisions.md](docs/decisions.md).
 
+## Learning
+
+Dhakerni learns how you speak and work, and shows all of it on one screen (Settings, "What Dhakerni knows about
+you"): edit, delete, "Forget everything", or switch learning off. What is learned, when it starts to count and how
+corrections work is in [docs/decisions.md](docs/decisions.md) (D9).
+
 ## Privacy model
 
 - Tasks, notes and everything Dhakerni learns about you stay on your device.
@@ -59,5 +65,6 @@ Design: [docs/design-notes.md](docs/design-notes.md). Decisions and push strateg
   reminder fire time and a short title (cut to 80 characters). It is AES-256-GCM encrypted at rest, each reminder
   is deleted right after it is sent, and turning notifications off deletes the rest. Nothing is stored for
   people who leave notifications off.
-- Audio and text you send for parsing go to the AI provider to be processed. Only the minimal slice of
-  your profile needed for that request is included.
+- Audio and text you send for parsing go to the AI provider to be processed. Only the few trusted profile facts
+  that matter for that sentence go with it, never the whole profile.
+- Export and import work on a JSON file you control. The file leaves out the anonymous ID and push subscription.

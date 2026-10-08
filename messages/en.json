@@ -64,7 +64,8 @@
     "anonymousId": "Anonymous ID",
     "version": "Version",
     "madeBy": "Made with love ❤️ by Firas",
-    "reminders": "Reminders"
+    "reminders": "Reminders",
+    "learning": "Learning"
   },
   "time": {
     "today": "Today",
@@ -105,7 +106,8 @@
     "learned": "Saved: {fact}. Change anytime.",
     "resurfaced": "Still need a time for “{title}”.",
     "unclear": "Couldn't tell the time. Pick one of the options.",
-    "triggered": "Reminders sent"
+    "triggered": "Reminders sent",
+    "noticed": "Noticed: {fact}. Change anytime."
   },
   "voice": {
     "denied": "Microphone is blocked. Allow it in your browser settings, or type instead.",
@@ -156,13 +158,19 @@
   },
   "facts": {
     "vague": "“{word}” = {n} min",
-    "anchor": "{label} ≈ {time}"
+    "anchor": "{label} ≈ {time}",
+    "usualTime": "{list}: usually at {time}",
+    "priority": "{list} tasks: usually {priority}",
+    "snooze": "Snooze: {n} min",
+    "languageMix": "You mix Arabic with French or English words",
+    "frequent": "“{title}”: you add it often ({n} times)"
   },
   "reminders": {
     "label": "Reminders due",
     "done": "Done",
     "snooze": "Snooze {n} min",
-    "open": "Open"
+    "open": "Open",
+    "snoozeFor": "Snooze for"
   },
   "notify": {
     "done": "Done",
@@ -206,5 +214,61 @@
     "after_breakfast": "I had breakfast",
     "after_lunch": "I had lunch",
     "after_dinner": "I had dinner"
+  },
+  "memory": {
+    "title": "What Dhakerni knows about you",
+    "link": "What Dhakerni knows about you",
+    "intro": "Everything learned stays on this device. Edit or delete any of it. Each request to the AI carries only the few facts that matter for that sentence.",
+    "learning": {
+      "title": "Keep learning",
+      "on": "Dhakerni learns from your answers and habits.",
+      "off": "Learning is off. Nothing new is saved. What is listed below is still used until you delete it."
+    },
+    "groups": {
+      "words": "Your words",
+      "routine": "Your day",
+      "habits": "Habits"
+    },
+    "empty": "Nothing learned yet. Answer a question or keep using Dhakerni and it will show up here.",
+    "source": {
+      "answer": "You told me",
+      "manual": "You set this",
+      "behavior": "Noticed from your habits"
+    },
+    "notYet": "Not used yet. It starts once it repeats.",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleted": "Deleted",
+    "undo": "Undo",
+    "forgetAll": "Forget everything",
+    "forgetConfirm": "Delete everything Dhakerni has learned about you? Your tasks stay.",
+    "forgetYes": "Yes, forget it all",
+    "forgotten": "Everything learned was deleted",
+    "updated": "Updated {when}",
+    "value": "Value",
+    "minutes": "minutes"
+  },
+  "backup": {
+    "title": "Backup",
+    "body": "Save your tasks and everything learned in one file, or restore from one.",
+    "export": "Export",
+    "import": "Import",
+    "exported": "Backup saved",
+    "choose": "How should I import “{name}”?",
+    "merge": "Merge with what's here",
+    "mergeHelp": "Keeps your current data. The newer copy of anything in both wins.",
+    "replace": "Replace everything",
+    "replaceHelp": "This device becomes exactly the backup.",
+    "cancel": "Cancel",
+    "done": "Imported {tasks} tasks and {facts} learned facts.",
+    "skipped": "{n} damaged items were skipped.",
+    "errors": {
+      "not_json": "That file isn't valid JSON.",
+      "wrong_file": "That isn't a Dhakerni backup.",
+      "too_new": "This backup comes from a newer version of Dhakerni.",
+      "too_large": "That file is too large."
+    }
   }
 }

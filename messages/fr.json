@@ -64,7 +64,8 @@
     "anonymousId": "Identifiant anonyme",
     "version": "Version",
     "madeBy": "Fait avec amour ❤️ par Firas",
-    "reminders": "Rappels"
+    "reminders": "Rappels",
+    "learning": "Apprentissage"
   },
   "time": {
     "today": "Aujourd'hui",
@@ -105,7 +106,8 @@
     "learned": "Enregistré : {fact}. Modifiable à tout moment.",
     "resurfaced": "Il manque encore une heure pour « {title} ».",
     "unclear": "Je n'ai pas compris l'heure. Choisissez une option.",
-    "triggered": "Rappels envoyés"
+    "triggered": "Rappels envoyés",
+    "noticed": "Remarqué : {fact}. Modifiable à tout moment."
   },
   "voice": {
     "denied": "Le micro est bloqué. Autorisez-le dans les réglages du navigateur, ou écrivez.",
@@ -156,13 +158,19 @@
   },
   "facts": {
     "vague": "« {word} » = {n} min",
-    "anchor": "{label} ≈ {time}"
+    "anchor": "{label} ≈ {time}",
+    "usualTime": "{list} : en général à {time}",
+    "priority": "Tâches « {list} » : en général {priority}",
+    "snooze": "Report : {n} min",
+    "languageMix": "Vous mélangez l'arabe avec des mots français ou anglais",
+    "frequent": "« {title} » : vous l'ajoutez souvent ({n} fois)"
   },
   "reminders": {
     "label": "Rappels à traiter",
     "done": "Terminé",
     "snooze": "Reporter {n} min",
-    "open": "Ouvrir"
+    "open": "Ouvrir",
+    "snoozeFor": "Reporter de"
   },
   "notify": {
     "done": "Terminé",
@@ -206,5 +214,61 @@
     "after_breakfast": "J'ai pris le petit-déj",
     "after_lunch": "J'ai déjeuné",
     "after_dinner": "J'ai dîné"
+  },
+  "memory": {
+    "title": "Ce que Dhakerni sait de vous",
+    "link": "Ce que Dhakerni sait de vous",
+    "intro": "Tout ce qui est appris reste sur cet appareil. Modifiez ou supprimez ce que vous voulez. Chaque requête à l'IA ne contient que les quelques faits utiles à la phrase.",
+    "learning": {
+      "title": "Continuer d'apprendre",
+      "on": "Dhakerni apprend de vos réponses et de vos habitudes.",
+      "off": "L'apprentissage est désactivé. Rien de nouveau n'est enregistré. Ce qui est listé ci-dessous reste utilisé jusqu'à sa suppression."
+    },
+    "groups": {
+      "words": "Vos mots",
+      "routine": "Votre journée",
+      "habits": "Habitudes"
+    },
+    "empty": "Rien d'appris pour l'instant. Répondez à une question ou continuez à utiliser Dhakerni, et cela apparaîtra ici.",
+    "source": {
+      "answer": "Vous me l'avez dit",
+      "manual": "Vous l'avez réglé",
+      "behavior": "Remarqué dans vos habitudes"
+    },
+    "notYet": "Pas encore utilisé. Cela commencera quand ça se répète.",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "deleted": "Supprimé",
+    "undo": "Annuler",
+    "forgetAll": "Tout oublier",
+    "forgetConfirm": "Supprimer tout ce que Dhakerni a appris sur vous ? Vos tâches restent.",
+    "forgetYes": "Oui, tout oublier",
+    "forgotten": "Tout ce qui était appris a été supprimé",
+    "updated": "Mis à jour {when}",
+    "value": "Valeur",
+    "minutes": "minutes"
+  },
+  "backup": {
+    "title": "Sauvegarde",
+    "body": "Enregistrez vos tâches et tout ce qui a été appris dans un fichier, ou restaurez-en un.",
+    "export": "Exporter",
+    "import": "Importer",
+    "exported": "Sauvegarde enregistrée",
+    "choose": "Comment importer « {name} » ?",
+    "merge": "Fusionner avec l'existant",
+    "mergeHelp": "Garde vos données actuelles. La copie la plus récente l'emporte.",
+    "replace": "Tout remplacer",
+    "replaceHelp": "Cet appareil devient exactement la sauvegarde.",
+    "cancel": "Annuler",
+    "done": "{tasks} tâches et {facts} faits appris importés.",
+    "skipped": "{n} éléments abîmés ont été ignorés.",
+    "errors": {
+      "not_json": "Ce fichier n'est pas un JSON valide.",
+      "wrong_file": "Ce n'est pas une sauvegarde Dhakerni.",
+      "too_new": "Cette sauvegarde vient d'une version plus récente de Dhakerni.",
+      "too_large": "Ce fichier est trop volumineux."
+    }
   }
 }
