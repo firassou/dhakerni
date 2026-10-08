@@ -8,9 +8,6 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ### Added
 
-- **An Android app.** A thin shell around the live site, so it updates itself with every deploy and never
-  needs reinstalling. Inside it, reminders are Android alarms set on the phone: they ring on time with the
-  phone asleep, the app closed and no internet. Android browsers see a download link in Settings.
 - The text field takes several lines and grows as you type. With a keyboard Enter sends and Shift+Enter breaks
   the line; on a phone Enter breaks the line and the button sends.
 - Tapping anywhere on a task card opens the editor, not only the title.
@@ -24,6 +21,8 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ### Changed
 
+- Notifications are asked for on the first visit, as soon as the app opens, instead of waiting in Settings
+  until a task has a reminder.
 - Voice no longer creates tasks directly: what was heard is written into the text field so it can be checked and
   corrected before it is sent.
 - Finished tasks are kept for one day, then removed.

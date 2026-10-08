@@ -64,13 +64,6 @@ Keys are read only in server routes and never sent to the client.
 
 Check a deployment end to end with real Chrome: `APP_URL=https://YOUR-DOMAIN node scripts/live-push-check.mjs`.
 
-## Android app
-
-`android/` is a Capacitor shell that loads the live site, so a deploy updates every installed app with no new
-APK. Inside it, reminders are scheduled on the phone with Android alarms. Build with `npm run android:apk`
-(JDK 21 and the Android SDK; see [docs/decisions.md](docs/decisions.md) D19, including the signing key you
-must back up), then attach `dhakerni.apk` to a GitHub release.
-
 ## Architecture
 
 Local-first. Tasks, settings and the learned profile live in IndexedDB on the device. The server is a

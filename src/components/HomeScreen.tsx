@@ -26,7 +26,6 @@ import { toggleItem } from "@/lib/tasks/items";
 import { useCapture } from "@/lib/ai/useCapture";
 import { usePush } from "@/lib/push/usePush";
 import { useReminderSync } from "@/lib/push/useReminderSync";
-import { useNativeReminders } from "@/lib/native/useNativeReminders";
 import { ANCHOR_CHOICES } from "@/lib/questions/answers";
 import {
   anchorsWaiting,
@@ -221,16 +220,6 @@ export function HomeScreen() {
 
   // Keep the server's copy of future reminders in step with the tasks (only when notifications are on).
   useReminderSync({ enabled: ready && push.state === "enabled", tasks, getTasks });
-  // In the Android app the phone's own alarm clock does it instead, with no server.
-  useNativeReminders({
-    enabled: push.state === "native",
-    ready,
-    tasks,
-    snoozeMinutes,
-    onDone: reminders.done,
-    onSnooze: reminders.snooze,
-    onOpen: focusReminder,
-  });
 
   const handleTrigger = useCallback(
     (anchor: string) => {
@@ -433,11 +422,7 @@ export function HomeScreen() {
         </Link>
       </header>
 
-      <PushBanner
-        state={push.state}
-        hasReminders={tasks.some((x) => !x.done && x.dueAt)}
-        onEnable={push.enable}
-      />
+      <PushBanner state={push.state} onEnable={push.enable} />
       <ReminderAlerts
         alerts={reminders.alerts}
         snoozeMinutes={snoozeMinutes}

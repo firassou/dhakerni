@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getSessionId } from "../db";
-import { isNativeApp, nativePermission, requestNativePermission } from "../native/reminders";
 import {
   isIos,
   isStandalone,
@@ -23,13 +22,6 @@ export function usePush() {
   const [background, setBackground] = useState<"ok" | "stalled" | null>(null);
 
   const refresh = useCallback(async () => {
-    // The Android app schedules reminders on the phone itself: no push, no server.
-    if (isNativeApp()) {
-      const permission = await nativePermission().catch(() => "prompt" as const);
-      return setState(
-        permission === "granted" ? "native" : permission === "denied" ? "native-denied" : "default",
-      );
-    }
     if (isIos() && !isStandalone()) return setState("ios-install");
     if (!pushApisPresent()) return setState("unsupported");
     try {
@@ -56,10 +48,6 @@ export function usePush() {
 
   /** Must be called from a click: browsers ignore permission prompts that are not a user gesture. */
   const enable = useCallback(async () => {
-    if (isNativeApp()) {
-      await requestNativePermission();
-      return void (await refresh());
-    }
     const permission = await Notification.requestPermission();
     if (permission !== "granted") return void (await refresh());
     const { key } = (await (await fetch("/api/push/key")).json()) as { key: string };
@@ -74,7 +62,6 @@ export function usePush() {
 
   /** Turning off deletes the server's copy of the subscription and everything scheduled. */
   const disable = useCallback(async () => {
-    if (isNativeApp()) return; // nothing is held anywhere but on the phone
     const { sub } = await currentSubscription();
     if (sub) {
       try {
