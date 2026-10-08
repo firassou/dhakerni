@@ -1,0 +1,53 @@
+{
+  "app": { "name": "Dhakerni" },
+  "filters": {
+    "label": "Filtres des tâches",
+    "today": "Aujourd'hui",
+    "upcoming": "À venir",
+    "needsTime": "Sans heure",
+    "all": "Toutes",
+    "done": "Terminées"
+  },
+  "empty": {
+    "today": {
+      "title": "Rien pour aujourd'hui",
+      "body": "Maintenez le micro et dites ce que vous avez en tête."
+    },
+    "upcoming": {
+      "title": "Rien à venir",
+      "body": "Les tâches avec une date future apparaissent ici."
+    },
+    "needsTime": {
+      "title": "Chaque tâche a une heure",
+      "body": "Les tâches qui attendent encore une heure sont ici."
+    },
+    "all": {
+      "title": "Aucune tâche",
+      "body": "Maintenez le micro et dites-le, ou écrivez en bas."
+    },
+    "done": { "title": "Rien de terminé", "body": "Les tâches terminées arrivent ici." }
+  },
+  "dock": {
+    "talk": "Maintenir pour parler",
+    "inputLabel": "Ajouter une tâche",
+    "placeholder": "Ou écrivez ici…",
+    "send": "Ajouter"
+  },
+  "nav": { "settings": "Réglages", "back": "Retour" },
+  "settings": {
+    "title": "Réglages",
+    "language": {
+      "title": "Langue",
+      "system": "Suivre le système",
+      "ar": "العربية",
+      "fr": "Français",
+      "en": "English"
+    },
+    "privacy": {
+      "title": "Confidentialité",
+      "local": "Vos tâches et ce que Dhakerni apprend sur vous restent sur cet appareil.",
+      "server": "Pour vous rappeler quand l'app est fermée, notre serveur garde seulement votre adresse push, un identifiant anonyme, l'heure du rappel et un titre court. Tout est chiffré et supprimé juste après l'envoi."
+    },
+    "anonymousId": "Identifiant anonyme"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "app": { "name": "Dhakerni" },
+  "filters": {
+    "label": "Task filters",
+    "today": "Today",
+    "upcoming": "Upcoming",
+    "needsTime": "Needs time",
+    "all": "All",
+    "done": "Done"
+  },
+  "empty": {
+    "today": { "title": "Nothing for today", "body": "Hold the mic and say what's on your mind." },
+    "upcoming": { "title": "Nothing coming up", "body": "Tasks with a future date show up here." },
+    "needsTime": {
+      "title": "Every task has a time",
+      "body": "Tasks that still need a time wait here."
+    },
+    "all": { "title": "No tasks yet", "body": "Hold the mic and say it, or type below." },
+    "done": { "title": "Nothing done yet", "body": "Finished tasks land here." }
+  },
+  "dock": {
+    "talk": "Hold to talk",
+    "inputLabel": "Add a task",
+    "placeholder": "Or type it here…",
+    "send": "Add"
+  },
+  "nav": { "settings": "Settings", "back": "Back" },
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language",
+      "system": "Follow system",
+      "ar": "العربية",
+      "fr": "Français",
+      "en": "English"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "local": "Your tasks and what Dhakerni learns about you stay on this device.",
+      "server": "For reminders when the app is closed, our server keeps only your push address, an anonymous ID, the reminder time and a short title. It is encrypted and deleted right after the reminder fires."
+    },
+    "anonymousId": "Anonymous ID"
+  }
+}
