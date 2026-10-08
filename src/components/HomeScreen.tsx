@@ -30,6 +30,9 @@ import {
   upcomingReminders,
 } from "@/lib/reminders/engine";
 import { useReminders } from "@/lib/reminders/useReminders";
+import { observeCreated, observeEdit, observeSnooze } from "@/lib/memory/learning";
+import { isUsable, type LearnResult } from "@/lib/memory/profile";
+import { describeFact } from "@/lib/questions/describe";
 import { useProfile } from "@/lib/memory/useProfile";
 import { isQuestionOpen } from "@/lib/questions/ask";
 import { useAnswers } from "@/lib/questions/useAnswers";
@@ -54,10 +57,11 @@ export function HomeScreen() {
   const { tasks, ready, reload, insert, getTasks, update, toggle, remove, upsert, move } =
     useTasks();
   const { show } = useToast();
-  const { facts, learn, getResolveOptions } = useProfile();
+  const { facts, learn, refresh, getResolveOptions, hintsFor } = useProfile();
   const push = usePush();
   const [filter, setFilter] = useState<Filter>("today");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const editSnapshot = useRef<Task | null>(null);
   const [now, setNow] = useState(() => new Date());
   // Tasks just completed stay visible briefly so the check animation can play.
   const [lingering, setLingering] = useState<ReadonlySet<string>>(new Set());
@@ -108,11 +112,23 @@ export function HomeScreen() {
     [tasks, toggle, undoToast, t],
   );
 
+  // Passive learning saves quietly. Only when something has become trusted enough to use do we say so.
+  const notice = useCallback(
+    async (results: LearnResult[]) => {
+      if (!results.length) return;
+      await refresh();
+      const usable = results.find((r) => r.becameUsable);
+      if (usable) show({ message: t("toast.noticed", { fact: describeFact(usable.fact, t) }) });
+    },
+    [refresh, show, t],
+  );
+
   const { pending, submitText, submitAudio } = useCapture({
     getTasks,
     insert,
     remove,
     getResolveOptions,
+    hintsFor,
     // Jump to the view where the first new task lives, so it is visible straight away.
     onCreated: (created) => {
       const at = new Date();
@@ -120,6 +136,9 @@ export function HomeScreen() {
         matchesFilter(created[0], f, at),
       );
       if (view) setFilter(view);
+      void observeCreated(created)
+        .then(notice)
+        .catch((e) => console.error("learning failed", e));
     },
   });
 
@@ -131,10 +150,32 @@ export function HomeScreen() {
   });
 
   const snoozeMinutes =
-    Number(facts.find((f) => f.key === "snooze.default")?.value) || DEFAULT_SNOOZE_MIN;
+    Number(facts.find((f) => f.key === "snooze.default" && isUsable(f))?.value) ||
+    DEFAULT_SNOOZE_MIN;
   const reminders = useReminders({ tasks, getTasks, ready, upsert, toggle, snoozeMinutes });
 
   const focusReminder = reminders.focus;
+
+  const openEditor = useCallback(
+    (id: string) => {
+      editSnapshot.current = getTasks().find((x) => x.id === id) ?? null;
+      setEditingId(id);
+    },
+    [getTasks],
+  );
+
+  /** On close, compare with how the task looked when opened: that is what the person corrected. */
+  const closeEditor = useCallback(() => {
+    const before = editSnapshot.current;
+    editSnapshot.current = null;
+    setEditingId(null);
+    const after = before ? getTasks().find((x) => x.id === before.id) : undefined;
+    if (before && after) {
+      void observeEdit(before, after)
+        .then(notice)
+        .catch((e) => console.error("learning failed", e));
+    }
+  }, [getTasks, notice]);
 
   // The service worker changes tasks from notification buttons; pick those changes up.
   useEffect(() => {
@@ -265,10 +306,15 @@ export function HomeScreen() {
         alerts={reminders.alerts}
         snoozeMinutes={snoozeMinutes}
         onDone={reminders.done}
-        onSnooze={reminders.snooze}
+        onSnooze={(id, minutes) => {
+          reminders.snooze(id, minutes);
+          void observeSnooze(minutes, snoozeMinutes)
+            .then(notice)
+            .catch((e) => console.error("learning failed", e));
+        }}
         onOpen={(id) => {
           reminders.hide(id);
-          setEditingId(id);
+          openEditor(id);
         }}
       />
       <TriggerBar anchors={anchorsWaiting(tasks, now)} onTrigger={handleTrigger} />
@@ -307,7 +353,7 @@ export function HomeScreen() {
                     now={now}
                     draggable={filter !== "done"}
                     onToggle={handleToggle}
-                    onOpen={setEditingId}
+                    onOpen={openEditor}
                     onAsk={(id) => {
                       const tk = tasks.find((x) => x.id === id);
                       if (tk) askAgain(tk);
@@ -337,12 +383,14 @@ export function HomeScreen() {
       />
       <TaskEditor
         task={editing}
-        onClose={() => setEditingId(null)}
+        onClose={closeEditor}
         onChange={(id, patch) =>
           // Setting a time by hand settles the question and replaces any learned guess.
           update(
             id,
-            "dueAt" in patch && patch.dueAt ? { ...patch, needs: null, assumed: null } : patch,
+            "dueAt" in patch && patch.dueAt
+              ? { ...patch, needs: null, assumed: null, timeBy: "edited" }
+              : patch,
           )
         }
         onDelete={handleDelete}

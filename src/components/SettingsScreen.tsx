@@ -6,6 +6,8 @@ import { getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import { LOCALES } from "@/lib/i18n/locales";
 import { BackIcon } from "./Icon";
+import { BackupControls } from "./BackupControls";
+import { LearningSwitch } from "./LearningSwitch";
 import { PushControls } from "./PushControls";
 
 export function SettingsScreen() {
@@ -72,6 +74,29 @@ export function SettingsScreen() {
           {t("push.title")}
         </h2>
         <PushControls />
+      </section>
+
+      <section aria-labelledby="learn-h" className="mt-10 space-y-2">
+        <h2 id="learn-h" className="t-small text-ink-2 font-medium">
+          {t("settings.learning")}
+        </h2>
+        <LearningSwitch />
+        <Link
+          href="/memory"
+          className="rounded-card bg-surface hover:bg-surface-2 flex items-center justify-between p-4 font-medium"
+        >
+          {t("memory.link")}
+          <span aria-hidden className="text-ink-2 rtl:-scale-x-100">
+            ›
+          </span>
+        </Link>
+      </section>
+
+      <section aria-labelledby="backup-h" className="mt-10">
+        <h2 id="backup-h" className="t-small text-ink-2 mb-2 font-medium">
+          {t("backup.title")}
+        </h2>
+        <BackupControls />
       </section>
 
       <section aria-labelledby="priv-h" className="mt-10">

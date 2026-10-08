@@ -89,7 +89,8 @@ async function snoozeMinutes(db) {
   const fact = await wrap(
     db.transaction("profile").objectStore("profile").index("by-key").get("snooze.default"),
   );
-  const n = Number(fact && fact.value);
+  // A habit that has only been noticed once is not trusted yet (same threshold as the app).
+  const n = fact && fact.confidence >= 0.6 ? Number(fact.value) : 0;
   return n > 0 ? n : DEFAULT_SNOOZE_MIN;
 }
 
