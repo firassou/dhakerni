@@ -1,4 +1,4 @@
-/** Server-side speech-to-text. The provider is chosen by STT_PROVIDER (see docs/decisions.md D5). */
+/** Server-side speech-to-text. Default is ElevenLabs Scribe v2; STT_PROVIDER switches it (see docs/decisions.md D5). */
 const GEMINI_PROMPT =
   "Transcribe this audio exactly as spoken. Keep every language as spoken: Tunisian Arabic (Derja) in Arabic script, French and English words in Latin script. Do not translate, correct or add anything. Output only the transcript.";
 
@@ -11,7 +11,7 @@ export interface SttChoice {
 
 export async function transcribeAudio(audio: Blob, choice: SttChoice = {}): Promise<string> {
   const provider =
-    choice.provider ?? (process.env.STT_PROVIDER as SttProvider | undefined) ?? "gemini";
+    choice.provider ?? (process.env.STT_PROVIDER as SttProvider | undefined) ?? "elevenlabs";
   const model = choice.model ?? process.env.STT_MODEL;
   if (provider === "elevenlabs") return scribe(audio, model);
   if (provider === "groq") return groqWhisper(audio, model);

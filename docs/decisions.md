@@ -31,9 +31,21 @@ covers the offline shell and, from v0.6, push handlers.
 - **Server data:** only subscription, anonymous session id, fire time and short title; encrypted at
   rest; deleted after firing (implemented in v0.6).
 
-## D5. Speech-to-text and parser model (v0.3, provisional)
+## D5. Speech-to-text and parser model (v0.3)
 
-**Status: provider not final.** It becomes final after a test with real Derja voice (see below).
+**Decision: ElevenLabs Scribe v2 for speech-to-text** (`STT_PROVIDER=elevenlabs`, the default), chosen from a
+real-voice comparison on 2026-10-08 with the dev page `/dev/stt`. The parser model is a separate choice (below).
+
+Real-voice result (one 11-second sentence, Derja mixed with French, spoken by the project owner):
+
+- **Scribe v2** kept the Derja as spoken ("بش ناخو عصير… حاب نمشي للدار") and kept French words in Latin
+  script ("shampooing", "gazoz"). The only candidate that obeyed "do not translate".
+- **Groq Whisper large-v3 and v3-turbo** rewrote the Derja into formal Arabic ("نريد أن نأخذ عصير…"),
+  changing the words. Fast (about 2 s) and free, but wrong for this app.
+- **Gemini 3.5 Transcribe** returned empty text on browser-recorded audio in two tries (cause not found).
+  **Gemini 3.5 Flash** was out of free quota.
+- This is one speaker and a few sentences, not a benchmark. Keep using `/dev/stt` to re-check, and note
+  Scribe's free credits are limited: check usage before launch.
 
 What the research found (2026-10-08):
 
@@ -48,11 +60,10 @@ What the research found (2026-10-08):
 
 What happened when I tried to benchmark:
 
-- No real recordings were available. Synthetic clips failed: Gemini TTS free tier allows 10 requests/day and
+- Before the real-voice test, synthetic clips failed: Gemini TTS free tier allows 10 requests/day and
   ElevenLabs free accounts cannot use TTS via API. A first clip batch was also invalid (the TTS read my
   instruction aloud). Those numbers were discarded; nothing from them is used here.
-- `/dev/stt` (dev only) records one sentence and shows what every candidate heard. The decision is made from
-  real voice samples.
+- `/dev/stt` (dev only) records one sentence and shows what every candidate heard.
 
 Free-tier reality (checked): Google AI Studio free tier allows about 20 requests/day per Gemini model, which is
 exhausted by one eval run, so Google needs billing for real use. Groq's free plan allows Whisper at 2,000

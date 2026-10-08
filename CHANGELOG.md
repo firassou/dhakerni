@@ -2,12 +2,13 @@
 
 All notable changes to this project are documented here. Format: Keep a Changelog; versions: SemVer.
 
-## [Unreleased] - v0.3.0 voice and parsing
+## [0.3.0] - 2026-10-08
 
 ### Added
 
 - Hold-to-talk and tap-to-talk recording with live waveform; typed text goes through the same parser.
-- `/api/transcribe` and `/api/parse` with session rate limits; Groq, Gemini and ElevenLabs STT adapters.
+- `/api/transcribe` and `/api/parse` with session rate limits. Speech-to-text: ElevenLabs Scribe v2 (chosen after a real-voice comparison; Groq and Gemini adapters kept). Parser: Gemini flash-lite with automatic fallback to Groq.
+- New app icon (list and bell on door-blue).
 - Structured parser output (Zod): several tasks per utterance, shared reminders, uncertain fields.
 - Time resolver and "Needs time" state with reason; parse failures still save the text.
 - Eval set of 48 utterances and `npm run eval`; dev-only `/dev/stt` provider comparison page.

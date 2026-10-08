@@ -15,7 +15,11 @@ for (let i = 0; i < info.width * info.height; i++) {
   glyph[i * 4] = glyph[i * 4 + 1] = glyph[i * 4 + 2] = 255;
   glyph[i * 4 + 3] = Math.round(m * 255);
 }
-const glyphPng = await sharp(glyph, { raw: { width: info.width, height: info.height, channels: 4 } }).png().toBuffer();
+const glyphPng = await sharp(glyph, {
+  raw: { width: info.width, height: info.height, channels: 4 },
+})
+  .png()
+  .toBuffer();
 
 /** Square icon: blue field, glyph scaled to `scale` of the canvas and centered. */
 async function render(size, scale, file) {
