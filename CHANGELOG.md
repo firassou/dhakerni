@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here. Format: Keep a Changelog; versions: SemVer.
 
+## [0.4.0] - 2026-10-08
+
+### Added
+
+- Clarifying questions for imprecise times: a vague word ("بعد شوية") or an event ("after work") creates the
+  task in "Needs time" and asks one short question in your language, once per group of tasks, with 3-4
+  tappable answers, a custom time and a voice answer. Plain tasks with no time cue are never asked about.
+- Answers save a profile fact (source, time, confidence) in IndexedDB: "شوية" = 20 min, leaves work at 17:00.
+  The first save shows "Saved: ... Change anytime."; later uses are silent and show an editable chip.
+  A correction replaces the old value. Facts are not saved when learning is off.
+- Ignored questions collapse after 20 minutes and return exactly once, 3 hours after creation, with a Show button.
+- Tapping a task's "Needs time" chip asks again on demand.
+
+### Changed
+
+- Parser writes the task category in the same language as the task.
+
 ## [0.3.0] - 2026-10-08
 
 ### Added
