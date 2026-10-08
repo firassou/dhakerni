@@ -1,5 +1,7 @@
 {
-  "app": { "name": "Dhakerni" },
+  "app": {
+    "name": "Dhakerni"
+  },
   "filters": {
     "label": "Filtres des tâches",
     "today": "Aujourd'hui",
@@ -25,7 +27,10 @@
       "title": "Aucune tâche",
       "body": "Maintenez le micro et dites-le, ou écrivez en bas."
     },
-    "done": { "title": "Rien de terminé", "body": "Les tâches terminées arrivent ici." }
+    "done": {
+      "title": "Rien de terminé",
+      "body": "Les tâches terminées arrivent ici."
+    }
   },
   "dock": {
     "talk": "Maintenir pour parler",
@@ -33,7 +38,10 @@
     "placeholder": "Ou écrivez ici…",
     "send": "Ajouter"
   },
-  "nav": { "settings": "Réglages", "back": "Retour" },
+  "nav": {
+    "settings": "Réglages",
+    "back": "Retour"
+  },
   "settings": {
     "title": "Réglages",
     "language": {
@@ -49,5 +57,40 @@
       "server": "Pour vous rappeler quand l'app est fermée, notre serveur garde seulement votre adresse push, un identifiant anonyme, l'heure du rappel et un titre court. Tout est chiffré et supprimé juste après l'envoi."
     },
     "anonymousId": "Identifiant anonyme"
+  },
+  "time": {
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "overdue": "En retard"
+  },
+  "task": {
+    "needsTime": "Sans heure",
+    "markDone": "Marquer comme terminée",
+    "markUndone": "Marquer comme non terminée",
+    "reorder": "Réorganiser",
+    "reorderHelp": "Espace pour saisir, flèches pour déplacer, espace pour déposer.",
+    "edit": "Modifier la tâche",
+    "priority": {
+      "low": "Basse",
+      "normal": "Normale",
+      "high": "Haute"
+    }
+  },
+  "editor": {
+    "title": "Tâche",
+    "name": "Titre",
+    "notes": "Notes",
+    "due": "Échéance",
+    "clearTime": "Effacer l'heure",
+    "priority": "Priorité",
+    "list": "Liste",
+    "delete": "Supprimer la tâche",
+    "close": "Fermer"
+  },
+  "toast": {
+    "added": "Tâche ajoutée",
+    "deleted": "Tâche supprimée",
+    "done": "Marquée comme terminée",
+    "undo": "Annuler"
   }
 }

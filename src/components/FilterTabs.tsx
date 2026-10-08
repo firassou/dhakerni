@@ -2,8 +2,10 @@
 
 import { useI18n } from "@/lib/i18n";
 
-export const FILTERS = ["today", "upcoming", "needsTime", "all", "done"] as const;
-export type Filter = (typeof FILTERS)[number];
+import { FILTERS, type Filter } from "@/lib/tasks/filters";
+
+export { FILTERS };
+export type { Filter };
 
 export function FilterTabs({ value, onChange }: { value: Filter; onChange: (f: Filter) => void }) {
   const { t } = useI18n();
