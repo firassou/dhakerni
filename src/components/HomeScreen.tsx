@@ -20,11 +20,15 @@ import { getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import { useCapture } from "@/lib/ai/useCapture";
+import { useProfile } from "@/lib/memory/useProfile";
+import { isQuestionOpen } from "@/lib/questions/ask";
+import { useAnswers } from "@/lib/questions/useAnswers";
 import { matchesFilter, selectTasks, type Filter } from "@/lib/tasks/filters";
 import { useTasks } from "@/lib/tasks/useTasks";
 import { Dock } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
 import { Mark, SlidersIcon } from "./Icon";
+import { QuestionCard } from "./QuestionCard";
 import { TaskCard } from "./TaskCard";
 import { TaskEditor } from "./TaskEditor";
 import { useToast, useUndoToast } from "./Toast";
@@ -36,16 +40,21 @@ export function HomeScreen() {
   const undoToast = useUndoToast();
   const { tasks, ready, insert, getTasks, update, toggle, remove, upsert, move } = useTasks();
   const { show } = useToast();
+  const { learn, getResolveOptions } = useProfile();
   const [filter, setFilter] = useState<Filter>("today");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
   // Tasks just completed stay visible briefly so the check animation can play.
   const [lingering, setLingering] = useState<ReadonlySet<string>>(new Set());
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const resurfaceRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     getSessionId().catch(() => {});
-    const tick = setInterval(() => setNow(new Date()), 30_000);
+    const tick = setInterval(() => {
+      setNow(new Date());
+      resurfaceRef.current();
+    }, 30_000);
     const pending = timers.current;
     return () => {
       clearInterval(tick);
@@ -88,6 +97,7 @@ export function HomeScreen() {
     getTasks,
     insert,
     remove,
+    getResolveOptions,
     // Jump to the view where the first new task lives, so it is visible straight away.
     onCreated: (created) => {
       const at = new Date();
@@ -97,6 +107,20 @@ export function HomeScreen() {
       if (view) setFilter(view);
     },
   });
+
+  const { answer, answerByVoice, dismissGroup, askAgain, resurface, answering } = useAnswers({
+    getTasks,
+    upsert,
+    learn,
+    onShowResurfaced: () => setFilter("needsTime"),
+  });
+
+  // Ignored questions come back once, a few hours later: check shortly after load and on every tick.
+  useEffect(() => {
+    if (!ready) return;
+    const id = setTimeout(resurface, 800);
+    return () => clearTimeout(id);
+  }, [ready, resurface]);
 
   const handleDelete = useCallback(
     (task: Task) => {
@@ -118,6 +142,27 @@ export function HomeScreen() {
     const to = visible.findIndex((x) => x.id === over.id);
     if (from >= 0 && to >= 0) move(visible, from, to);
   }
+
+  useEffect(() => {
+    resurfaceRef.current = resurface;
+  }, [resurface]);
+
+  // One question per group: show it on the first task of each group that is visible.
+  const questionFor = (task: Task, index: number) => {
+    if (!isQuestionOpen(task, now) || !task.needs) return undefined;
+    const g = task.needs.group;
+    if (g && visible.findIndex((x) => x.needs?.group === g) !== index) return undefined;
+    return (
+      <QuestionCard
+        task={task}
+        busy={answering === (g ?? task.id)}
+        onAnswer={(a) => void answer(task, a)}
+        onVoice={(audio, ms) => void answerByVoice(task, audio, ms)}
+        onDismiss={() => dismissGroup(task)}
+        onVoiceError={(kind) => show({ message: t(`voice.${kind}`) })}
+      />
+    );
+  };
 
   const editing = tasks.find((x) => x.id === editingId) ?? null;
 
@@ -164,7 +209,7 @@ export function HomeScreen() {
               strategy={verticalListSortingStrategy}
             >
               <ul className="space-y-2" aria-label={t(`filters.${filter}`)}>
-                {visible.map((task) => (
+                {visible.map((task, index) => (
                   <TaskCard
                     key={task.id}
                     task={task}
@@ -172,6 +217,11 @@ export function HomeScreen() {
                     draggable={filter !== "done"}
                     onToggle={handleToggle}
                     onOpen={setEditingId}
+                    onAsk={(id) => {
+                      const tk = tasks.find((x) => x.id === id);
+                      if (tk) askAgain(tk);
+                    }}
+                    footer={questionFor(task, index)}
                   />
                 ))}
               </ul>
@@ -197,7 +247,13 @@ export function HomeScreen() {
       <TaskEditor
         task={editing}
         onClose={() => setEditingId(null)}
-        onChange={update}
+        onChange={(id, patch) =>
+          // Setting a time by hand settles the question and replaces any learned guess.
+          update(
+            id,
+            "dueAt" in patch && patch.dueAt ? { ...patch, needs: null, assumed: null } : patch,
+          )
+        }
         onDelete={handleDelete}
       />
     </div>

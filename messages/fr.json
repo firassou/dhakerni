@@ -79,7 +79,8 @@
       "low": "Basse",
       "normal": "Normale",
       "high": "Haute"
-    }
+    },
+    "assumedHint": "Appris de vous. Touchez pour modifier."
   },
   "editor": {
     "title": "Tâche",
@@ -96,7 +97,11 @@
     "added": "Tâche ajoutée",
     "deleted": "Tâche supprimée",
     "done": "Marquée comme terminée",
-    "undo": "Annuler"
+    "undo": "Annuler",
+    "timeSet": "Heure définie",
+    "learned": "Enregistré : {fact}. Modifiable à tout moment.",
+    "resurfaced": "Il manque encore une heure pour « {title} ».",
+    "unclear": "Je n'ai pas compris l'heure. Choisissez une option."
   },
   "voice": {
     "denied": "Le micro est bloqué. Autorisez-le dans les réglages du navigateur, ou écrivez.",
@@ -111,5 +116,42 @@
     "rateLimited": "Trop de demandes. Attendez une minute et réessayez.",
     "transcribeFailed": "Impossible de traiter l'enregistrement. Réessayez ou écrivez.",
     "addedMany": "{count} tâches ajoutées"
+  },
+  "q": {
+    "min": "{n} min",
+    "hour": "1 h",
+    "tonight": "Ce soir",
+    "tomorrowMorning": "Demain matin",
+    "other": "Autre heure",
+    "set": "Valider",
+    "voice": "Répondre à la voix",
+    "stopVoice": "Arrêter et envoyer la réponse",
+    "notNow": "Pas maintenant",
+    "thinking": "Je comprends…",
+    "vague": "« {word} », ça veut dire combien de temps ?",
+    "generic": "Quand dois-je vous rappeler ?",
+    "anchor": {
+      "leave_work": "À quelle heure quittez-vous le travail d'habitude ?",
+      "arrive_home": "À quelle heure rentrez-vous d'habitude ?",
+      "leave_home": "À quelle heure sortez-vous de chez vous d'habitude ?",
+      "wake_up": "À quelle heure vous réveillez-vous d'habitude ?",
+      "after_breakfast": "À quelle heure prenez-vous le petit-déjeuner d'habitude ?",
+      "after_lunch": "À quelle heure déjeunez-vous d'habitude ?",
+      "after_dinner": "À quelle heure dînez-vous d'habitude ?"
+    },
+    "show": "Voir"
+  },
+  "anchors": {
+    "leave_work": "Après le travail",
+    "arrive_home": "En rentrant",
+    "leave_home": "En sortant",
+    "wake_up": "Au réveil",
+    "after_breakfast": "Après le petit-déj",
+    "after_lunch": "Après le déjeuner",
+    "after_dinner": "Après le dîner"
+  },
+  "facts": {
+    "vague": "« {word} » = {n} min",
+    "anchor": "{label} ≈ {time}"
   }
 }
