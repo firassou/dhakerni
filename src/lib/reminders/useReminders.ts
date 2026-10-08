@@ -1,0 +1,96 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useI18n } from "../i18n";
+import type { Task } from "../schemas";
+import { dueNow, isStale, snoozed } from "./engine";
+
+const TICK_MS = 5000;
+
+interface Deps {
+  tasks: Task[];
+  getTasks: () => Task[];
+  ready: boolean;
+  upsert: (task: Task) => void;
+  toggle: (id: string) => void;
+  snoozeMinutes: number;
+}
+
+/**
+ * Shows due reminders inside the app, and as a system notification when the tab is in the background.
+ * (With the app closed, the server's push does this instead.)
+ */
+export function useReminders({ tasks, getTasks, ready, upsert, toggle, snoozeMinutes }: Deps) {
+  const { t } = useI18n();
+  const [shown, setShown] = useState<string[]>([]);
+  const latest = useRef({ upsert, t, snoozeMinutes });
+  useEffect(() => {
+    latest.current = { upsert, t, snoozeMinutes };
+  });
+
+  const check = useCallback(() => {
+    const now = new Date();
+    const fresh: string[] = [];
+    for (const task of dueNow(getTasks(), now)) {
+      const { upsert: save, t: tr, snoozeMinutes: minutes } = latest.current;
+      save({ ...task, notifiedAt: now.toISOString() });
+      if (isStale(task, now)) continue; // long past: mark it, don't interrupt
+      fresh.push(task.id);
+      if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+        void navigator.serviceWorker?.ready.then((reg) =>
+          reg.showNotification(task.title, {
+            body: tr("notify.body"),
+            tag: `task-${task.id}`,
+            data: { taskId: task.id },
+            icon: "/icons/icon-192.png",
+            requireInteraction: true,
+            actions: [
+              { action: "done", title: tr("notify.done") },
+              { action: "snooze", title: tr("notify.snooze", { n: minutes }) },
+              { action: "open", title: tr("notify.open") },
+            ],
+          } as NotificationOptions),
+        );
+      }
+    }
+    if (fresh.length) {
+      navigator.vibrate?.(150);
+      setShown((s) => [...new Set([...s, ...fresh])]);
+    }
+  }, [getTasks]);
+
+  useEffect(() => {
+    if (!ready) return;
+    const first = setTimeout(check, 400);
+    const id = setInterval(check, TICK_MS);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
+  }, [ready, check]);
+
+  const hide = useCallback((id: string) => setShown((s) => s.filter((x) => x !== id)), []);
+  /** Bring one task's reminder up, e.g. after a click on the system notification. */
+  const focus = useCallback((id: string) => setShown((s) => [...new Set([...s, id])]), []);
+
+  const done = useCallback(
+    (id: string) => {
+      hide(id);
+      toggle(id);
+    },
+    [hide, toggle],
+  );
+  const snooze = useCallback(
+    (id: string) => {
+      const task = getTasks().find((x) => x.id === id);
+      hide(id);
+      if (task) upsert(snoozed(task, snoozeMinutes, new Date()));
+    },
+    [getTasks, hide, snoozeMinutes, upsert],
+  );
+
+  const alerts = shown
+    .map((id) => tasks.find((x) => x.id === id))
+    .filter((x): x is Task => !!x && !x.done);
+  return { alerts, hide, focus, done, snooze };
+}

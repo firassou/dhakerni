@@ -20,6 +20,16 @@ import { getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import { useCapture } from "@/lib/ai/useCapture";
+import { usePush, syncToServer } from "@/lib/push/usePush";
+import { ANCHOR_CHOICES } from "@/lib/questions/answers";
+import {
+  anchorsWaiting,
+  DEFAULT_SNOOZE_MIN,
+  roundedClock,
+  triggerable,
+  upcomingReminders,
+} from "@/lib/reminders/engine";
+import { useReminders } from "@/lib/reminders/useReminders";
 import { useProfile } from "@/lib/memory/useProfile";
 import { isQuestionOpen } from "@/lib/questions/ask";
 import { useAnswers } from "@/lib/questions/useAnswers";
@@ -28,9 +38,12 @@ import { useTasks } from "@/lib/tasks/useTasks";
 import { Dock } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
 import { Mark, SlidersIcon } from "./Icon";
+import { PushBanner } from "./PushBanner";
 import { QuestionCard } from "./QuestionCard";
+import { ReminderAlerts } from "./ReminderAlerts";
 import { TaskCard } from "./TaskCard";
 import { TaskEditor } from "./TaskEditor";
+import { TriggerBar } from "./TriggerBar";
 import { useToast, useUndoToast } from "./Toast";
 
 const LINGER_MS = 450;
@@ -38,9 +51,11 @@ const LINGER_MS = 450;
 export function HomeScreen() {
   const { t } = useI18n();
   const undoToast = useUndoToast();
-  const { tasks, ready, insert, getTasks, update, toggle, remove, upsert, move } = useTasks();
+  const { tasks, ready, reload, insert, getTasks, update, toggle, remove, upsert, move } =
+    useTasks();
   const { show } = useToast();
-  const { learn, getResolveOptions } = useProfile();
+  const { facts, learn, getResolveOptions } = useProfile();
+  const push = usePush();
   const [filter, setFilter] = useState<Filter>("today");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
@@ -115,6 +130,65 @@ export function HomeScreen() {
     onShowResurfaced: () => setFilter("needsTime"),
   });
 
+  const snoozeMinutes =
+    Number(facts.find((f) => f.key === "snooze.default")?.value) || DEFAULT_SNOOZE_MIN;
+  const reminders = useReminders({ tasks, getTasks, ready, upsert, toggle, snoozeMinutes });
+
+  const focusReminder = reminders.focus;
+
+  // The service worker changes tasks from notification buttons; pick those changes up.
+  useEffect(() => {
+    if (!("serviceWorker" in navigator)) return;
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.type === "tasks-changed") void reload();
+      if (e.data?.type === "focus-task" && e.data.taskId) focusReminder(e.data.taskId);
+    };
+    navigator.serviceWorker.addEventListener("message", onMessage);
+    return () => navigator.serviceWorker.removeEventListener("message", onMessage);
+  }, [reload, focusReminder]);
+
+  // Opened from a notification click: /?task=ID shows that reminder.
+  useEffect(() => {
+    if (!ready) return;
+    const id = new URLSearchParams(location.search).get("task");
+    if (!id) return;
+    focusReminder(id);
+    history.replaceState(null, "", "/");
+  }, [ready, focusReminder]);
+
+  // Keep the server's copy of future reminders in step with the tasks (only when notifications are on).
+  useEffect(() => {
+    if (!ready || push.state !== "enabled") return;
+    const id = setTimeout(() => {
+      syncToServer(upcomingReminders(tasks, new Date())).catch((e) =>
+        console.error("reminder sync failed", e),
+      );
+    }, 1000);
+    return () => clearTimeout(id);
+  }, [ready, push.state, tasks]);
+
+  const handleTrigger = useCallback(
+    (anchor: string) => {
+      const at = new Date();
+      for (const task of triggerable(getTasks(), anchor, at)) {
+        upsert({
+          ...task,
+          dueAt: at.toISOString(),
+          reminders: [at.toISOString()],
+          needs: null,
+          assumed: null,
+          notifiedAt: null,
+          updatedAt: at.toISOString(),
+        });
+      }
+      setNow(new Date()); // so the trigger button disappears immediately
+      show({ message: t("toast.triggered") });
+      // Pressing "I'm leaving work" at about the same time every day teaches the app when that is.
+      if (anchor in ANCHOR_CHOICES) void learn(`anchor.${anchor}`, roundedClock(at), "behavior");
+    },
+    [getTasks, learn, show, t, upsert],
+  );
+
   // Ignored questions come back once, a few hours later: check shortly after load and on every tick.
   useEffect(() => {
     if (!ready) return;
@@ -181,6 +255,23 @@ export function HomeScreen() {
           <SlidersIcon />
         </Link>
       </header>
+
+      <PushBanner
+        state={push.state}
+        hasReminders={tasks.some((x) => !x.done && x.dueAt)}
+        onEnable={push.enable}
+      />
+      <ReminderAlerts
+        alerts={reminders.alerts}
+        snoozeMinutes={snoozeMinutes}
+        onDone={reminders.done}
+        onSnooze={reminders.snooze}
+        onOpen={(id) => {
+          reminders.hide(id);
+          setEditingId(id);
+        }}
+      />
+      <TriggerBar anchors={anchorsWaiting(tasks, now)} onTrigger={handleTrigger} />
 
       <FilterTabs value={filter} onChange={setFilter} />
 

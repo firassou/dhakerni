@@ -75,6 +75,7 @@ export function toTasks(
       uncertain,
       needs,
       assumed,
+      anchor: when?.kind === "anchor" ? when.anchor : null,
       order: minOrder - count + i, // first task on top, all above existing ones
       createdAt: stamp,
       updatedAt: stamp,

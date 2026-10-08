@@ -6,6 +6,7 @@ import { getSessionId } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import { LOCALES } from "@/lib/i18n/locales";
 import { BackIcon } from "./Icon";
+import { PushControls } from "./PushControls";
 
 export function SettingsScreen() {
   const { t, preference, setPreference } = useI18n();
@@ -66,6 +67,13 @@ export function SettingsScreen() {
         </div>
       </section>
 
+      <section aria-labelledby="push-h" className="mt-10">
+        <h2 id="push-h" className="t-small text-ink-2 mb-2 font-medium">
+          {t("push.title")}
+        </h2>
+        <PushControls />
+      </section>
+
       <section aria-labelledby="priv-h" className="mt-10">
         <h2 id="priv-h" className="t-small text-ink-2 mb-2 font-medium">
           {t("settings.privacy.title")}
@@ -81,6 +89,13 @@ export function SettingsScreen() {
           </p>
         </div>
       </section>
+
+      <footer className="text-ink-2 mt-12 space-y-1 text-center">
+        <p data-bidi>{t("settings.madeBy")}</p>
+        <p className="t-micro">
+          {t("settings.version")} <span dir="ltr">{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+        </p>
+      </footer>
     </div>
   );
 }

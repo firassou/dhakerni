@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented here. Format: Keep a Changelog; versions: SemVer.
 
+## [0.5.0] - 2026-10-08
+
+### Added
+
+- Reminders: due tasks alert inside the app (Done, Snooze, Open), and as a system notification when the tab is in
+  the background. Each reminder shows once.
+- Web Push for a closed app: encrypted server store (Upstash), VAPID, atomic claim-and-delete firing,
+  `/api/cron/fire` for a scheduler, `npm run dev:cron` locally. Verified end to end with real Chrome.
+- Service worker notification buttons (Done, Snooze with the learned or default minutes, Open) that work with the
+  app closed; desktop Firefox falls back to click-to-open.
+- Settings: notification status and controls with honest messages (blocked, unsupported, server not set up,
+  iPhone needs the Home Screen), a test notification, and a stricter privacy text.
+- One-tap triggers for event-based reminders ("I'm leaving work"), no location tracking.
+- Settings footer: version number and "Made with love by Firas".
+
+### Security
+
+- Push subscription endpoints are accepted only from known push services.
+
 ## [0.4.0] - 2026-10-08
 
 ### Added

@@ -88,3 +88,9 @@ export const StopIcon = (p: P) => (
     <rect x="6" y="6" width="12" height="12" rx="2.5" fill="currentColor" />
   </svg>
 );
+
+export const BellIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 21h4" />
+  </svg>
+);

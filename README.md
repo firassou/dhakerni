@@ -3,8 +3,8 @@
 Voice-first todo and reminder app for Tunisian Arabic (Derja), French and English. You speak or type;
 it turns what you said into tasks and reminders.
 
-Status: **v0.3.0**: tasks, voice and typed capture, structured parsing. Clarifying questions, memory, push
-reminders and polish arrive in v0.4 to v0.7. See [CHANGELOG](CHANGELOG.md).
+Status: **v0.5.0**: tasks, voice and typed capture, clarifying questions, reminders with Web Push. The memory
+screen, export/import and polish arrive in v0.6 and v0.7. See [CHANGELOG](CHANGELOG.md).
 
 ## Setup
 
@@ -29,6 +29,21 @@ npm run eval                 # parser accuracy on evals/cases.json (uses real AP
 
 Keys are read only in server routes and never sent to the client.
 
+## Deploying (Vercel)
+
+1. Import the repo. Add every variable above in Project Settings, Environment Variables (Production). Without the
+   Upstash, VAPID, `REMINDER_ENCRYPTION_KEY` and `CRON_SECRET` variables the app still works, but background
+   reminders are off and Settings says so.
+2. Deploy from `main`. Use the production domain: preview deployments sit behind Vercel Authentication, which blocks
+   the manifest and service worker.
+3. **Scheduler.** Vercel Cron on the free Hobby plan runs once a day at most, so use a free external pinger. On
+   cron-job.org create a job: URL `https://YOUR-DOMAIN/api/cron/fire`, every 1 minute, with the header
+   `Authorization: Bearer <your CRON_SECRET>`. (On Vercel Pro you can use a cron entry instead; Vercel sends the
+   same header automatically when `CRON_SECRET` is set.)
+4. Open the site on each device, Settings, Notifications, Turn on. On iPhone, add it to the Home Screen first.
+
+Check a deployment end to end with real Chrome: `APP_URL=https://YOUR-DOMAIN node scripts/live-push-check.mjs`.
+
 ## Architecture
 
 Local-first. Tasks, settings and the learned profile live in IndexedDB on the device. The server is a
@@ -41,6 +56,8 @@ Design: [docs/design-notes.md](docs/design-notes.md). Decisions and push strateg
 - Tasks, notes and everything Dhakerni learns about you stay on your device.
 - There are no accounts. A random anonymous ID is created on first launch.
 - For reminders when the app is closed, the server stores only: push subscription, anonymous ID,
-  reminder fire time and a short title. It is encrypted at rest and deleted after the reminder fires.
+  reminder fire time and a short title (cut to 80 characters). It is AES-256-GCM encrypted at rest, each reminder
+  is deleted right after it is sent, and turning notifications off deletes the rest. Nothing is stored for
+  people who leave notifications off.
 - Audio and text you send for parsing go to the AI provider to be processed. Only the minimal slice of
   your profile needed for that request is included.

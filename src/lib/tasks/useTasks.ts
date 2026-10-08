@@ -26,6 +26,15 @@ export function useTasks() {
       .finally(() => setReady(true));
   }, [commit]);
 
+  /** Re-read from IndexedDB, e.g. after the service worker changed a task from a notification. */
+  const reload = useCallback(async () => {
+    try {
+      commit(await loadTasks());
+    } catch (e) {
+      console.error("reload tasks failed", e);
+    }
+  }, [commit]);
+
   const save = useCallback((changed: Task[]) => {
     putTasks(changed).catch((e) => console.error("save tasks failed", e));
   }, []);
@@ -97,6 +106,7 @@ export function useTasks() {
   return {
     tasks,
     ready,
+    reload,
     insert,
     getTasks: () => ref.current,
     add,
