@@ -28,6 +28,8 @@ const when = (p: Partial<When>): When => ({
   offsetMinutes: null,
   vagueWord: null,
   anchor: null,
+  anchorLabel: null,
+  leadMinutes: null,
   confidence: 0.9,
   ...p,
 });

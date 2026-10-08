@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Task } from "../schemas";
-import { newTask, reorderVisible, toggleDone } from "./ops";
+import { newTask, reorderVisible } from "./ops";
+import { completeTask } from "./recur";
 import { deleteTask, loadTasks, putTasks } from "./repo";
 
 /**
@@ -79,7 +80,8 @@ export function useTasks() {
   const toggle = useCallback(
     (id: string) => {
       const current = ref.current.find((t) => t.id === id);
-      if (current) upsert(toggleDone(current, new Date()));
+      // A repeating task moves to its next date instead of being put away.
+      if (current) upsert(completeTask(current, new Date()));
     },
     [upsert],
   );

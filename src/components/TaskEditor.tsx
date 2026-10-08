@@ -3,7 +3,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
-import { fromLocalInput, toLocalInput } from "@/lib/time/format";
+import { fromLocalInput, leadLabel, toLocalInput } from "@/lib/time/format";
 import { CloseIcon, TrashIcon } from "./Icon";
 import {
   DecisionSection,
@@ -14,6 +14,7 @@ import {
 } from "./TaskDetails";
 
 const PRIORITIES = ["low", "normal", "high"] as const;
+const LEADS = [10, 30, 60, 120, 1440]; // minutes before the time
 
 const field =
   "w-full rounded-field bg-surface-2 px-3 py-3 outline-none focus:ring-2 focus:ring-door";
@@ -92,7 +93,9 @@ export function TaskEditor({ task, onClose, onChange, onDelete, onCloseAutoFocus
                     />
                     {task.dueAt && (
                       <button
-                        onClick={() => onChange(task.id, { dueAt: null, reminders: [] })}
+                        onClick={() =>
+                          onChange(task.id, { dueAt: null, reminders: [], remindBefore: null })
+                        }
                         className="t-small rounded-field text-ink-2 hover:bg-surface-2 shrink-0 px-3"
                       >
                         {t("editor.clearTime")}
@@ -100,6 +103,30 @@ export function TaskEditor({ task, onClose, onChange, onDelete, onCloseAutoFocus
                     )}
                   </div>
                 </div>
+
+                {task.dueAt && (
+                  <label className="block">
+                    <span className="t-small text-ink-2 mb-1 block">
+                      {t("editor.remindBefore")}
+                    </span>
+                    <select
+                      className={field}
+                      value={task.remindBefore ?? ""}
+                      onChange={(e) =>
+                        onChange(task.id, { remindBefore: Number(e.target.value) || null })
+                      }
+                    >
+                      <option value="">{t("editor.remindNone")}</option>
+                      {[...new Set([...LEADS, ...(task.remindBefore ? [task.remindBefore] : [])])]
+                        .sort((a, b) => a - b)
+                        .map((m) => (
+                          <option key={m} value={m}>
+                            {leadLabel(m, t)}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                )}
 
                 <fieldset>
                   <legend className="t-small text-ink-2 mb-1">{t("editor.priority")}</legend>

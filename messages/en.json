@@ -115,6 +115,14 @@
       "confirm": "Delete all tasks, everything Dhakerni has learned and all settings on this device, and turn off notifications? This can't be undone.",
       "yes": "Yes, delete everything",
       "cancel": "Cancel"
+    },
+    "ramadan": {
+      "title": "Ramadan",
+      "auto": "Follow the calendar",
+      "on": "On",
+      "off": "Off",
+      "help": "In Ramadan, “after breakfast” (بعد الفطور) means after iftar, at Maghrib. The calendar can be a day off from the announced date: switch it by hand if so.",
+      "active": "Ramadan is on: “after breakfast” (بعد الفطور) now means after iftar, at Maghrib."
     }
   },
   "time": {
@@ -148,7 +156,15 @@
       "dropped": "{title} dropped at position {pos} of {total}.",
       "cancelled": "Move cancelled. {title} is back at position {pos}."
     },
-    "doneKeep": "Finished tasks are removed after a day."
+    "doneKeep": "Finished tasks are removed after a day.",
+    "repeat": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    },
+    "remindBefore": "Also {when} before",
+    "hours": "{n} h",
+    "days": "{n} d"
   },
   "editor": {
     "title": "Task",
@@ -178,7 +194,9 @@
     "options": "Options",
     "pick": "Choose {option}",
     "picked": "Chosen: {option}",
-    "add": "Add"
+    "add": "Add",
+    "remindBefore": "Earlier reminder",
+    "remindNone": "None, only at the time"
   },
   "toast": {
     "added": "Task added",
@@ -191,7 +209,8 @@
     "unclear": "Couldn't tell the time. Pick one of the options.",
     "triggered": "Reminders sent",
     "noticed": "Noticed: {fact}. Change anytime.",
-    "deletedMany": "{count} tasks deleted"
+    "deletedMany": "{count} tasks deleted",
+    "repeats": "Done. Next: {when}"
   },
   "voice": {
     "denied": "Microphone is blocked. Allow it in your browser settings, or type instead.",
@@ -206,7 +225,9 @@
     "fallback": "Couldn't understand that, so it was saved as written.",
     "rateLimited": "Too many requests. Wait a minute and try again.",
     "transcribeFailed": "Couldn't process the recording. Try again or type it.",
-    "addedMany": "{count} tasks added"
+    "addedMany": "{count} tasks added",
+    "updated": "Updated: {title}",
+    "updatedMany": "{count} tasks updated"
   },
   "q": {
     "min": "{n} min",
@@ -250,7 +271,14 @@
     "prayer_maghrib": "At Maghrib",
     "after_prayer_maghrib": "After Maghrib",
     "prayer_isha": "At Isha",
-    "after_prayer_isha": "After Isha"
+    "after_prayer_isha": "After Isha",
+    "iftar": "Iftar",
+    "suhoor": "Suhoor",
+    "before_prayer_fajr": "Before Fajr",
+    "before_prayer_dhuhr": "Before Dhuhr",
+    "before_prayer_asr": "Before Asr",
+    "before_prayer_maghrib": "Before Maghrib",
+    "before_prayer_isha": "Before Isha"
   },
   "facts": {
     "vague": "“{word}” = {n} min",
@@ -259,7 +287,8 @@
     "priority": "{list} tasks: usually {priority}",
     "snooze": "Snooze: {n} min",
     "languageMix": "You mix Arabic with French or English words",
-    "frequent": "“{title}”: you add it often ({n} times)"
+    "frequent": "“{title}”: you add it often ({n} times)",
+    "heard": "Heard “{from}”, you mean “{to}”"
   },
   "reminders": {
     "label": "Reminders due",
@@ -313,7 +342,8 @@
     "wake_up": "I'm up",
     "after_breakfast": "I had breakfast",
     "after_lunch": "I had lunch",
-    "after_dinner": "I had dinner"
+    "after_dinner": "I had dinner",
+    "custom": "Now: {event}"
   },
   "memory": {
     "title": "What Dhakerni knows about you",
@@ -379,5 +409,16 @@
   },
   "install": {
     "action": "Install"
+  },
+  "quick": {
+    "label": "Add again",
+    "add": "Add “{title}” again"
+  },
+  "digest": {
+    "title": "Evening summary",
+    "help": "One notification at {hour}:00 saying how many tasks tomorrow holds and how many still need a time. Written on this device from what it knew when you last opened the app.",
+    "both": "Tomorrow: {n} to do · {m} still without a time",
+    "tomorrow": "Tomorrow: {n} to do",
+    "needsTime": "{m} tasks still without a time"
   }
 }

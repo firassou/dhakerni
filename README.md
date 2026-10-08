@@ -3,9 +3,10 @@
 Voice-first todo and reminder app for Tunisian Arabic (Derja), French and English. You speak or type;
 it turns what you said into tasks and reminders.
 
-Status: **v0.8.0**: voice and typed capture that understands the idea (clean titles, descriptions, quantities,
-checklists, steps, decision help), clarifying questions, reminders with Web Push, a visible learned profile,
-backup, prayer-time words, an opening animation, accessibility checks. See [CHANGELOG](CHANGELOG.md). See [CHANGELOG](CHANGELOG.md).
+Status: **v0.10.0**: voice and typed capture that understands the idea (clean titles, descriptions, quantities,
+checklists, steps, decision help), clarifying questions, reminders with Web Push (also ahead of the time), tasks
+that repeat, changes to existing tasks by voice, a visible learned profile, backup, prayer-time words and
+Ramadan, sharing from other apps, an evening summary, accessibility checks. See [CHANGELOG](CHANGELOG.md).
 
 ## Setup
 
@@ -23,7 +24,7 @@ npm run eval                 # parser accuracy on evals/cases.json (uses real AP
 
 | Command                            | What it checks                                                                                                                            |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm test`                         | Unit tests: time resolution, learning rules, reminders, encryption, backup, prayer times                                                  |
+| `npm test`                         | Unit tests: time resolution, repeating tasks, learning rules, reminders, voice edits, encryption, backup, prayer times                    |
 | `npm run test:e2e`                 | Playwright on a phone and a desktop browser: voice (fake microphone), questions, memory, push settings, keyboard, WCAG AA with axe, speed |
 | `npm run eval`                     | Parser accuracy on 68 utterances (real API calls)                                                                                         |
 | `node scripts/live-push-check.mjs` | Real Web Push round trip in Google Chrome (needs `npm run dev:cron`)                                                                      |
@@ -88,4 +89,9 @@ corrections work is in [docs/decisions.md](docs/decisions.md) (D9).
   people who leave notifications off.
 - Audio and text you send for parsing go to the AI provider to be processed. Only the few trusted profile facts
   that matter for that sentence go with it, never the whole profile.
+- So that a sentence can change a task you already have, the titles of at most 5 open tasks that share a word
+  with that sentence go with it (and the names of their unchecked items), plus the category names of open
+  checklists. Your other tasks are never sent.
+- The evening summary is written on your device; the server only receives its one line of text
+  ("Tomorrow: 3 to do"), like any reminder title.
 - Export and import work on a JSON file you control. The file leaves out the anonymous ID and push subscription.

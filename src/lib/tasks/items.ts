@@ -80,3 +80,79 @@ export const chooseOption = (task: Task, option: string): Task =>
         decision: { ...task.decision, chosen: task.decision.chosen === option ? null : option },
       })
     : task;
+
+const itemKey = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/[\u064B-\u0652\u0640]/g, "")
+    .trim();
+
+/** Adds things to a checklist. One already on it is not listed twice: it is unchecked and its quantity grows. */
+export function mergeItems(
+  task: Task,
+  extra: readonly Pick<Item, "name" | "qty" | "unit">[],
+): Task {
+  const items = task.items.slice();
+  for (const add of extra) {
+    const at = items.findIndex((i) => itemKey(i.name) === itemKey(add.name));
+    if (at < 0) {
+      items.push({
+        id: crypto.randomUUID(),
+        name: add.name,
+        qty: add.qty,
+        unit: add.unit,
+        done: false,
+      });
+      continue;
+    }
+    const was = items[at];
+    const qty = was.done
+      ? add.qty
+      : was.qty !== null && add.qty !== null
+        ? was.qty + add.qty
+        : (add.qty ?? was.qty);
+    items[at] = { ...was, qty, unit: add.unit ?? was.unit, done: false };
+  }
+  return touch(task, { items });
+}
+
+/**
+ * New things for a list that is already open belong on that list. A freshly parsed task goes into an open
+ * checklist when it is only things (it has items), has no time of its own, and the open one is in the same
+ * category. Returns the lists that grew and the tasks that stay new.
+ */
+export function mergeIntoOpenLists(
+  created: readonly Task[],
+  existing: readonly Task[],
+): { grown: Task[]; fresh: Task[] } {
+  const grown = new Map<string, Task>();
+  const fresh: Task[] = [];
+  for (const task of created) {
+    const home =
+      task.items.length > 0 && task.dueAt === null && task.list !== "inbox" && !task.recurrence
+        ? existing
+            .filter((e) => !e.done && e.items.length > 0 && e.list === task.list)
+            .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0]
+        : undefined;
+    if (!home) {
+      fresh.push(task);
+      continue;
+    }
+    grown.set(home.id, mergeItems(grown.get(home.id) ?? home, task.items));
+  }
+  return { grown: [...grown.values()], fresh };
+}
+
+/**
+ * One sentence for the parser when a checklist is open, so a single thing named for it ("add milk") comes
+ * back as an item and can join the list. Only the category names go along, never what is on the lists.
+ */
+export function openListHint(tasks: readonly Task[]): string | null {
+  const lists = [
+    ...new Set(
+      tasks.filter((t) => !t.done && t.items.length > 0 && t.list !== "inbox").map((t) => t.list),
+    ),
+  ].slice(0, 3);
+  if (!lists.length) return null;
+  return `They have an open checklist in: ${lists.map((l) => `"${l.slice(0, 30)}"`).join(", ")}. When they name things to add to it, put each thing in items (even a single one, qty null) and use that same list.`;
+}

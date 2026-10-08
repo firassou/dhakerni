@@ -34,7 +34,14 @@ export const When = z.object({
   dayPart: DayPart.nullable().describe(
     "morning=الصباح/matin, noon=نص النهار/midi, afternoon=بعد الظهر/après-midi, late_afternoon=العشية (not a prayer), evening=الليل بكري/soir, night=الليل/nuit.",
   ),
-  offsetMinutes: z.number().int().positive().nullable().describe("Only for kind=relative."),
+  offsetMinutes: z
+    .number()
+    .int()
+    .positive()
+    .nullable()
+    .describe(
+      "For kind=relative: minutes from now. For a before_prayer_/after_prayer_ anchor: the distance from the prayer when one was said (قبل المغرب بربع ساعة = 15). Else null.",
+    ),
   vagueWord: z
     .string()
     .nullable()
@@ -43,7 +50,21 @@ export const When = z.object({
     .string()
     .nullable()
     .describe(
-      "Normalized event key for kind=anchor: leave_work, arrive_home, leave_home, wake_up, after_breakfast, after_lunch, after_dinner, prayer_fajr/dhuhr/asr/maghrib/isha (at the prayer) or after_prayer_fajr/dhuhr/asr/maghrib/isha (shortly after). Use a short snake_case key for others.",
+      "Normalized event key for kind=anchor: leave_work, arrive_home, leave_home, wake_up, after_breakfast, after_lunch, after_dinner, iftar, suhoor, prayer_fajr/dhuhr/asr/maghrib/isha (at the prayer), after_prayer_fajr/dhuhr/asr/maghrib/isha (shortly after) or before_prayer_fajr/dhuhr/asr/maghrib/isha (shortly before). For any other event use a short snake_case key that names it (sami_arrives, match_ends).",
+    ),
+  anchorLabel: z
+    .string()
+    .nullable()
+    .describe(
+      'Only for an anchor that is not in the list above: the event itself in the person\'s own words and script, 2 to 4 words ("tji Sami", "يوفى الماتش"). Else null.',
+    ),
+  leadMinutes: z
+    .number()
+    .int()
+    .positive()
+    .nullable()
+    .describe(
+      "Only when the person asks to be reminded BEFORE the time they gave (فكرني ساعة قبل = 60, rappelle-moi 30 min avant = 30, a day before = 1440). Else null.",
     ),
   confidence: z.number().min(0).max(1),
 });
@@ -132,11 +153,35 @@ export const ParsedTask = z.object({
 });
 export type ParsedTask = z.infer<typeof ParsedTask>;
 
+/** A change to a task the person already has, instead of a new task. */
+export const ParsedEdit = z.object({
+  ref: z.string().describe("The ref of one of the open tasks listed in the request."),
+  action: z
+    .enum(["complete", "reschedule", "check_item"])
+    .describe(
+      "complete: they say it is done. reschedule: they move it to another time. check_item: they got or did one thing of its checklist.",
+    ),
+  reminderId: z
+    .string()
+    .nullable()
+    .describe("For reschedule: id of the entry in reminders that holds the new time. Else null."),
+  item: z
+    .string()
+    .nullable()
+    .describe("For check_item: the name of the item, as listed. Else null."),
+});
+export type ParsedEdit = z.infer<typeof ParsedEdit>;
+
 export const ParseResult = z.object({
   tasks: z.array(ParsedTask),
   reminders: z.array(z.object({ id: z.string(), when: When })),
+  edits: z
+    .array(ParsedEdit)
+    .describe("Changes to open tasks listed in the request. Empty when none were listed."),
 });
 export type ParseResult = z.infer<typeof ParseResult>;
+/** The part that becomes new tasks. */
+export type ParsedTasks = Pick<ParseResult, "tasks" | "reminders">;
 
 export const ParseRequest = z.object({
   text: z.string().min(1).max(2000),
@@ -148,6 +193,20 @@ export const ParseRequest = z.object({
   vocabulary: z.record(z.string().max(60), z.string().max(60)).optional(),
   /** Short hints from the learned profile, only those relevant to this text. */
   hints: z.array(z.string().max(200)).max(6).optional(),
+  /**
+   * Open tasks this sentence may be about: only those that share a word with it, never the whole list.
+   * Lets "move the medicine to tomorrow" change a task instead of adding one.
+   */
+  openTasks: z
+    .array(
+      z.object({
+        ref: z.string().max(8),
+        title: z.string().max(300),
+        items: z.array(z.string().max(120)).max(30).optional(),
+      }),
+    )
+    .max(5)
+    .optional(),
   /** When the text answers a clarifying question about an existing task. */
   followUp: z.object({ taskTitle: z.string().max(300), question: z.string().max(300) }).optional(),
 });

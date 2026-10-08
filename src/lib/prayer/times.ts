@@ -27,17 +27,39 @@ export function prayerTimesOn(city: CityKey, date: Date): Record<Prayer, Date> {
 
 export const isPrayer = (v: string): v is Prayer => (PRAYERS as readonly string[]).includes(v);
 
-/** Anchor keys: `prayer_asr` is at the prayer, `after_prayer_asr` is shortly after it. */
-export function parsePrayerAnchor(anchor: string): { prayer: Prayer; after: boolean } | null {
-  const m = /^(after_)?prayer_(\w+)$/.exec(anchor);
-  return m && isPrayer(m[2]) ? { prayer: m[2], after: !!m[1] } : null;
+/** "Before the prayer" with no distance said: time to stop what you are doing and get ready. */
+export const BEFORE_PRAYER_MIN = 15;
+
+/**
+ * Anchor keys: `prayer_asr` is at the prayer, `after_prayer_asr` shortly after it, `before_prayer_asr`
+ * shortly before it.
+ */
+export function parsePrayerAnchor(
+  anchor: string,
+): { prayer: Prayer; after: boolean; before: boolean } | null {
+  const m = /^(after_|before_)?prayer_(\w+)$/.exec(anchor);
+  return m && isPrayer(m[2])
+    ? { prayer: m[2], after: m[1] === "after_", before: m[1] === "before_" }
+    : null;
 }
 
-/** The next moment that prayer (plus the offset, for "after") occurs, today or tomorrow. */
-export function nextPrayerMoment(city: CityKey, anchor: string, now: Date): Date | null {
+/**
+ * The next moment that prayer occurs, today or tomorrow, moved by the offset for "after" and "before".
+ * `minutes` replaces the usual distance when the person said one.
+ */
+export function nextPrayerMoment(
+  city: CityKey,
+  anchor: string,
+  now: Date,
+  minutes?: number | null,
+): Date | null {
   const parsed = parsePrayerAnchor(anchor);
   if (!parsed) return null;
-  const offset = parsed.after ? AFTER_PRAYER_MIN * 60_000 : 0;
+  const offset = parsed.after
+    ? (minutes ?? AFTER_PRAYER_MIN) * 60_000
+    : parsed.before
+      ? -(minutes ?? BEFORE_PRAYER_MIN) * 60_000
+      : 0;
   for (let day = 0; day <= 1; day++) {
     const on = new Date(now.getFullYear(), now.getMonth(), now.getDate() + day, 12);
     const at = new Date(prayerTimesOn(city, on)[parsed.prayer].getTime() + offset);

@@ -115,6 +115,14 @@
       "confirm": "Supprimer toutes les tâches, tout ce que Dhakerni a appris et tous les réglages sur cet appareil, et désactiver les notifications ? C'est définitif.",
       "yes": "Oui, tout supprimer",
       "cancel": "Annuler"
+    },
+    "ramadan": {
+      "title": "Ramadan",
+      "auto": "Suivre le calendrier",
+      "on": "Activé",
+      "off": "Désactivé",
+      "help": "Pendant le Ramadan, « après le petit-déjeuner » (بعد الفطور) veut dire après l'iftar, au Maghrib. Le calendrier peut avoir un jour d'écart avec la date annoncée : changez-le à la main dans ce cas.",
+      "active": "Ramadan activé : « après le petit-déjeuner » (بعد الفطور) veut dire après l'iftar, au Maghrib."
     }
   },
   "time": {
@@ -148,7 +156,15 @@
       "dropped": "{title} déposée en position {pos} sur {total}.",
       "cancelled": "Déplacement annulé. {title} est revenue en position {pos}."
     },
-    "doneKeep": "Les tâches terminées sont supprimées après un jour."
+    "doneKeep": "Les tâches terminées sont supprimées après un jour.",
+    "repeat": {
+      "daily": "Chaque jour",
+      "weekly": "Chaque semaine",
+      "monthly": "Chaque mois"
+    },
+    "remindBefore": "Aussi {when} avant",
+    "hours": "{n} h",
+    "days": "{n} j"
   },
   "editor": {
     "title": "Tâche",
@@ -178,7 +194,9 @@
     "options": "Options",
     "pick": "Choisir {option}",
     "picked": "Choisi : {option}",
-    "add": "Ajouter"
+    "add": "Ajouter",
+    "remindBefore": "Rappel en avance",
+    "remindNone": "Aucun, seulement à l'heure"
   },
   "toast": {
     "added": "Tâche ajoutée",
@@ -191,7 +209,8 @@
     "unclear": "Je n'ai pas compris l'heure. Choisissez une option.",
     "triggered": "Rappels envoyés",
     "noticed": "Remarqué : {fact}. Modifiable à tout moment.",
-    "deletedMany": "{count} tâches supprimées"
+    "deletedMany": "{count} tâches supprimées",
+    "repeats": "Terminée. Prochaine : {when}"
   },
   "voice": {
     "denied": "Le micro est bloqué. Autorisez-le dans les réglages du navigateur, ou écrivez.",
@@ -206,7 +225,9 @@
     "fallback": "Je n'ai pas compris, la tâche est enregistrée telle quelle.",
     "rateLimited": "Trop de demandes. Attendez une minute et réessayez.",
     "transcribeFailed": "Impossible de traiter l'enregistrement. Réessayez ou écrivez.",
-    "addedMany": "{count} tâches ajoutées"
+    "addedMany": "{count} tâches ajoutées",
+    "updated": "Mise à jour : {title}",
+    "updatedMany": "{count} tâches mises à jour"
   },
   "q": {
     "min": "{n} min",
@@ -250,7 +271,14 @@
     "prayer_maghrib": "À Maghrib",
     "after_prayer_maghrib": "Après Maghrib",
     "prayer_isha": "À Isha",
-    "after_prayer_isha": "Après Isha"
+    "after_prayer_isha": "Après Isha",
+    "iftar": "Iftar",
+    "suhoor": "Shour",
+    "before_prayer_fajr": "Avant Fajr",
+    "before_prayer_dhuhr": "Avant Dhuhr",
+    "before_prayer_asr": "Avant Asr",
+    "before_prayer_maghrib": "Avant Maghrib",
+    "before_prayer_isha": "Avant Isha"
   },
   "facts": {
     "vague": "« {word} » = {n} min",
@@ -259,7 +287,8 @@
     "priority": "Tâches « {list} » : en général {priority}",
     "snooze": "Report : {n} min",
     "languageMix": "Vous mélangez l'arabe avec des mots français ou anglais",
-    "frequent": "« {title} » : vous l'ajoutez souvent ({n} fois)"
+    "frequent": "« {title} » : vous l'ajoutez souvent ({n} fois)",
+    "heard": "Entendu « {from} », vous voulez dire « {to} »"
   },
   "reminders": {
     "label": "Rappels à traiter",
@@ -313,7 +342,8 @@
     "wake_up": "Je suis réveillé",
     "after_breakfast": "J'ai pris le petit-déj",
     "after_lunch": "J'ai déjeuné",
-    "after_dinner": "J'ai dîné"
+    "after_dinner": "J'ai dîné",
+    "custom": "Maintenant : {event}"
   },
   "memory": {
     "title": "Ce que Dhakerni sait de vous",
@@ -379,5 +409,16 @@
   },
   "install": {
     "action": "Installer"
+  },
+  "quick": {
+    "label": "Ajouter de nouveau",
+    "add": "Ajouter de nouveau « {title} »"
+  },
+  "digest": {
+    "title": "Résumé du soir",
+    "help": "Une notification à {hour} h : combien de tâches demain et combien attendent encore une heure. Rédigée sur cet appareil, d'après ce qu'il savait à la dernière ouverture de l'application.",
+    "both": "Demain : {n} à faire · {m} encore sans heure",
+    "tomorrow": "Demain : {n} à faire",
+    "needsTime": "{m} tâches encore sans heure"
   }
 }

@@ -4,6 +4,43 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-08
+
+### Added
+
+- **Repeating tasks repeat.** Finishing a task that repeats ("كل يوم", "chaque lundi", every month) moves it to
+  its next date with its checklist and steps cleared, instead of putting it away for good. The card shows
+  "Daily", "Weekly" or "Monthly", the toast says when it comes back, and Undo restores it. Done on the
+  notification does the same and books the next reminder on the server at once.
+- **A reminder before the time.** "موعد الطبيب 15h، فكرني ساعة قبل" gives two reminders: one an hour ahead (its
+  notification shows the time of the appointment) and one at the time. Also settable in the editor. Snoozing
+  the early one does not move the appointment.
+- **Before a prayer.** "قبل المغرب" is 15 minutes before; "قبل المغرب بربع ساعة" and "ساعة بعد العصر" use the
+  distance that was said.
+- **Ramadan.** In Ramadan "بعد الفطور" means after iftar (after Maghrib), not after breakfast. Followed from the
+  calendar, or switched by hand in Settings, Prayer times. "الإفطار" and "السحور" are understood all year.
+- **Triggers for any event.** "9bal ma tji Sami" now gets a one-tap button in your own words ("Now: tji Sami"),
+  not only the seven events the app knew.
+- **Add again.** A task you have added three times or more is offered as a one-tap chip, with the checklist it
+  had last time, whenever it is not already on your list.
+- **Learns what the microphone gets wrong.** A word you fix in the transcript before sending is remembered; after
+  the same fix three times it is made for you. Listed, editable and deletable under "Your words".
+- **Say it about a task you already have.** "خلصت التقرير" finishes it, "خلّي الدوا لغدوة" moves it, "شريت الخبز"
+  checks it off its list, instead of adding a new task. One Undo puts it back.
+- **One shopping list.** Things you name while a checklist of the same category is open are added to that
+  list ("زيد حليب"), not made into a second task.
+- **Share into Dhakerni.** On Android, share a message from another app to Dhakerni and it lands in the text
+  field, to be checked and sent.
+- **Evening summary** (off by default; Settings, Notifications): one notification at 21:00 saying how many tasks
+  tomorrow holds and how many still need a time.
+
+### Changed
+
+- To let a sentence change an existing task, each request to the AI may now carry the titles (and unchecked
+  item names) of at most 5 open tasks that share a word with that sentence, and the category names of open
+  checklists. The rest of the list still never leaves the device. See D23.
+- A task given a new, later time after its reminder was shown is reminded again at the new time.
+
 ## [0.9.0] - 2026-10-08
 
 ### Added

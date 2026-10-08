@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { toTasks } from "./apply";
-import type { ParsedTask, ParseResult, When } from "./schema";
+import type { ParsedTask, ParsedTasks, When } from "./schema";
 
 const now = new Date(2026, 9, 8, 10, 0);
 const when = (p: Partial<When>): When => ({
@@ -13,6 +13,8 @@ const when = (p: Partial<When>): When => ({
   offsetMinutes: null,
   vagueWord: null,
   anchor: null,
+  anchorLabel: null,
+  leadMinutes: null,
   confidence: 0.9,
   ...p,
 });
@@ -32,7 +34,7 @@ const task = (title: string, reminderId: string | null): ParsedTask => ({
 
 describe("toTasks", () => {
   it("two tasks sharing one resolved reminder get the same time", () => {
-    const r: ParseResult = {
+    const r: ParsedTasks = {
       tasks: [task("x", "r1"), task("y", "r1")],
       reminders: [{ id: "r1", when: when({ kind: "relative", offsetMinutes: 10 }) }],
     };
@@ -44,7 +46,7 @@ describe("toTasks", () => {
   });
 
   it("creates vague and anchor tasks in the Needs time state with the reason", () => {
-    const r: ParseResult = {
+    const r: ParsedTasks = {
       tasks: [task("a", "r1"), task("b", "r2"), task("c", null)],
       reminders: [
         { id: "r1", when: when({ kind: "vague", vagueWord: "بعد شوية" }) },
@@ -59,7 +61,7 @@ describe("toTasks", () => {
   });
 
   it("applies learned vague meanings and flags low confidence", () => {
-    const r: ParseResult = {
+    const r: ParsedTasks = {
       tasks: [task("a", "r1")],
       reminders: [{ id: "r1", when: when({ kind: "vague", vagueWord: "شوية", confidence: 0.3 }) }],
     };
@@ -69,7 +71,7 @@ describe("toTasks", () => {
   });
 
   it("gives tasks that share a reminder one group, so they are asked about once", () => {
-    const r: ParseResult = {
+    const r: ParsedTasks = {
       tasks: [task("a", "r1"), task("b", "r1"), task("c", "r2")],
       reminders: [
         { id: "r1", when: when({ kind: "vague", vagueWord: "شوية" }) },
@@ -83,7 +85,7 @@ describe("toTasks", () => {
   });
 
   it("records what a learned value decided, for the editable chip", () => {
-    const r: ParseResult = {
+    const r: ParsedTasks = {
       tasks: [task("a", "r1")],
       reminders: [{ id: "r1", when: when({ kind: "anchor", anchor: "leave_work" }) }],
     };
@@ -95,7 +97,7 @@ describe("toTasks", () => {
 });
 
 describe("smarter tasks", () => {
-  const withReminder = (t: ParsedTask): ParseResult => ({ tasks: [t], reminders: [] });
+  const withReminder = (t: ParsedTask): ParsedTasks => ({ tasks: [t], reminders: [] });
 
   it("keeps the title short and puts the full idea in the description", () => {
     const [a] = toTasks(
@@ -196,7 +198,7 @@ describe("smarter tasks", () => {
         },
       ],
       reminders: [],
-    } as unknown as ParseResult;
+    } as unknown as ParsedTasks;
     const [a] = toTasks(old, now, []);
     expect(a).toMatchObject({ title: "x", notes: "", items: [], suggestions: [], decision: null });
   });

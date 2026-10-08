@@ -41,3 +41,14 @@ export function fromLocalInput(value: string): string | null {
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
+
+/** "30 min", "1 h", "2 h", "1 d": how long before the time an earlier reminder comes. */
+export function leadLabel(
+  minutes: number,
+  t: (key: string, vars?: Record<string, string | number>) => string,
+): string {
+  if (minutes % 1440 === 0) return t("task.days", { n: minutes / 1440 });
+  if (minutes === 60) return t("q.hour");
+  if (minutes % 60 === 0) return t("task.hours", { n: minutes / 60 });
+  return t("q.min", { n: minutes });
+}

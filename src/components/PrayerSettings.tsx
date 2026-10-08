@@ -4,18 +4,28 @@ import { useEffect, useState } from "react";
 import { getMeta, setMeta } from "@/lib/db";
 import { useI18n } from "@/lib/i18n";
 import { CITY_KEYS, isCity, type CityKey } from "@/lib/prayer/cities";
+import {
+  isRamadanMode,
+  RAMADAN_MODES,
+  ramadanActive,
+  type RamadanMode,
+} from "@/lib/prayer/ramadan";
 import { PRAYERS, prayerTimesOn } from "@/lib/prayer/times";
 
 /** Choose a city so prayer words become real times. Calculated on the device; nothing is sent. */
 export function PrayerSettings() {
   const { t, locale } = useI18n();
   const [city, setCity] = useState<CityKey | "">("");
+  const [ramadan, setRamadan] = useState<RamadanMode>("auto");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     // React may run this effect twice in development. Only the latest read may write, or a slow
     // earlier read could overwrite what the person has already chosen.
     let current = true;
+    getMeta<string>("ramadan")
+      .then((m) => current && setRamadan(isRamadanMode(m) ? m : "auto"))
+      .catch(() => {});
     getMeta<string>("city")
       .then((c) => current && setCity(isCity(c) ? c : ""))
       .catch(() => {})
@@ -73,6 +83,33 @@ export function PrayerSettings() {
           </dl>
         </div>
       )}
+
+      <label className="block">
+        <span className="t-small text-ink-2 mb-1 block">{t("settings.ramadan.title")}</span>
+        <select
+          disabled={!loaded}
+          value={ramadan}
+          onChange={(e) => {
+            const next = isRamadanMode(e.target.value) ? e.target.value : "auto";
+            setRamadan(next);
+            void setMeta("ramadan", next);
+          }}
+          className="rounded-field bg-surface-2 focus:ring-door w-full px-3 py-3 outline-none focus:ring-2"
+        >
+          {RAMADAN_MODES.map((m) => (
+            <option key={m} value={m}>
+              {t(`settings.ramadan.${m}`)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <p className="t-small text-ink-2" aria-live="polite">
+        {t(
+          loaded && ramadanActive(ramadan, new Date())
+            ? "settings.ramadan.active"
+            : "settings.ramadan.help",
+        )}
+      </p>
     </div>
   );
 }

@@ -14,6 +14,8 @@ const base: When = {
   offsetMinutes: null,
   vagueWord: null,
   anchor: null,
+  anchorLabel: null,
+  leadMinutes: null,
   confidence: 0.9,
 };
 const w = (p: Partial<When>): When => ({ ...base, ...p });

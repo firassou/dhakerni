@@ -1,8 +1,7 @@
 import { Task } from "../schemas";
 import type { LearnedOptions } from "../memory/profile";
 import { resolveWhen, type Resolution } from "../time/resolve";
-import type { When } from "./schema";
-import type { ParseResult } from "./schema";
+import type { ParsedTasks, When } from "./schema";
 
 const LOW_CONFIDENCE = 0.5;
 
@@ -12,7 +11,7 @@ const LOW_CONFIDENCE = 0.5;
  * created, in the "Needs time" state.
  */
 export function toTasks(
-  result: ParseResult,
+  result: ParsedTasks,
   now: Date,
   existing: readonly Task[],
   opts: LearnedOptions = {},
@@ -95,6 +94,10 @@ export function toTasks(
             : when.time
               ? ("said" as const)
               : ("default" as const);
+    // "Remind me an hour before": an extra, earlier reminder. Pointless once that moment has passed.
+    const lead = dueAt && when?.leadMinutes ? when.leadMinutes : null;
+    const early = lead ? new Date(Date.parse(dueAt!) - lead * 60_000) : null;
+    const remindBefore = early && early > now ? lead : null;
     const uncertain = [...t.uncertain];
     if (dueAt && when && when.confidence < LOW_CONFIDENCE && !uncertain.includes("time"))
       uncertain.push("time");
@@ -126,7 +129,8 @@ export function toTasks(
             }
           : null,
       dueAt,
-      reminders: dueAt ? [dueAt] : [],
+      reminders: dueAt ? (remindBefore ? [early!.toISOString(), dueAt] : [dueAt]) : [],
+      remindBefore,
       priority: t.priority ?? opts.categoryPriority?.[list] ?? "normal",
       list,
       recurrence: t.recurrence
@@ -146,6 +150,7 @@ export function toTasks(
       assumed,
       timeBy,
       anchor: when?.kind === "anchor" ? when.anchor : null,
+      anchorLabel: when?.kind === "anchor" ? when.anchorLabel?.trim() || null : null,
       order: minOrder - count + i, // first task on top, all above existing ones
       createdAt: stamp,
       updatedAt: stamp,
