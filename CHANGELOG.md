@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented here. Format: Keep a Changelog; versions: SemVer.
 
+## [0.6.0] - 2026-10-08
+
+### Added
+
+- "What Dhakerni knows about you": every learned fact in plain words with its source and age, edit, delete with
+  undo, "not used yet" for facts that have not repeated, and "Forget everything" with a confirmation.
+- Learning switch (Settings and the memory screen).
+- Passive learning with a trust threshold: usual time per category, typical priority per category, snooze habit,
+  language mix, repeated titles. Nothing noticed from behavior is used until it repeats.
+- Corrections: changing a time the app assumed lowers trust in the old value; the same correction twice replaces it.
+- Snooze length picker on reminders.
+- Each parse request sends only the trusted facts relevant to that sentence.
+- Backup: export and import (merge or replace) of tasks, the profile and settings, with validation.
+
 ## [0.5.0] - 2026-10-08
 
 ### Added
