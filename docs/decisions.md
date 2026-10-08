@@ -17,19 +17,41 @@ Server and first client render both use English, and the real locale applies rig
 Serwist's Next plugin targets webpack; this project builds with Turbopack. A small `public/sw.js`
 covers the offline shell and, from v0.6, push handlers.
 
-## D4. Web Push: state of the platform (researched 2026-10-08) and fallback
+## D4. Web Push: platform state (researched 2026-10-08), what is built, and the fallback
 
-- **Android / desktop (Chrome, Edge, Firefox):** works in browser and installed PWA.
-- **iOS / iPadOS:** only for a PWA added to the Home Screen, permission requested from a user tap.
-  iOS 18.4+ adds Declarative Web Push (JSON payload, no service worker needed to display).
-- **No background sync on iOS**, and storage may be evicted after inactivity, so reminders cannot rely
-  on the device waking the app.
-- **Fallback strategy:** (1) in-app alerts and local scheduling while the app is open;
-  (2) server push when subscribed; (3) on iOS in a normal Safari tab, an install prompt explains
-  Add to Home Screen; (4) if push is denied or unsupported, an honest banner says reminders only fire while
-  the app is open. Reminders also remain visible in "Today" and "Needs time".
-- **Server data:** only subscription, anonymous session id, fire time and short title; encrypted at
-  rest; deleted after firing (implemented in v0.6).
+- **Android / desktop (Chrome, Edge, Firefox):** Web Push works in the browser and in an installed PWA.
+- **iOS / iPadOS:** only for a PWA added to the Home Screen, with permission requested from a tap. Not in a
+  normal Safari tab. iOS has no background sync, and storage may be evicted after inactivity.
+- **Notification buttons (Done, Snooze, Open):** supported in Chrome, Edge and Android. **Desktop Firefox shows
+  no action buttons**; clicking the notification opens the app, which then shows the reminder with Done and
+  Snooze. The Settings screen says so.
+- **Chrome refuses Web Push in incognito.** Automated tests therefore use a persistent profile.
+
+What is built (v0.5):
+
+1. The app schedules and shows reminders itself while open (alert card with Done / Snooze / Open, and a system
+   notification when the tab is in the background). This needs no server.
+2. With notifications on, the app syncs future reminders to `/api/reminders`. The server stores only the push
+   subscription, the anonymous session id, the fire time and a title cut to 80 characters, all AES-256-GCM
+   encrypted, in Upstash Redis. A scheduler calls `/api/cron/fire` every minute; due reminders are claimed
+   atomically (so none is sent twice), pushed, and deleted. A dead subscription (404/410) is forgotten.
+3. The service worker shows the notification, marks the task as notified in IndexedDB (so the app does not alert
+   again), and handles Done and Snooze by editing IndexedDB directly, so they work with the app closed.
+   Snooze also re-schedules on the server.
+4. Turning notifications off sends `forget`, which deletes the subscription and every scheduled reminder.
+5. Subscription endpoints are checked against known push services only (FCM, Mozilla, Apple, Windows), so the
+   server cannot be made to call arbitrary URLs.
+
+Fallbacks, in order: in-app alerts while the app is open; server push when subscribed; on iOS in a Safari tab, an
+install guide; if push is blocked or unsupported or the server is not configured, Settings says so plainly and
+reminders still appear while the app is open and as the overdue chip.
+
+**Scheduler.** Vercel Cron on the Hobby plan runs at most once a day, which is too slow for reminders. Use a free
+external pinger every minute (see README) or Vercel Pro cron. Locally: `npm run dev:cron`.
+
+**Manual triggers instead of location.** Tasks waiting on an event ("after I leave work") show a one-tap button
+("I'm leaving work"). Pressing it fires those reminders now and records the time as a low-confidence fact; it only
+affects behavior after the same time repeats. No geofencing or location is used.
 
 ## D5. Speech-to-text and parser model (v0.3)
 

@@ -110,7 +110,7 @@ test("a vague time asks once for the whole group, saves the answer, and next tim
 
   // the same word again: no question, the learned meaning is used and shown as an editable chip
   await say(page, "بعد شوية again");
-  await expect(page.getByRole("group")).toHaveCount(0);
+  await expect(page.getByRole("group", { name: /\?$/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /“شوية” = 30 min/ }).first()).toBeVisible();
 });
 
@@ -123,14 +123,14 @@ test("an unknown anchor asks, remembers the answer, and uses it next time", asyn
   expect(await facts(page)).toMatchObject([{ key: "anchor.leave_work", value: "17:00" }]);
 
   await say(page, "after work buy bread");
-  await expect(page.getByRole("group")).toHaveCount(0);
+  await expect(page.getByRole("group", { name: /\?$/ })).toHaveCount(0);
   await page.getByRole("tab", { name: "All" }).click();
   await expect(page.getByRole("button", { name: /After work ≈ 17:00/ }).first()).toBeVisible();
 });
 
 test("a custom time can be typed", async ({ page }) => {
   await say(page, "after work buy milk");
-  const q = page.getByRole("group");
+  const q = page.getByRole("group", { name: /\?$/ });
   await q.getByRole("button", { name: "Other time" }).click();
   await q.getByLabel("Other time").fill("18:45");
   await q.getByRole("button", { name: "Set" }).click();
@@ -140,7 +140,7 @@ test("a custom time can be typed", async ({ page }) => {
 
 test("answering by voice works", async ({ page }) => {
   await say(page, "بعد شوية باش نعمل réunion و نبعث الميل");
-  const q = page.getByRole("group");
+  const q = page.getByRole("group", { name: /\?$/ });
   await q.getByRole("button", { name: "Answer by voice" }).click();
   await page.waitForTimeout(800);
   await q.getByRole("button", { name: "Stop and send answer" }).click();
@@ -152,10 +152,10 @@ test("ignoring the question keeps the task in Needs time; the chip asks again on
 }) => {
   await say(page, "بعد شوية باش نعمل réunion و نبعث الميل");
   await page.getByRole("button", { name: "Not now" }).click();
-  await expect(page.getByRole("group")).toHaveCount(0);
+  await expect(page.getByRole("group", { name: /\?$/ })).toHaveCount(0);
   await expect(page.getByText("نعمل réunion")).toBeVisible();
   await page.getByRole("button", { name: "Needs time" }).first().click();
-  await expect(page.getByRole("group")).toHaveCount(1);
+  await expect(page.getByRole("group", { name: /\?$/ })).toHaveCount(1);
 });
 
 test("an ignored question comes back exactly once, hours later", async ({ page }) => {
@@ -182,20 +182,20 @@ test("an ignored question comes back exactly once, hours later", async ({ page }
   await page.reload();
   await expect(page.getByText(/Still need a time for/)).toBeVisible();
   await page.getByRole("button", { name: "Show" }).click();
-  await expect(page.getByRole("group")).toHaveCount(1);
+  await expect(page.getByRole("group", { name: /\?$/ })).toHaveCount(1);
 
   // dismiss again, reload: it does not come back a second time
   await page.getByRole("button", { name: "Not now" }).click();
   await page.reload();
   await page.waitForTimeout(1500);
-  await expect(page.getByRole("group")).toHaveCount(0);
+  await expect(page.getByRole("group", { name: /\?$/ })).toHaveCount(0);
   await expect(page.getByText(/Still need a time for/)).toHaveCount(0);
 });
 
 test("tasks with no time cue are not nagged", async ({ page }) => {
   await say(page, "plain");
   await expect(page.getByText("plain task")).toBeVisible();
-  await expect(page.getByRole("group")).toHaveCount(0);
+  await expect(page.getByRole("group", { name: /\?$/ })).toHaveCount(0);
 });
 
 test("with learning off, the answer sets the time but nothing is saved", async ({ page }) => {
@@ -211,7 +211,7 @@ test("with learning off, the answer sets the time but nothing is saved", async (
       }),
   );
   await say(page, "بعد شوية باش نعمل réunion و نبعث الميل");
-  await page.getByRole("group").getByRole("button", { name: "15 min" }).click();
+  await page.getByRole("group", { name: /\?$/ }).getByRole("button", { name: "15 min" }).click();
   await expect(page.getByText("Time set")).toBeVisible();
   expect(await facts(page)).toEqual([]);
 });
