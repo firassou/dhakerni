@@ -1084,6 +1084,32 @@
         "priority": "high",
         "smart": {}
       }
+    },
+    {
+      "id": "pl01",
+      "category": "plan",
+      "text": "8odwa sba7:\nbch nchay3 lmra\nnet3ada l m3awya\nnwasslo massage\nnemchi lel contabli\nnemchy lel banka\nnarje3 lel contabli\nnemchy ne5dem 3ala rouhi m3a 11h",
+      "expect": {
+        "titles": [
+          ["nchay3"],
+          ["m3awya"],
+          ["massage"],
+          ["contabli"],
+          ["banka"],
+          ["contabli"],
+          ["ne5dem", "5edma", "khedma"]
+        ],
+        "reminders": [
+          {
+            "status": "resolved",
+            "at": "2026-10-09T08:00"
+          },
+          {
+            "status": "resolved",
+            "at": "2026-10-09T11:00"
+          }
+        ]
+      }
     }
   ]
 }

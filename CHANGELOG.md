@@ -27,6 +27,8 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ### Fixed
 
+- A long list typed under a heading ("8odwa sba7:" then one action per line) was saved as one plain task: the
+  backup model's answer was cut off. Each line is now its own task, in order, on the heading's day.
 - The Done list showed its tasks for a moment and then they faded away.
 
 ## [0.8.0] - 2026-10-08
