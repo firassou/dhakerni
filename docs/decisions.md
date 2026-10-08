@@ -155,3 +155,30 @@ Export writes one JSON file: tasks, profile facts, the observations behind them,
 It leaves out the anonymous session id and the push subscription, which belong to one device. Import validates
 every item with the same Zod schemas and skips damaged ones (and says how many). Merge keeps current data and
 lets the newer copy win; Replace makes the device match the file.
+
+## D11. Prayer-time words
+
+`adhan` (maintained, MIT) computes the five prayers on the device from a city the person picks in Settings
+(the 24 governorate capitals, a fixed list: no location lookup, nothing detected or sent). Method: Fajr and Isha
+at 18 degrees (Tunisia's Ministry of Religious Affairs), Asr with the standard shadow (Maliki, Shafi'i, Hanbali).
+The parser maps a prayer name used as a moment ("عند المغرب") to `prayer_<name>` and "بعد العصر" to
+`after_prayer_<name>` (the adhan plus 20 minutes). With a city set these resolve to a real time, shown as an
+editable chip ("After Asr ≈ 16:12"), recomputed per day so winter and summer are right. Without a city the app
+asks, and the question offers a link to Settings. "العشاء" alone near the evening means dinner; the Isha prayer is
+used only when the prayer is clearly meant. Prayer anchors never create "I'm leaving..." trigger buttons and never
+become learned facts, because they come from the clock.
+
+## D12. Accessibility and speed: what is checked, and how
+
+- **axe-core** (WCAG 2.0/2.1/2.2 A and AA) runs in the e2e suite on the home screen (empty and with tasks, an open
+  question), Settings, the memory screen and the task editor, in light, dark, English and Arabic. A guard test
+  injects a deliberate contrast failure and requires the scanner to catch it, so a green run means something.
+  axe finds roughly a third of accessibility problems automatically; it does not replace testing with a screen reader.
+- **Keyboard:** one test does the main flow with the keyboard alone (add, complete, undo, edit, filter, record and
+  cancel). Focus rings are asserted to be visible. Closing the editor or the import dialog returns focus to the
+  button that opened it.
+- **Speed:** measured in the page from the click event to the result on screen, dev build: completing a task
+  about 6 ms, opening the editor about 23 ms, a typed task appearing about 70 ms including a mocked parse and the
+  IndexedDB write. The 100 ms budget is asserted for the first two.
+- **Motion:** every animation is switched off by `prefers-reduced-motion`.
+- **Not verified:** real screen readers (VoiceOver, TalkBack, NVDA), 60 fps on low-end phones, and iOS Safari.

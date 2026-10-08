@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here. Format: Keep a Changelog; versions: SemVer.
 
+## [0.7.0] - 2026-10-08
+
+### Added
+
+- Prayer-time words: pick a Tunisian city in Settings and "بعد العصر" or "عند المغرب" become real times
+  (computed on the device with `adhan`, Tunisian Ministry angles). Shows today's five times.
+- Recording can always be cancelled without sending anything to the AI: a cancel button while recording, drag the
+  held mic away and let go, or press Escape.
+- Accessibility checks (axe, WCAG AA) in the test suite for every screen in light, dark, English and Arabic.
+- Keyboard-only and speed tests.
+
+### Fixed
+
+- The recording timer never counted past 0:00.
+- Pressing Escape while the microphone was still starting did not cancel the recording.
+- Closing the task editor left keyboard focus on the page body instead of the task you opened.
+- The Next.js dev badge covered the dock's cancel button during development.
+
 ## [0.6.0] - 2026-10-08
 
 ### Added
