@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { useToast, useUndoToast } from "@/components/Toast";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
-import type { ResolveOptions } from "@/lib/time/resolve";
+import type { LearnedOptions } from "@/lib/memory/profile";
 import { newTask } from "@/lib/tasks/ops";
 import { ApiError, parse, transcribe } from "./client";
 import { toTasks } from "./apply";
@@ -17,11 +17,19 @@ interface Deps {
   remove: (id: string) => void;
   onCreated: (tasks: Task[]) => void;
   /** Learned meanings, so known words resolve silently. */
-  getResolveOptions: () => ResolveOptions;
+  getResolveOptions: () => LearnedOptions;
+  hintsFor: (text: string) => string[];
 }
 
 /** Text or audio in; tasks out. Never blocks: any failure still saves what the person said. */
-export function useCapture({ getTasks, insert, remove, onCreated, getResolveOptions }: Deps) {
+export function useCapture({
+  getTasks,
+  insert,
+  remove,
+  onCreated,
+  getResolveOptions,
+  hintsFor,
+}: Deps) {
   const { t, locale } = useI18n();
   const { show } = useToast();
   const undoToast = useUndoToast();
@@ -44,7 +52,7 @@ export function useCapture({ getTasks, insert, remove, onCreated, getResolveOpti
       if (!clean) return;
       setPending({ text: clean });
       try {
-        const result = await parse({ text: clean, locale });
+        const result = await parse({ text: clean, locale, hints: hintsFor(clean) });
         const created = toTasks(result, new Date(), getTasks(), getResolveOptions());
         if (created.length === 0) show({ message: t("voice.noTask") });
         else finish(created);
@@ -62,7 +70,7 @@ export function useCapture({ getTasks, insert, remove, onCreated, getResolveOpti
         setPending(null);
       }
     },
-    [finish, getResolveOptions, getTasks, locale, show, t],
+    [finish, getResolveOptions, getTasks, hintsFor, locale, show, t],
   );
 
   const submitAudio = useCallback(

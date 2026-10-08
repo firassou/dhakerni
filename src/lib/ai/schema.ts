@@ -94,6 +94,8 @@ export const ParseRequest = z.object({
   locale: z.enum(["ar", "fr", "en"]).optional(),
   /** Minimal profile slice the caller chose to share, e.g. {"شوية":"20 min"}. */
   vocabulary: z.record(z.string().max(60), z.string().max(60)).optional(),
+  /** Short hints from the learned profile, only those relevant to this text. */
+  hints: z.array(z.string().max(200)).max(6).optional(),
   /** When the text answers a clarifying question about an existing task. */
   followUp: z.object({ taskTitle: z.string().max(300), question: z.string().max(300) }).optional(),
 });

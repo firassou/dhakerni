@@ -1,4 +1,5 @@
 import type { When } from "../ai/schema";
+import type { LearnedFactDraft as LearnedFact } from "../memory/types";
 import type { Needs } from "../schemas";
 import { nextOccurrence, resolveWhen } from "../time/resolve";
 
@@ -70,11 +71,6 @@ export function resolveAnswer(answer: Answer, now: Date): Date {
     case "exact":
       return new Date(answer.at);
   }
-}
-
-export interface LearnedFact {
-  key: string;
-  value: string;
 }
 
 /**
