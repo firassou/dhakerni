@@ -231,6 +231,76 @@ test("reset everything asks first, then leaves the device empty", async ({ page 
   await expect(page.getByText("No tasks yet")).toBeVisible();
 });
 
+/** Drag a finger across a card. Playwright's mouse is not a touch, so the pointer events are made by hand. */
+async function swipe(page: import("@playwright/test").Page, name: string, byPx: number) {
+  await page
+    .getByRole("listitem")
+    .filter({ hasText: name })
+    .evaluate(async (li, by) => {
+      const r = li.getBoundingClientRect();
+      const y = r.top + r.height / 2;
+      const x0 = r.left + r.width / 2;
+      const fire = (type: string, x: number) =>
+        li.dispatchEvent(
+          new PointerEvent(type, {
+            pointerType: "touch",
+            pointerId: 7,
+            isPrimary: true,
+            bubbles: true,
+            clientX: x,
+            clientY: y,
+          }),
+        );
+      fire("pointerdown", x0);
+      for (let i = 1; i <= 8; i++) {
+        fire("pointermove", x0 + (by * i) / 8);
+        await new Promise((r) => setTimeout(r, 40)); // slow: this is a drag, not a flick
+      }
+      fire("pointerup", x0 + by);
+    }, byPx);
+}
+
+test.describe("swiping a card", () => {
+  test.skip(({ isMobile }) => !isMobile, "a finger gesture");
+
+  test("right finishes it, left deletes it, and both can be undone", async ({ page }) => {
+    await addTask(page, "alpha");
+    await addTask(page, "bravo");
+    const card = (name: string) => page.getByRole("listitem").filter({ hasText: name });
+
+    await swipe(page, "alpha", 220);
+    await expect(page.getByText("Marked as done")).toBeVisible();
+    await expect(card("alpha")).toHaveCount(0);
+    await page.getByRole("button", { name: "Undo" }).click();
+    await expect(card("alpha")).toBeVisible();
+
+    await swipe(page, "bravo", -220);
+    await expect(page.getByText("Task deleted")).toBeVisible();
+    await expect(card("bravo")).toHaveCount(0);
+    await page.getByRole("button", { name: "Undo" }).click();
+    await expect(card("bravo")).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(0); // a swipe never opens the editor
+  });
+
+  test("a short swipe springs back and does nothing", async ({ page }) => {
+    await addTask(page, "alpha");
+    await swipe(page, "alpha", 60);
+    await page.waitForTimeout(500);
+    await expect(page.getByRole("listitem").filter({ hasText: "alpha" })).toBeVisible();
+    await expect(page.getByText("Marked as done")).toHaveCount(0);
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test("in the Done list, right puts the task back", async ({ page }) => {
+    await addTask(page, "alpha");
+    await swipe(page, "alpha", 220);
+    await page.getByRole("tab", { name: "Done" }).click();
+    await swipe(page, "alpha", 220);
+    await page.getByRole("tab", { name: "All" }).click();
+    await expect(page.getByRole("listitem").filter({ hasText: "alpha" })).toBeVisible();
+  });
+});
+
 test("keyboard reorder", async ({ page }) => {
   await addTask(page, "first");
   await addTask(page, "second"); // newest on top

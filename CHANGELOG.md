@@ -10,6 +10,9 @@ All notable changes to this project are documented here. Format: Keep a Changelo
   the line; on a phone Enter breaks the line and the button sends.
 - Tapping anywhere on a task card opens the editor, not only the title.
 - Long-press (or long-click) a card to pick several, then delete them together, with one Undo.
+- Swipe a card with a finger: right finishes it (or reopens it in the Done list), left deletes it. Both show what
+  will happen behind the card, need about a third of its width or a quick flick, and can be undone.
+- An Install button in the header, shown only while the browser offers to install the app.
 - Settings, Reset everything: wipes tasks, what was learned, settings and the server's copy of the reminders.
 - A reminder nobody answers is sent again twice, 3 minutes apart, and each copy vibrates. Done, Snooze or opening
   the app stops the repeats. On Android, Settings explains how to stop the phone holding reminders back.
@@ -19,6 +22,8 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 - Voice no longer creates tasks directly: what was heard is written into the text field so it can be checked and
   corrected before it is sent.
 - Finished tasks are kept for one day, then removed.
+
+- The installed app's short name is "Dhakerni", capitalized.
 
 ### Fixed
 

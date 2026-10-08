@@ -131,3 +131,26 @@ test.describe("brand link", () => {
     await expect(page).toHaveURL(/\/$/);
   });
 });
+
+test("an Install button shows only while the browser offers to install the app", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
+  const button = page.getByRole("button", { name: "Install", exact: true });
+  await expect(button).toHaveCount(0); // not offered: nothing to show
+
+  // what Chrome sends when the app can be installed
+  await page.evaluate(() => {
+    const offer = Object.assign(new Event("beforeinstallprompt", { cancelable: true }), {
+      prompt: async () => void ((window as unknown as { prompted: boolean }).prompted = true),
+      userChoice: Promise.resolve({ outcome: "accepted" }),
+    });
+    window.dispatchEvent(offer);
+  });
+  await button.click();
+  expect(await page.evaluate(() => (window as unknown as { prompted: boolean }).prompted)).toBe(
+    true,
+  );
+  await expect(button).toHaveCount(0); // one prompt per offer
+});
