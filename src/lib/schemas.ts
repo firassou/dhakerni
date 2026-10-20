@@ -81,6 +81,8 @@ export const Task = z.object({
   notifiedAt: z.iso.datetime({ offset: true }).nullable().default(null),
   /** Set when the time came from something the app learned, so the card can show an editable chip. */
   assumed: z.object({ key: z.string(), value: z.string() }).nullable().default(null),
+  /** Saved while offline as written; the AI fills in time and details once the network is back. */
+  aiPending: z.boolean().default(false),
   done: z.boolean().default(false),
   doneAt: z.iso.datetime({ offset: true }).nullable().default(null),
   order: z.number(),

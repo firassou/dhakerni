@@ -61,3 +61,12 @@ describe("tasks saved by older versions", () => {
     expect(t.reminders).toEqual([]);
   });
 });
+
+describe("aiPending", () => {
+  it("defaults to false for tasks saved before offline capture", () => {
+    expect(normalizeTask(legacy).aiPending).toBe(false);
+  });
+  it("is kept when set", () => {
+    expect(normalizeTask({ ...legacy, aiPending: true }).aiPending).toBe(true);
+  });
+});

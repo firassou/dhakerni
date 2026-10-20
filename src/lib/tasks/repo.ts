@@ -20,6 +20,7 @@ export function normalizeTask(raw: unknown): Task {
     suggestions: arr(r.suggestions),
     uncertain: arr(r.uncertain),
     decision: null,
+    aiPending: r.aiPending === true,
   };
 }
 

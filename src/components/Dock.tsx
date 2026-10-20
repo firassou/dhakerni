@@ -25,6 +25,8 @@ export interface DockHandle {
 interface Props {
   ref?: Ref<DockHandle>;
   busy: boolean;
+  /** No network: speech-to-text cannot work, so the mic is off. Typing still does. */
+  offline?: boolean;
   /** `heard` is what the microphone gave, when part of the text came from it: the fixes teach the app. */
   onSubmitText: (text: string, heard?: string) => void;
   /** Resolves to what was heard, which lands in the field to be checked before sending. */
@@ -36,7 +38,7 @@ interface Props {
  * Bottom dock, always within thumb reach. Hold the mic to talk, or tap to start and tap again to stop.
  * What was heard is written into the field, so it can be corrected before it is sent.
  */
-export function Dock({ ref, busy, onSubmitText, onAudio, onVoiceError }: Props) {
+export function Dock({ ref, busy, offline = false, onSubmitText, onAudio, onVoiceError }: Props) {
   const { t } = useI18n();
   const [text, setText] = useState("");
   const [tapMode, setTapMode] = useState(false);
@@ -227,7 +229,13 @@ export function Dock({ ref, busy, onSubmitText, onAudio, onVoiceError }: Props) 
                 setText(e.target.value);
               }}
               onKeyDown={onFieldKeyDown}
-              placeholder={busy ? t("dock.processing") : t("dock.placeholder")}
+              placeholder={
+                busy
+                  ? t("dock.processing")
+                  : offline
+                    ? t("dock.placeholderOffline")
+                    : t("dock.placeholder")
+              }
               autoComplete="off"
               enterKeyHint="enter"
               className="placeholder:text-ink-2 my-1 max-h-36 min-w-0 flex-1 resize-none overflow-y-auto bg-transparent px-3 py-3 outline-none"
@@ -246,8 +254,8 @@ export function Dock({ ref, busy, onSubmitText, onAudio, onVoiceError }: Props) 
         ) : (
           <button
             type="button"
-            disabled={busy && !active}
-            aria-label={active ? t("dock.stop") : t("dock.talk")}
+            disabled={(busy || offline) && !active}
+            aria-label={active ? t("dock.stop") : offline ? t("dock.talkOffline") : t("dock.talk")}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}

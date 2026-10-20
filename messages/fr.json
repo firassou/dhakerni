@@ -33,6 +33,8 @@
     }
   },
   "dock": {
+    "talkOffline": "La voix demande internet",
+    "placeholderOffline": "Hors ligne : écrivez, je m'en occupe plus tard",
     "talk": "Maintenir pour parler",
     "inputLabel": "Ajouter une tâche",
     "placeholder": "Ou écrivez ici…",
@@ -221,7 +223,13 @@
     "noTask": "Aucune tâche trouvée. Essayez de reformuler.",
     "review": "Vérifiez ce que j'ai entendu, corrigez si besoin, puis envoyez."
   },
+  "offline": {
+    "title": "Hors ligne",
+    "body": "Tout fonctionne. L'IA est en pause. Les rappels sonnent tant que l'app est ouverte."
+  },
   "capture": {
+    "offlineSaved": "Enregistré. Je remplirai l'heure au retour de la connexion.",
+    "backfilled": "De retour en ligne : « {title} » complétée",
     "fallback": "Je n'ai pas compris, la tâche est enregistrée telle quelle.",
     "rateLimited": "Trop de demandes. Attendez une minute et réessayez.",
     "transcribeFailed": "Impossible de traiter l'enregistrement. Réessayez ou écrivez.",
