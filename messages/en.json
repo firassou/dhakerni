@@ -33,6 +33,8 @@
     }
   },
   "dock": {
+    "talkOffline": "Voice needs internet",
+    "placeholderOffline": "Offline: type it, I'll sort it out later",
     "talk": "Hold to talk",
     "inputLabel": "Add a task",
     "placeholder": "Or type it here…",
@@ -221,7 +223,13 @@
     "noTask": "No task found in that. Try rephrasing.",
     "review": "Check what I heard, fix it if needed, then send."
   },
+  "offline": {
+    "title": "Offline",
+    "body": "Everything works. AI is paused. Reminders ring while the app is open."
+  },
   "capture": {
+    "offlineSaved": "Saved. I'll fill in the time when you're back online.",
+    "backfilled": "Online again: filled in \"{title}\"",
     "fallback": "Couldn't understand that, so it was saved as written.",
     "rateLimited": "Too many requests. Wait a minute and try again.",
     "transcribeFailed": "Couldn't process the recording. Try again or type it.",

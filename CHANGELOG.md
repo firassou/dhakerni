@@ -4,6 +4,17 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-20
+
+### Added
+
+- **Works offline.** The app opens and runs without internet, including Settings and Memory (the offline
+  shell now covers them). An "Offline" note says what still works; the mic is off while offline because speech
+  recognition needs the network.
+- **Typing offline is not lost.** A task typed with no connection is saved as written and, once you are back
+  online, the AI fills in its time and details on its own, with an Undo.
+- Reminders still ring while the app is open offline; background alerts resume when the device reconnects.
+
 ## [0.10.0] - 2026-10-08
 
 ### Added

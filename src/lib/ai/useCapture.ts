@@ -5,11 +5,10 @@ import { useToast, useUndoToast } from "@/components/Toast";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import type { LearnedOptions } from "@/lib/memory/profile";
-import { mergeIntoOpenLists, openListHint } from "@/lib/tasks/items";
+import { getOnline } from "@/lib/net/online";
 import { newTask } from "@/lib/tasks/ops";
-import { ApiError, parse, transcribe } from "./client";
-import { toTasks } from "./apply";
-import { applyEdits, editCandidates, toOpenTasks } from "./edits";
+import { ApiError, transcribe } from "./client";
+import { understand } from "./understand";
 
 const MIN_AUDIO_MS = 500;
 
@@ -69,46 +68,33 @@ export function useCapture({
     async (text: string) => {
       const clean = text.trim();
       if (!clean) return;
+      // No network: keep the words now, and the AI fills in the rest when it is back (useAiBackfill).
+      if (!getOnline()) {
+        finish([newTask(clean, getTasks(), new Date(), { aiPending: true })]);
+        show({ message: t("capture.offlineSaved") });
+        return;
+      }
       setPending({ text: clean });
       try {
-        // Open tasks that share a word with the sentence: it may be about one of them, not a new task.
-        const candidates = editCandidates(clean, getTasks());
-        const listHint = openListHint(getTasks());
-        const result = await parse({
-          text: clean,
+        const { fresh, changed, before } = await understand(clean, {
+          tasks: getTasks(),
           locale,
-          hints: [...hintsFor(clean), ...(listHint ? [listHint] : [])].slice(0, 6),
-          openTasks: toOpenTasks(candidates),
+          hints: hintsFor(clean),
+          options: getResolveOptions(),
         });
-        const now = new Date();
-        const options = getResolveOptions();
-        const edited = applyEdits(result, candidates, now, options);
-        const editedById = new Map(edited.map((e) => [e.id, e]));
-        const current = getTasks().map((x) => editedById.get(x.id) ?? x);
-        // Things named for a list that is already open go onto that list.
-        const { grown, fresh } = mergeIntoOpenLists(
-          toTasks(result, now, current, options),
-          current,
-        );
-        grown.forEach((g) => editedById.set(g.id, g));
-        const changed = [...editedById.values()];
         if (fresh.length === 0 && changed.length === 0) show({ message: t("voice.noTask") });
-        else {
-          const ids = new Set(changed.map((c) => c.id));
-          finish(
-            fresh,
-            changed,
-            getTasks().filter((x) => ids.has(x.id)),
-          );
-        }
+        else finish(fresh, changed, before);
       } catch (e) {
         // Keep the words: save them as a plain task with no time.
-        finish([newTask(clean, getTasks(), new Date())]);
+        const offline = e instanceof ApiError && e.kind === "network";
+        finish([newTask(clean, getTasks(), new Date(), { aiPending: offline })]);
         show({
           message: t(
-            e instanceof ApiError && e.kind === "rate_limited"
-              ? "capture.rateLimited"
-              : "capture.fallback",
+            offline
+              ? "capture.offlineSaved"
+              : e instanceof ApiError && e.kind === "rate_limited"
+                ? "capture.rateLimited"
+                : "capture.fallback",
           ),
         });
       } finally {

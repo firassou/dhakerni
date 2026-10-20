@@ -38,6 +38,8 @@ import {
   roundedClock,
   triggerable,
 } from "@/lib/reminders/engine";
+import { useAiBackfill } from "@/lib/ai/useAiBackfill";
+import { useOnline } from "@/lib/net/useOnline";
 import { useReminders } from "@/lib/reminders/useReminders";
 import {
   loadTemplates,
@@ -60,6 +62,7 @@ import { Dock, type DockHandle } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
 import { InstallButton } from "./InstallButton";
 import { CloseIcon, SlidersIcon, TrashIcon } from "./Icon";
+import { OfflinePill } from "./OfflinePill";
 import { PushBanner } from "./PushBanner";
 import { QuestionCard } from "./QuestionCard";
 import { QuickAdd } from "./QuickAdd";
@@ -88,6 +91,7 @@ export function HomeScreen() {
   const [templates, setTemplates] = useState<Record<string, Template>>({});
   const [digestOn, setDigestOn] = useState(false);
   const push = usePush();
+  const online = useOnline();
   const [filter, setFilter] = useState<Filter>("today");
   const [editingId, setEditingId] = useState<string | null>(null);
   const editSnapshot = useRef<Task | null>(null);
@@ -167,6 +171,8 @@ export function HomeScreen() {
     },
     [refresh, show, t],
   );
+
+  useAiBackfill({ tasks, ready, getTasks, insert, remove, upsert, getResolveOptions, hintsFor });
 
   const { pending, submitText, hear } = useCapture({
     getTasks,
@@ -527,6 +533,7 @@ export function HomeScreen() {
         </Link>
       </header>
 
+      <OfflinePill />
       <PushBanner state={push.state} onEnable={push.enable} />
       <ReminderAlerts
         alerts={reminders.alerts}
@@ -687,6 +694,7 @@ export function HomeScreen() {
         <Dock
           ref={dock}
           busy={pending !== null}
+          offline={!online}
           onSubmitText={(text, heard) => {
             void submitText(text);
             // Words fixed in the transcript before sending are how the app learns what was really said.

@@ -1,4 +1,5 @@
 import { getSessionId } from "../db";
+import { markOffline, markOnline } from "../net/online";
 import type { ParseRequest, ParseResult } from "./schema";
 
 export type ApiErrorKind = "rate_limited" | "too_large" | "network" | "server";
@@ -16,8 +17,10 @@ async function call(path: string, init: RequestInit): Promise<Response> {
       headers: { ...init.headers, "x-session-id": await getSessionId() },
     });
   } catch {
+    markOffline();
     throw new ApiError("network");
   }
+  markOnline(); // the server answered, whatever it answered
   if (res.status === 429) throw new ApiError("rate_limited");
   if (res.status === 413) throw new ApiError("too_large");
   if (!res.ok) throw new ApiError("server");
