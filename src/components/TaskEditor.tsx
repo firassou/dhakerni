@@ -17,7 +17,7 @@ const PRIORITIES = ["low", "normal", "high"] as const;
 const LEADS = [10, 30, 60, 120, 1440]; // minutes before the time
 
 const field =
-  "w-full rounded-field bg-surface-2 px-3 py-3 outline-none focus:ring-2 focus:ring-door";
+  "w-full rounded-field bg-surface-2 px-3 py-3 outline-none focus:ring-2 focus:ring-brand";
 
 interface Props {
   task: Task | null;
@@ -134,7 +134,7 @@ export function TaskEditor({ task, onClose, onChange, onDelete, onCloseAutoFocus
                     {PRIORITIES.map((p) => (
                       <label
                         key={p}
-                        className="t-small has-[:checked]:bg-surface has-[:focus-visible]:outline-door flex-1 cursor-pointer rounded-[9px] py-2 text-center transition-colors has-[:checked]:font-medium has-[:focus-visible]:outline-2"
+                        className="t-small has-[:checked]:bg-surface has-[:focus-visible]:outline-brand flex-1 cursor-pointer rounded-[9px] py-2 text-center transition-colors has-[:checked]:font-medium has-[:focus-visible]:outline-2"
                       >
                         <input
                           type="radio"

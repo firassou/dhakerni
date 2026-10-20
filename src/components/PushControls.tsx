@@ -74,7 +74,7 @@ export function PushControls() {
           <button
             disabled={busy}
             onClick={() => run(enable)}
-            className={`${btn} bg-door text-door-ink`}
+            className={`${btn} bg-brand text-brand-ink`}
           >
             {t("push.enable")}
           </button>

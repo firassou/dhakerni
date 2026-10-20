@@ -26,7 +26,8 @@ import { toggleItem } from "@/lib/tasks/items";
 import { newTask } from "@/lib/tasks/ops";
 import { isRepeating } from "@/lib/tasks/recur";
 import { formatDue } from "@/lib/time/format";
-import { useCapture } from "@/lib/ai/useCapture";
+import { AnimatePresence } from "motion/react";
+import { useCapture, type CaptureOutcome } from "@/lib/ai/useCapture";
 import { usePush } from "@/lib/push/usePush";
 import { useReminderSync } from "@/lib/push/useReminderSync";
 import { ANCHOR_CHOICES } from "@/lib/questions/answers";
@@ -71,6 +72,7 @@ import { TaskCard, TaskCardOverlay } from "./TaskCard";
 import { TaskEditor } from "./TaskEditor";
 import { TriggerBar } from "./TriggerBar";
 import { useToast, useUndoToast } from "./Toast";
+import { VoiceCard } from "./VoiceCard";
 
 const LINGER_MS = 450;
 const EXIT_MS = 220; // how long a deleted card takes to leave before it is removed
@@ -195,6 +197,56 @@ export function HomeScreen() {
         .catch((e) => console.error("learning failed", e));
     },
   });
+
+  // The card after speaking: the words, then what they became. The task is already saved; Undo takes it back.
+  const [voice, setVoice] = useState<{ heard: string; outcome: CaptureOutcome | null } | null>(
+    null,
+  );
+  const [voiceHeld, setVoiceHeld] = useState(false); // pointer or focus inside: do not close it under the finger
+  const voiceRun = useRef(0); // a newer recording or correction makes older results stale
+
+  const understandVoice = useCallback(
+    async (text: string) => {
+      const run = ++voiceRun.current;
+      setVoice({ heard: text, outcome: null });
+      const outcome = await submitText(text, { quiet: true });
+      if (run === voiceRun.current) setVoice({ heard: text, outcome });
+    },
+    [submitText],
+  );
+
+  const handleVoice = useCallback(
+    async (audio: Blob, ms: number) => {
+      const heard = await hear(audio, ms);
+      if (heard) await understandVoice(fixHeard(heard));
+    },
+    [fixHeard, hear, understandVoice],
+  );
+
+  /** A word was fixed: undo what the wrong words made, teach the fix, and understand the corrected sentence. */
+  const correctVoice = useCallback(
+    (corrected: string) => {
+      if (!voice) return;
+      voice.outcome?.undo();
+      void observeHeard(voice.heard, corrected)
+        .then(notice)
+        .catch((e) => console.error("learning failed", e));
+      void understandVoice(corrected);
+    },
+    [notice, understandVoice, voice],
+  );
+
+  const closeVoice = useCallback(() => {
+    voiceRun.current++;
+    setVoice(null);
+  }, []);
+
+  // The card leaves by itself a while after the result is in, unless it is being used.
+  useEffect(() => {
+    if (!voice?.outcome || voiceHeld) return;
+    const id = setTimeout(closeVoice, 10_000);
+    return () => clearTimeout(id);
+  }, [voice, voiceHeld, closeVoice]);
 
   // What was learned to offer for one-tap adding, and whether the evening summary is on.
   useEffect(() => {
@@ -512,10 +564,11 @@ export function HomeScreen() {
   const editing = tasks.find((x) => x.id === editingId) ?? null;
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-4 pt-[max(16px,env(safe-area-inset-top))] pb-44">
+    <div className="page-in mx-auto flex min-h-dvh w-full max-w-xl flex-col px-4 pt-[max(16px,env(safe-area-inset-top))] pb-44">
       <header className="flex items-center justify-between py-3">
         <h1>
           <Brand
+            large
             onClick={() => {
               // Already home: tapping the name takes you back to the top of Today.
               setFilter("today");
@@ -566,7 +619,24 @@ export function HomeScreen() {
       />
 
       <main className="mt-3 flex flex-1 flex-col">
-        {pending && (
+        <AnimatePresence initial={false}>
+          {voice && (
+            <VoiceCard
+              key="voice"
+              heard={voice.heard}
+              outcome={voice.outcome}
+              now={now}
+              onCorrect={correctVoice}
+              onUndo={() => {
+                voice.outcome?.undo();
+                closeVoice();
+              }}
+              onClose={closeVoice}
+              onHold={setVoiceHeld}
+            />
+          )}
+        </AnimatePresence>
+        {pending && !voice && (
           <div
             className="card-in shimmer rounded-card mb-2 px-4 py-3.5"
             role="status"
@@ -595,11 +665,15 @@ export function HomeScreen() {
               items={visible.map((x) => x.id)}
               strategy={verticalListSortingStrategy}
             >
-              <ul className="space-y-2" aria-label={t(`filters.${filter}`)}>
+              <ul
+                className="grouped rounded-group bg-surface overflow-hidden"
+                aria-label={t(`filters.${filter}`)}
+              >
                 {visible.map((task, index) => (
                   <TaskCard
                     key={task.id}
                     task={task}
+                    index={index}
                     now={now}
                     draggable={filter !== "done" && !selecting}
                     selecting={selecting}
@@ -648,9 +722,11 @@ export function HomeScreen() {
         ) : (
           ready &&
           !pending && (
-            <div key={filter} className="rise my-auto max-w-[28ch] py-16">
-              <h2 className="t-title">{t(`empty.${filter}.title`)}</h2>
-              <p className="text-ink-2 mt-2">{t(`empty.${filter}.body`)}</p>
+            <div key={filter} className="my-auto max-w-[28ch] py-16">
+              <h2 className="t-title stagger">{t(`empty.${filter}.title`)}</h2>
+              <p className="text-ink-2 stagger mt-2" style={{ "--d": 2 } as React.CSSProperties}>
+                {t(`empty.${filter}.body`)}
+              </p>
             </div>
           )
         )}
@@ -695,18 +771,8 @@ export function HomeScreen() {
           ref={dock}
           busy={pending !== null}
           offline={!online}
-          onSubmitText={(text, heard) => {
-            void submitText(text);
-            // Words fixed in the transcript before sending are how the app learns what was really said.
-            if (heard)
-              void observeHeard(heard, text)
-                .then(notice)
-                .catch((e) => console.error("learning failed", e));
-          }}
-          onAudio={async (audio, ms) => {
-            const heard = await hear(audio, ms);
-            return heard ? fixHeard(heard) : heard;
-          }}
+          onSubmitText={(text) => void submitText(text)}
+          onVoice={(audio, ms) => void handleVoice(audio, ms)}
           onVoiceError={(kind) => show({ message: t(`voice.${kind}`) })}
         />
       </div>

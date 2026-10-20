@@ -38,7 +38,7 @@ export function LearningSwitch() {
           setOn(next);
           void setLearning(next);
         }}
-        className="bg-ink-2/40 data-[state=checked]:bg-door relative mt-0.5 h-7 w-12 shrink-0 rounded-full transition-colors duration-[var(--t-base)]"
+        className="bg-ink-2/40 data-[state=checked]:bg-brand relative mt-0.5 h-7 w-12 shrink-0 rounded-full transition-colors duration-[var(--t-base)]"
       >
         <Switch.Thumb className="block size-6 translate-x-0.5 rounded-full bg-white shadow transition-transform duration-[var(--t-base)] ease-[var(--ease-spring)] data-[state=checked]:translate-x-[22px] rtl:-translate-x-0.5 rtl:data-[state=checked]:-translate-x-[22px]" />
       </Switch.Root>

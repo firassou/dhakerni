@@ -10,6 +10,7 @@ import { describeFact } from "@/lib/questions/describe";
 import { formatDue, leadLabel } from "@/lib/time/format";
 import { formatRemaining } from "@/lib/time/remaining";
 import { formatItem, stepsDone } from "@/lib/tasks/items";
+import { Burst } from "./Burst";
 import { CheckIcon, GripIcon, TrashIcon } from "./Icon";
 
 interface BodyProps {
@@ -41,6 +42,8 @@ interface Props extends Omit<BodyProps, "grip"> {
   onSelect?: (id: string) => void;
   /** Swiped with a finger: right finishes the task (or reopens it in the Done list), left deletes it. */
   onSwipe?: (id: string, action: SwipeAction) => void;
+  /** Position in the list: the first cards arrive one after another instead of all at once. */
+  index?: number;
 }
 
 export type SwipeAction = "toggle" | "delete";
@@ -67,6 +70,18 @@ function TaskCardBody({
   grip,
 }: BodyProps) {
   const { t, locale } = useI18n();
+  // Sparks fly for a moment when the task goes from open to done (not when it simply appears done).
+  const [burst, setBurst] = useState(false);
+  const wasDone = useRef(task.done);
+  useEffect(() => {
+    if (task.done && !wasDone.current) {
+      setBurst(true);
+      const id = setTimeout(() => setBurst(false), 650);
+      wasDone.current = true;
+      return () => clearTimeout(id);
+    }
+    wasDone.current = task.done;
+  }, [task.done]);
   const overdue = isOverdue(task, now);
   const remaining = task.dueAt && !task.done ? formatRemaining(task.dueAt, now, locale) : null;
   const showDescription =
@@ -82,17 +97,18 @@ function TaskCardBody({
           onClick={() => onToggle(task.id)}
           aria-label={task.done ? t("task.markUndone") : t("task.markDone")}
           aria-pressed={task.done}
-          className="grid size-12 shrink-0 place-items-center"
+          className="relative grid size-12 shrink-0 place-items-center"
         >
           <span
             className={`grid size-6 place-items-center rounded-full border-2 transition-all duration-[var(--t-base)] ease-[var(--ease-spring)] ${
               task.done
-                ? "border-door bg-door text-door-ink scale-110"
-                : "border-ink-2/50 group-hover:border-door"
+                ? "border-brand bg-brand text-brand-glyph scale-110"
+                : "border-ink-2/50 group-hover:border-brand"
             }`}
           >
             <CheckIcon className={`check size-4 ${task.done ? "check-on" : ""}`} />
           </span>
+          {burst && <Burst />}
         </button>
 
         <div className="min-w-0 flex-1 py-2.5">
@@ -127,7 +143,7 @@ function TaskCardBody({
                     className={`t-small rounded-full border px-2.5 py-1 transition-colors duration-[var(--t-fast)] ${
                       item.done
                         ? "bg-surface-2 text-ink-2 border-transparent line-through"
-                        : "border-ink/15 hover:border-door"
+                        : "border-ink/15 hover:border-brand"
                     }`}
                   >
                     {formatItem(item, locale)}
@@ -165,7 +181,7 @@ function TaskCardBody({
             ) : askable ? (
               <button
                 onClick={() => onAsk(task.id)}
-                className="border-ink-2/60 hover:border-door hover:text-ink rounded-full border border-dashed px-2 py-0.5"
+                className="border-ink-2/60 hover:border-brand hover:text-ink rounded-full border border-dashed px-2 py-0.5"
               >
                 {t("task.needsTime")}
               </button>
@@ -195,7 +211,7 @@ function TaskCardBody({
                 title={t("task.assumedHint")}
                 aria-label={`${describeFact(task.assumed, t)}. ${t("task.assumedHint")}`}
                 data-bidi
-                className="bg-door-soft text-door hover:bg-door/20 rounded-full px-2 py-0.5"
+                className="bg-brand-soft text-brand-text hover:bg-brand/20 rounded-full px-2 py-0.5"
               >
                 {describeFact(task.assumed, t)}
               </button>
@@ -216,8 +232,8 @@ function TaskCardBody({
   );
 }
 
-const cardClass = (task: Task) =>
-  `group rounded-card bg-surface ${task.priority === "high" ? "border-s-door border-s-[3px]" : ""}`;
+const rowClass = (task: Task) =>
+  `group ${task.priority === "high" ? "border-s-brand border-s-[3px]" : ""}`;
 
 /** The card in the list. While it is being dragged it stays behind as a dashed placeholder. */
 export function TaskCard({
@@ -230,6 +246,7 @@ export function TaskCard({
   onLongPress,
   onSelect,
   onSwipe,
+  index,
   ...body
 }: Props) {
   const { t } = useI18n();
@@ -396,7 +413,11 @@ export function TaskCard({
   return (
     <li
       ref={setNodeRef}
-      style={{ transform: CSS.Translate.toString(transform), transition }}
+      style={{
+        transform: CSS.Translate.toString(transform),
+        transition,
+        animationDelay: index !== undefined ? `${Math.min(index, 8) * 45}ms` : undefined,
+      }}
       data-dragging={isDragging || undefined}
       data-selected={selected || undefined}
       onPointerDown={onPointerDown}
@@ -413,11 +434,11 @@ export function TaskCard({
       }}
       onClickCapture={onClickCapture}
       onClick={onClick}
-      className={`${cardClass(body.task)} card-in relative cursor-pointer touch-pan-y overflow-hidden select-none [-webkit-touch-callout:none] ${
+      className={`${rowClass(body.task)} card-in relative cursor-pointer touch-pan-y overflow-hidden select-none [-webkit-touch-callout:none] ${
         isDragging ? "drag-ghost" : ""
       } ${leaving ? "card-out" : finishing ? "card-done-out" : ""} ${
         settled ? "drop-settle" : ""
-      } ${selected ? "ring-door ring-2" : ""}`}
+      } ${selected ? "ring-brand ring-2" : ""}`}
     >
       {(dx !== 0 || flung !== 0) && (
         // What letting go will do, shown behind the card. Laid out left-to-right in every language:
@@ -428,7 +449,7 @@ export function TaskCard({
           data-swipe={dx > 0 || flung > 0 ? "toggle" : "delete"}
           className={`absolute inset-0 flex items-center px-6 ${
             dx > 0 || flung > 0
-              ? "bg-door text-door-ink justify-start"
+              ? "bg-brand text-brand-glyph justify-start"
               : "bg-danger text-paper justify-end"
           }`}
         >
@@ -458,13 +479,13 @@ export function TaskCard({
 /** The copy that is lifted and follows the pointer while dragging. */
 export function TaskCardOverlay(body: Omit<BodyProps, "grip">) {
   return (
-    <div data-drag-overlay className={`${cardClass(body.task)} drag-lift`}>
+    <div data-drag-overlay className={`${rowClass(body.task)} rounded-card bg-surface drag-lift`}>
       <TaskCardBody
         {...body}
         grip={
           <span
             aria-hidden
-            className="text-door grid size-11 shrink-0 cursor-grabbing place-items-center"
+            className="text-brand-text grid size-11 shrink-0 cursor-grabbing place-items-center"
           >
             <GripIcon />
           </span>

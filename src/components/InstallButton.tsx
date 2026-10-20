@@ -11,7 +11,7 @@ export function InstallButton({ className = "" }: { className?: string }) {
   return (
     <button
       onClick={() => void install()}
-      className={`t-small bg-door text-door-ink rounded-full px-4 py-2 font-medium transition-transform duration-[var(--t-fast)] active:scale-95 ${className}`}
+      className={`t-small bg-brand text-brand-ink rounded-full px-4 py-2 font-medium transition-transform duration-[var(--t-fast)] active:scale-95 ${className}`}
     >
       {t("install.action")}
     </button>

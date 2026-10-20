@@ -1,42 +1,52 @@
-// Builds the app icons from assets/icon-source.png (white glyph on a purple field).
-// The glyph is lifted out by its distance from the purple, then drawn white on the app's door-blue.
-import { writeFileSync, copyFileSync } from "node:fs";
+// Builds the app icons from assets/logo.svg: the white checklist and bell on Apple's orange, with the soft
+// top-to-bottom gradient of an iOS app icon.
+import { readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import sharp from "sharp";
 
-const BLUE = { r: 0x21, g: 0x52, b: 0xd1 };
-const SRC = "assets/icon-source.png";
+const SRC = "assets/logo.svg";
 const out = "public/icons";
 
-const { data, info } = await sharp(SRC).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-// Green channel separates white (255) from the purple field (~135).
-const bg = data[1];
-const glyph = Buffer.alloc(info.width * info.height * 4);
-for (let i = 0; i < info.width * info.height; i++) {
-  const m = Math.max(0, Math.min(1, (data[i * 4 + 1] - bg) / (255 - bg)));
-  glyph[i * 4] = glyph[i * 4 + 1] = glyph[i * 4 + 2] = 255;
-  glyph[i * 4 + 3] = Math.round(m * 255);
-}
-const glyphPng = await sharp(glyph, {
-  raw: { width: info.width, height: info.height, channels: 4 },
-})
-  .png()
-  .toBuffer();
+/** The glyph is drawn as SVG (assets/logo.svg), so every size is rendered sharp rather than resampled. */
+const glyphSvg = readFileSync(SRC);
 
-/** Square icon: blue field, glyph scaled to `scale` of the canvas and centered. */
-async function render(size, scale, file) {
+/** Rounded-corner mask, the same 22.5% radius as the logo tile. */
+const corners = (size) =>
+  Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${size * 0.225}"/></svg>`,
+  );
+
+/** The tile: systemOrange, a touch lighter at the top. */
+const tile = (size) =>
+  Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffae33"/><stop offset="1" stop-color="#ff9500"/></linearGradient></defs><rect width="${size}" height="${size}" fill="url(#g)"/></svg>`,
+  );
+
+/** Square icon: orange tile, glyph scaled to `scale` of the canvas and centered. */
+async function render(size, scale, file, round = false) {
   const g = Math.round(size * scale);
-  const sized = await sharp(glyphPng).resize(g, g).png().toBuffer();
-  await sharp({ create: { width: size, height: size, channels: 3, background: BLUE } })
+  const sized = await sharp(glyphSvg, { density: Math.max(72, Math.round((72 * g) / 64) * 2) })
+    .resize(g, g)
+    .png()
+    .toBuffer();
+  await sharp(tile(size))
     .composite([{ input: sized, gravity: "center" }])
     .png()
-    .toFile(`${out}/${file}`);
+    .toBuffer()
+    .then((square) =>
+      round
+        ? sharp(square)
+            .composite([{ input: corners(size), blend: "dest-in" }])
+            .png()
+            .toFile(`${out}/${file}`)
+        : sharp(square).toFile(`${out}/${file}`),
+    );
 }
 
-await render(192, 1, "icon-192.png");
-await render(512, 1, "icon-512.png");
+// Rounded where the icon is shown as is (tab, header, install list); square where the OS applies its own mask.
+await render(192, 1, "icon-192.png", true);
+await render(512, 1, "icon-512.png", true);
 await render(180, 1, "apple-touch-icon.png");
 await render(512, 0.7, "icon-maskable-512.png"); // glyph kept inside the maskable safe zone
-await render(64, 1, "favicon.png");
 
 /**
  * App Router icon files. Next.js links these itself, with a content hash in the URL so browsers and CDNs
@@ -45,12 +55,18 @@ await render(64, 1, "favicon.png");
  *   src/app/icon.png      the tab icon for modern browsers
  *   src/app/apple-icon.png  the iPhone/iPad Home Screen icon
  */
-copyFileSync(`${out}/icon-512.png`, "src/app/icon.png");
+// A tab icon never needs 512 px; the smaller file also keeps the page light.
+copyFileSync(`${out}/icon-192.png`, "src/app/icon.png");
 copyFileSync(`${out}/apple-touch-icon.png`, "src/app/apple-icon.png");
 
 const sizes = [16, 32, 48];
 const pngs = await Promise.all(
-  sizes.map((n) => sharp(`${out}/icon-512.png`).resize(n, n).png().toBuffer()),
+  sizes.map((n) =>
+    sharp(`${out}/icon-512.png`)
+      .resize(n, n)
+      .png({ palette: true, colours: 16, compressionLevel: 9, effort: 10 })
+      .toBuffer(),
+  ),
 );
 const header = Buffer.alloc(6);
 header.writeUInt16LE(1, 2); // type: icon

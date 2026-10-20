@@ -36,7 +36,7 @@ export function Waveform({ analyser }: { analyser: AnalyserNode | null }) {
           ref={(el) => {
             bars.current[i] = el;
           }}
-          className="bg-door h-full w-[3px] origin-center rounded-full"
+          className="bg-brand h-full w-[3px] origin-center rounded-full"
           style={{ transform: "scaleY(0.12)" }}
         />
       ))}

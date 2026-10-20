@@ -3,7 +3,7 @@
 Voice-first todo and reminder app for Tunisian Arabic (Derja), French and English. You speak or type;
 it turns what you said into tasks and reminders.
 
-Status: **v0.11.0**: voice and typed capture that understands the idea (clean titles, descriptions, quantities,
+Status: **v0.12.0**: voice and typed capture that understands the idea (clean titles, descriptions, quantities,
 checklists, steps, decision help), clarifying questions, reminders with Web Push (also ahead of the time), tasks
 that repeat, changes to existing tasks by voice, a visible learned profile, backup, prayer-time words and
 Ramadan, sharing from other apps, an evening summary, accessibility checks. See [CHANGELOG](CHANGELOG.md).

@@ -47,10 +47,11 @@ export function Intro() {
     return cleanup;
   }, []);
 
+  // Rows of the checklist (y, line end). The first is already ticked, the others are still open.
   const rows = [
-    { y: 20, to: 42 },
-    { y: 30, to: 38 },
-    { y: 40, to: 34 },
+    { y: 22, to: 42 },
+    { y: 31, to: 40 },
+    { y: 41, to: 35 },
   ];
 
   return (
@@ -61,34 +62,44 @@ export function Intro() {
           viewBox="0 0 64 64"
           fill="none"
           stroke="currentColor"
-          strokeWidth="3.2"
+          strokeWidth="3.4"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
           <path
             className="i-draw i-frame"
             pathLength={1}
-            d="M54 34V18a10 10 0 0 0-10-10H20a10 10 0 0 0-10 10v28a10 10 0 0 0 10 10h14"
+            d="M48 30V19a9 9 0 0 0-9-9H19a9 9 0 0 0-9 9v26a9 9 0 0 0 9 9h12"
+          />
+          <path
+            className="i-draw i-check"
+            pathLength={1}
+            strokeWidth="3"
+            d="M17.5 21.5l2.3 2.3 4.2-4.6"
           />
           {rows.map((r, i) => (
             <g key={r.y} style={{ "--i": i } as React.CSSProperties}>
-              <circle
-                className="i-dot"
-                cx="21"
-                cy={r.y}
-                r="1.7"
-                fill="currentColor"
-                stroke="none"
-              />
-              <path className="i-draw i-row" pathLength={1} d={`M28 ${r.y}H${r.to}`} />
+              {i > 0 && (
+                <circle
+                  className="i-dot"
+                  cx="20"
+                  cy={r.y}
+                  r="2"
+                  fill="currentColor"
+                  stroke="none"
+                />
+              )}
+              <path className="i-draw i-row" pathLength={1} d={`M29 ${r.y}H${r.to}`} />
             </g>
           ))}
-          <circle className="i-ripple i-r1" cx="46" cy="49" r="7" />
-          <circle className="i-ripple i-r2" cx="46" cy="49" r="7" />
+          <circle className="i-ripple i-r1" cx="47" cy="46" r="8" />
+          <circle className="i-ripple i-r2" cx="47" cy="46" r="8" />
           <g className="i-bell">
-            <path d="M46 40.5V43" />
-            <path d="M39 52c0-5.2 2.9-9 7-9s7 3.8 7 9l1.5 2.5h-17z" />
-            <path className="i-clapper" d="M44 58a2 2 0 0 0 4 0" />
+            <path
+              className="i-bell-body"
+              d="M47 35.5c-6.2 0-10.5 4.6-10.5 11.2v4.3l-3 4.5h27l-3-4.5v-4.3c0-6.6-4.3-11.2-10.5-11.2z"
+            />
+            <path className="i-clapper" d="M43.5 57.5a3.5 3.5 0 0 0 7 0" />
           </g>
         </svg>
         <p className="intro-word">{t("app.name")}</p>

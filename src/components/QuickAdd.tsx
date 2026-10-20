@@ -20,7 +20,7 @@ export function QuickAdd({
           key={tpl.title}
           onClick={() => onAdd(tpl)}
           aria-label={t("quick.add", { title: tpl.title })}
-          className="t-small border-ink/15 hover:border-door bg-surface rounded-full border px-3.5 py-2 font-medium transition-transform duration-[var(--t-fast)] ease-[var(--ease-spring)] active:scale-95"
+          className="t-small border-ink/15 hover:border-brand bg-surface rounded-full border px-3.5 py-2 font-medium transition-transform duration-[var(--t-fast)] ease-[var(--ease-spring)] active:scale-95"
         >
           <span aria-hidden className="text-ink-2 me-1">
             +

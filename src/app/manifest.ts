@@ -8,9 +8,9 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    // The blue of the intro: the phone's own launch screen uses this colour, so the two flow into each other.
-    background_color: "#2152d1",
-    theme_color: "#f2f5f4",
+    // The orange of the intro: the phone's own launch screen uses this colour, so the two flow into each other.
+    background_color: "#ff9500",
+    theme_color: "#f2f2f7",
     lang: "en",
     // Share a message from another app (WhatsApp, SMS) into the text field, to be checked and sent.
     share_target: {

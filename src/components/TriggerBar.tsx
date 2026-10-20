@@ -23,7 +23,7 @@ export function TriggerBar({
           <button
             key={a}
             onClick={() => onTrigger(a)}
-            className="t-small bg-door-soft text-door hover:bg-door/20 rounded-full px-4 py-2 font-medium transition-transform duration-[var(--t-fast)] ease-[var(--ease-spring)] active:scale-95"
+            className="t-small bg-brand-soft text-brand-text hover:bg-brand/20 rounded-full px-4 py-2 font-medium transition-transform duration-[var(--t-fast)] ease-[var(--ease-spring)] active:scale-95"
           >
             {label === `trigger.${a}` ? (
               <span data-bidi>{t("trigger.custom", { event: wordsFor(a) })}</span>

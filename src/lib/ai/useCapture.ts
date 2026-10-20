@@ -12,6 +12,18 @@ import { understand } from "./understand";
 
 const MIN_AUDIO_MS = 500;
 
+/** What a sentence did: the tasks it made, the ones it changed, and a way to take it all back. */
+export interface CaptureOutcome {
+  created: Task[];
+  changed: Task[];
+  undo: () => void;
+}
+
+interface SubmitOptions {
+  /** The caller shows the outcome itself (with its own Undo), so no toast. */
+  quiet?: boolean;
+}
+
 interface Deps {
   getTasks: () => Task[];
   insert: (tasks: Task[]) => void;
@@ -43,12 +55,22 @@ export function useCapture({
    * grew); `before` is how they looked, so one Undo puts everything back.
    */
   const finish = useCallback(
-    (created: Task[], changed: Task[] = [], before: Task[] = []) => {
+    (
+      created: Task[],
+      changed: Task[] = [],
+      before: Task[] = [],
+      options: SubmitOptions = {},
+    ): CaptureOutcome => {
       if (created.length) {
         insert(created);
         onCreated(created);
       }
       changed.forEach(upsert);
+      const undo = () => {
+        created.forEach((c) => remove(c.id));
+        before.forEach(upsert);
+      };
+      if (options.quiet) return { created, changed, undo };
       const message = created.length
         ? created.length === 1
           ? t("toast.added")
@@ -56,23 +78,26 @@ export function useCapture({
         : changed.length === 1
           ? t("capture.updated", { title: changed[0].title })
           : t("capture.updatedMany", { count: changed.length });
-      undoToast(message, () => {
-        created.forEach((c) => remove(c.id));
-        before.forEach(upsert);
-      });
+      undoToast(message, undo);
+      return { created, changed, undo };
     },
     [insert, onCreated, remove, t, undoToast, upsert],
   );
 
   const submitText = useCallback(
-    async (text: string) => {
+    async (text: string, options: SubmitOptions = {}): Promise<CaptureOutcome | null> => {
       const clean = text.trim();
-      if (!clean) return;
+      if (!clean) return null;
       // No network: keep the words now, and the AI fills in the rest when it is back (useAiBackfill).
       if (!getOnline()) {
-        finish([newTask(clean, getTasks(), new Date(), { aiPending: true })]);
+        const saved = finish(
+          [newTask(clean, getTasks(), new Date(), { aiPending: true })],
+          [],
+          [],
+          options,
+        );
         show({ message: t("capture.offlineSaved") });
-        return;
+        return saved;
       }
       setPending({ text: clean });
       try {
@@ -82,12 +107,20 @@ export function useCapture({
           hints: hintsFor(clean),
           options: getResolveOptions(),
         });
-        if (fresh.length === 0 && changed.length === 0) show({ message: t("voice.noTask") });
-        else finish(fresh, changed, before);
+        if (fresh.length === 0 && changed.length === 0) {
+          if (!options.quiet) show({ message: t("voice.noTask") });
+          return { created: [], changed: [], undo: () => {} };
+        }
+        return finish(fresh, changed, before, options);
       } catch (e) {
         // Keep the words: save them as a plain task with no time.
         const offline = e instanceof ApiError && e.kind === "network";
-        finish([newTask(clean, getTasks(), new Date(), { aiPending: offline })]);
+        const saved = finish(
+          [newTask(clean, getTasks(), new Date(), { aiPending: offline })],
+          [],
+          [],
+          options,
+        );
         show({
           message: t(
             offline
@@ -97,6 +130,7 @@ export function useCapture({
                 : "capture.fallback",
           ),
         });
+        return saved;
       } finally {
         setPending(null);
       }
@@ -105,8 +139,8 @@ export function useCapture({
   );
 
   /**
-   * Audio in, words out. The transcript is handed back, not turned into tasks: speech-to-text gets Derja
-   * wrong often enough that the person checks (and fixes) what was heard before it is understood.
+   * Audio in, words out. The caller shows the words, then understands them: speech-to-text gets Derja
+   * wrong often enough that the person must be able to see what was heard and fix a word.
    */
   const hear = useCallback(
     async (audio: Blob, durationMs: number): Promise<string | null> => {
@@ -134,7 +168,6 @@ export function useCapture({
         show({ message: t("voice.empty") });
         return null;
       }
-      show({ message: t("voice.review") });
       return text;
     },
     [show, t],

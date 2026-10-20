@@ -20,21 +20,28 @@ felt, not seen"; speed as a design feature), Things (calm, one primary action), 
 
 ## Identity
 
-Tunisian whitewash walls, a door-blue arch, a small sun. The app icon is a list with a bell (white on door-blue, `assets/icon-source.png` recolored by
+Apple's system look: grouped backgrounds, label greys, inset grouped lists, a segmented control for the filters, a
+34pt large title on Home, translucent bars. The accent is Apple orange. The app icon is a white checklist and bell
+on an orange tile with the soft top-to-bottom gradient of an iOS icon (`assets/logo.svg`, rendered by
 `scripts/make-icons.mjs`) and doubles as the header mark.
-Sun yellow is reserved for time and reminders so it keeps its meaning.
+Orange is a fill (mic, check circles, switches). As text it would be 2:1 on white, so text and links use the
+accessible variant (`--brand-text`). Yellow is reserved for time and reminders so it keeps its meaning.
 
 | Token                  | Light     | Dark      |
 | ---------------------- | --------- | --------- |
-| paper                  | `#f2f5f4` | `#0d1117` |
-| surface                | `#ffffff` | `#161b24` |
-| ink                    | `#11161d` | `#edf0f4` |
-| ink-2 (secondary text) | `#465160` | `#9aa6b6` |
-| door (primary)         | `#2152d1` | `#7a9dff` |
-| sun (time)             | `#f0b429` | `#f2bc4b` |
+| paper (grouped bg)     | `#f2f2f7` | `#000000` |
+| surface                | `#ffffff` | `#1c1c1e` |
+| surface-2              | `#ededf2` | `#2c2c2e` |
+| ink                    | `#000000` | `#ffffff` |
+| ink-2 (secondary text) | `#636366` | `#aeaeb2` |
+| brand (fill)           | `#ff9500` | `#ff9f0a` |
+| brand-text             | `#bf3000` | `#ffb340` |
+| sun (time)             | `#ffcc00` | `#ffd60a` |
+| danger                 | `#d70015` | `#ff453a` |
 
-Light and dark follow the system via `prefers-color-scheme`. Secondary text and primary on paper are
-chosen to clear WCAG AA (4.5:1); re-verify when adding colors.
+Light and dark follow the system via `prefers-color-scheme`. The font stack is `-apple-system` first (San
+Francisco on Apple devices; it is not licensed for other platforms) then Readex Pro, which also sets Arabic and
+Derja well. Secondary text and orange text clear WCAG AA (4.5:1); re-verify when adding colors.
 
 ## Type scale (rem, base 16px)
 
@@ -56,4 +63,4 @@ Recording waveform, task creation, chips and completion get bespoke motion in la
 
 ## Avoided on purpose
 
-Purple gradients, default shadcn styling, emoji icons, centered card on gray, same radius everywhere.
+Indigo/purple gradients, default shadcn styling, emoji icons, centered card on gray, same radius everywhere.
