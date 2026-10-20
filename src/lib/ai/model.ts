@@ -28,3 +28,13 @@ export function parseModels() {
 }
 
 export const parseModelLabel = () => parseModels()[0].label;
+
+/**
+ * The model that reads a bill photo or PDF. Only Gemini here: the fallback parser model cannot see
+ * images. Text pasted from an SMS can still go through `parseModels()`.
+ */
+export function visionModel(): { label: string; model: LanguageModel } | null {
+  if (!hasKey("google")) return null;
+  const id = process.env.BILL_MODEL ?? DEFAULTS.google;
+  return { label: `google:${id}`, model: google(id) };
+}

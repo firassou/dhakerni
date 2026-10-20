@@ -50,6 +50,21 @@ export const Decision = z.object({
 });
 export type Decision = z.infer<typeof Decision>;
 
+/**
+ * A bill, kept on the task that reminds about it. Money is whole millimes (1 DT = 1000), never a float.
+ * The photo or PDF it was read from is not kept anywhere.
+ */
+export const Bill = z.object({
+  provider: z.string().min(1),
+  amountMillimes: z.number().int().nonnegative(),
+  reference: z.string().nullable().default(null),
+  /** The period the bill covers, as local dates (YYYY-MM-DD). */
+  periodFrom: z.string().nullable().default(null),
+  periodTo: z.string().nullable().default(null),
+  paidAt: z.iso.datetime({ offset: true }).nullable().default(null),
+});
+export type Bill = z.infer<typeof Bill>;
+
 export const Task = z.object({
   id: z.string(),
   title: z.string().min(1),
@@ -83,6 +98,8 @@ export const Task = z.object({
   assumed: z.object({ key: z.string(), value: z.string() }).nullable().default(null),
   /** Saved while offline as written; the AI fills in time and details once the network is back. */
   aiPending: z.boolean().default(false),
+  /** Set on bill tasks (list "bills"): who to pay, how much, and when it was paid. */
+  bill: Bill.nullable().default(null),
   done: z.boolean().default(false),
   doneAt: z.iso.datetime({ offset: true }).nullable().default(null),
   order: z.number(),

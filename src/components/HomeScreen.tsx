@@ -58,11 +58,13 @@ import { isQuestionOpen } from "@/lib/questions/ask";
 import { useAnswers } from "@/lib/questions/useAnswers";
 import { expiredDone, matchesFilter, selectTasks, type Filter } from "@/lib/tasks/filters";
 import { useTasks } from "@/lib/tasks/useTasks";
+import { useBillCapture } from "@/lib/bills/useBillCapture";
+import { BillSheet } from "./BillSheet";
 import { Brand } from "./Brand";
 import { Dock, type DockHandle } from "./Dock";
 import { FilterTabs } from "./FilterTabs";
 import { InstallButton } from "./InstallButton";
-import { CloseIcon, SlidersIcon, TrashIcon } from "./Icon";
+import { CloseIcon, ReceiptIcon, SlidersIcon, TrashIcon } from "./Icon";
 import { OfflinePill } from "./OfflinePill";
 import { PushBanner } from "./PushBanner";
 import { QuestionCard } from "./QuestionCard";
@@ -150,17 +152,21 @@ export function HomeScreen() {
           LINGER_MS,
         ),
       );
-      toggle(id);
+      const paidCopy = toggle(id);
       if (wasDone || !before) return;
       // A repeating task has moved on to its next date: say when, and Undo puts it back as it was.
       const after = isRepeating(before) ? getTasks().find((x) => x.id === id) : undefined;
       if (after?.dueAt && !after.done)
-        undoToast(t("toast.repeats", { when: formatDue(after.dueAt, locale, new Date(), t) }), () =>
-          upsert(before),
+        undoToast(
+          t("toast.repeats", { when: formatDue(after.dueAt, locale, new Date(), t) }),
+          () => {
+            if (paidCopy) remove(paidCopy.id);
+            upsert(before);
+          },
         );
       else undoToast(t("toast.done"), () => toggle(id));
     },
-    [tasks, toggle, undoToast, t, getTasks, locale, upsert],
+    [tasks, toggle, undoToast, t, getTasks, locale, upsert, remove],
   );
 
   // Passive learning saves quietly. Only when something has become trusted enough to use do we say so.
@@ -175,6 +181,23 @@ export function HomeScreen() {
   );
 
   useAiBackfill({ tasks, ready, getTasks, insert, remove, upsert, getResolveOptions, hintsFor });
+
+  const bills = useBillCapture({ getTasks, insert, remove });
+  const readBillFile = bills.readFile;
+
+  // A photo or PDF pasted anywhere is read as a bill. Pasted text is left alone: it may be a task.
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const file = [...(e.clipboardData?.files ?? [])].find(
+        (f) => f.type.startsWith("image/") || f.type === "application/pdf",
+      );
+      if (!file) return;
+      e.preventDefault();
+      void readBillFile(file);
+    };
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [readBillFile]);
 
   const { pending, submitText, hear } = useCapture({
     getTasks,
@@ -578,6 +601,13 @@ export function HomeScreen() {
         </h1>
         <InstallButton className="ms-auto me-1" />
         <Link
+          href="/bills"
+          aria-label={t("nav.bills")}
+          className="text-ink-2 hover:bg-surface-2 grid size-11 place-items-center rounded-full transition-colors"
+        >
+          <ReceiptIcon />
+        </Link>
+        <Link
           href="/settings"
           aria-label={t("nav.settings")}
           className="text-ink-2 hover:bg-surface-2 grid size-11 place-items-center rounded-full transition-colors"
@@ -774,8 +804,10 @@ export function HomeScreen() {
           onSubmitText={(text) => void submitText(text)}
           onVoice={(audio, ms) => void handleVoice(audio, ms)}
           onVoiceError={(kind) => show({ message: t(`voice.${kind}`) })}
+          onAttach={() => bills.openPicker()}
         />
       </div>
+      <BillSheet capture={bills} />
       <TaskEditor
         task={editing}
         onClose={closeEditor}

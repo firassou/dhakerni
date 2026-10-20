@@ -50,7 +50,8 @@
   "nav": {
     "settings": "Settings",
     "back": "Back",
-    "home": "Home"
+    "home": "Home",
+    "bills": "Bills"
   },
   "settings": {
     "title": "Settings",
@@ -64,7 +65,8 @@
     "privacy": {
       "title": "Privacy",
       "local": "Your tasks and what Dhakerni learns about you stay on this device.",
-      "server": "For reminders when the app is closed, our server keeps only: your push address, an anonymous ID, the time each reminder fires, and a short title (cut to 80 characters). All of it is encrypted, each reminder is deleted once you answer it or after its last repeat, and turning notifications off deletes the rest."
+      "server": "For reminders when the app is closed, our server keeps only: your push address, an anonymous ID, the time each reminder fires, and a short title (cut to 80 characters). All of it is encrypted, each reminder is deleted once you answer it or after its last repeat, and turning notifications off deletes the rest.",
+      "bills": "Bills: a photo, PDF or message you add is sent once to the AI to be read, then thrown away. Dhakerni never keeps the picture; only the provider, amount, date and reference you confirm are saved, on this device."
     },
     "anonymousId": "Anonymous ID",
     "version": "Version",
@@ -436,5 +438,51 @@
     "both": "Tomorrow: {n} to do · {m} still without a time",
     "tomorrow": "Tomorrow: {n} to do",
     "needsTime": "{m} tasks still without a time"
+  },
+  "bills": {
+    "title": "Bills",
+    "summary": "This month",
+    "monthDue": "Still to pay this month",
+    "monthPaid": "Paid this month",
+    "addFile": "Photo or file",
+    "addText": "Paste a message",
+    "attach": "Add a bill from a photo or file",
+    "attachOffline": "Adding a bill needs internet",
+    "privacy": "The photo or message is sent once to the AI to be read, then thrown away. Only the details you confirm are saved, on this device.",
+    "emptyTitle": "No bills yet",
+    "emptyBody": "Take a photo of a STEG, SONEDE or phone bill and I’ll remind you before it’s due.",
+    "dueWeek": "Due this week",
+    "later": "Later",
+    "paid": "Paid",
+    "pay": "Mark paid",
+    "unpay": "Undo",
+    "everyMonth": "Every month",
+    "paidOn": "Paid {when}",
+    "paidToast": "{provider} marked paid",
+    "stamp": "Paid",
+    "added": "Bill added: {provider}",
+    "pasteTitle": "Paste the bill message",
+    "pastePlaceholder": "Paste the SMS or the text of the bill here…",
+    "read": "Read it",
+    "reading": "Reading your bill…",
+    "reviewTitle": "Check this bill",
+    "provider": "Who to pay",
+    "amount": "Amount (DT)",
+    "dueDate": "Due date",
+    "reference": "Reference (optional)",
+    "monthly": "Repeats every month",
+    "check": "Please check",
+    "save": "Add bill",
+    "remindNote": "I’ll remind you two days before it’s due, at 9:00 on the day.",
+    "byHand": "Fill it in by hand",
+    "errNetwork": "No internet, so I can’t read it. Fill it in by hand, or try again later.",
+    "errRateLimited": "Too many bills at once. Wait a minute, or fill it in by hand.",
+    "errTooLarge": "That file is too big to send. Try a smaller photo.",
+    "errFile": "I can’t open that file. Use a photo (JPG, PNG) or a PDF.",
+    "errRead": "I couldn’t read that bill. Fill it in by hand, or try a clearer photo.",
+    "period": "Period covered (optional)",
+    "periodFrom": "Period start",
+    "periodTo": "Period end",
+    "periodShort": "Period: {from} – {to}"
   }
 }

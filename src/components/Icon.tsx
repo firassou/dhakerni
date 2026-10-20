@@ -100,3 +100,15 @@ export const PencilIcon = (p: P) => (
     <path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4" />
   </svg>
 );
+
+export const ReceiptIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6M9 16h3" />
+  </svg>
+);
+
+export const PaperclipIcon = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M20 11.5l-7.8 7.8a4.5 4.5 0 0 1-6.4-6.4l8.3-8.3a3 3 0 0 1 4.2 4.2l-8.2 8.2a1.5 1.5 0 0 1-2.1-2.1l7.5-7.5" />
+  </svg>
+);

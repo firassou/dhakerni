@@ -4,6 +4,25 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-21
+
+### Added
+
+- **Bills.** Add a bill from a photo, a screenshot, a PDF or a pasted SMS (paperclip in the dock, or Bills ->
+  "Photo or file" / "Paste a message"; a photo pasted anywhere also works). The AI reads French and Arabic bills
+  (STEG, SONEDE, telecoms, insurers...) and you check provider, amount in DT (three decimals), due date and
+  reference before saving; anything it was unsure about is highlighted. The result is a normal task, due at 09:00
+  on the date, with a reminder two days before and an optional monthly repeat.
+- **Bills screen** (`/bills`): this month's remaining and paid totals (counting up), what is due this week, later
+  bills and paid ones, with a "Paid" stamp. Paying a monthly bill moves it to next month and keeps a paid copy.
+  Paid bills are kept for this month and the previous one.
+- The picture never leaves memory: it is shrunk on the phone, sent once to be read and thrown away. Offline,
+  the bill can be filled in by hand.
+
+### Changed
+
+- Finishing a bill from Home pays it too. The Done list still looks back one day only.
+
 ## [0.12.0] - 2026-10-20
 
 ### Changed

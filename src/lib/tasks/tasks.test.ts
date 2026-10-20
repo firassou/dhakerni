@@ -56,6 +56,22 @@ describe("ops", () => {
     expect(ids(expiredDone(list, now))).toEqual(["done-old"]);
   });
 
+  it("a paid bill is not expired by the one-day rule and drops out of Done after a day", () => {
+    const bill = {
+      provider: "STEG",
+      amountMillimes: 1000,
+      reference: null,
+      periodFrom: null,
+      periodTo: null,
+      paidAt: at(7, 11),
+    };
+    const paid = mk("paid", 1, { list: "bills", bill, done: true, doneAt: at(7, 11) }); // 25 h ago
+    expect(expiredDone([paid], now)).toEqual([]);
+    expect(ids(selectTasks([paid], "done", now))).toEqual([]);
+    const fresh = mk("fresh", 2, { list: "bills", bill, done: true, doneAt: at(7, 13) });
+    expect(ids(selectTasks([fresh], "done", now))).toEqual(["fresh"]);
+  });
+
   it("toggleDone sets and clears doneAt", () => {
     const done = toggleDone(mk("a", 1), now);
     expect(done.done).toBe(true);

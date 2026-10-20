@@ -8,8 +8,18 @@ export function endOfDay(now: Date): number {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime();
 }
 
+/** Paid bills are kept for the Bills screen (see lib/bills); the Done list still only looks back a day. */
+const isPaidBill = (t: Task) => t.bill?.paidAt != null;
+
 export function matchesFilter(task: Task, filter: Filter, now: Date): boolean {
-  if (filter === "done") return task.done;
+  if (filter === "done") {
+    if (
+      isPaidBill(task) &&
+      Date.parse(task.doneAt ?? task.updatedAt) <= now.getTime() - DONE_KEEP_MS
+    )
+      return false;
+    return task.done;
+  }
   if (task.done) return false;
   const due = task.dueAt === null ? null : Date.parse(task.dueAt);
   switch (filter) {
@@ -38,7 +48,9 @@ export const DONE_KEEP_MS = 24 * 3_600_000;
 
 export function expiredDone(tasks: readonly Task[], now: Date): Task[] {
   const limit = now.getTime() - DONE_KEEP_MS;
-  return tasks.filter((t) => t.done && Date.parse(t.doneAt ?? t.updatedAt) <= limit);
+  return tasks.filter(
+    (t) => t.done && !isPaidBill(t) && Date.parse(t.doneAt ?? t.updatedAt) <= limit,
+  );
 }
 
 export function isOverdue(task: Task, now: Date): boolean {

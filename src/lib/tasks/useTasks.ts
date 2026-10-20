@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Task } from "../schemas";
+import { isBill, isPaid, payBill, unpayBill } from "../bills/bills";
 import { newTask, reorderVisible } from "./ops";
 import { completeTask } from "./recur";
 import { deleteTask, loadTasks, putTasks } from "./repo";
@@ -77,13 +78,33 @@ export function useTasks() {
     [upsert],
   );
 
+  /**
+   * Finishing a task. A repeating one moves to its next date instead of being put away; a bill is paid
+   * (a monthly one leaves a paid copy behind, which is returned so an Undo can remove it).
+   */
   const toggle = useCallback(
-    (id: string) => {
+    (id: string): Task | null => {
       const current = ref.current.find((t) => t.id === id);
-      // A repeating task moves to its next date instead of being put away.
-      if (current) upsert(completeTask(current, new Date()));
+      if (!current) return null;
+      const now = new Date();
+      if (isBill(current)) {
+        if (isPaid(current)) {
+          upsert(unpayBill(current, now));
+          return null;
+        }
+        const { paid, next } = payBill(current, now);
+        if (!next) {
+          upsert(paid);
+          return null;
+        }
+        upsert(next);
+        insert([paid]);
+        return paid;
+      }
+      upsert(completeTask(current, now));
+      return null;
     },
-    [upsert],
+    [upsert, insert],
   );
 
   const remove = useCallback(

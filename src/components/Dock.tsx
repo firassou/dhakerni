@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useI18n } from "@/lib/i18n";
 import { useRecorder, type RecorderError } from "@/lib/voice/useRecorder";
-import { ArrowUpIcon, CloseIcon, MicIcon, StopIcon } from "./Icon";
+import { ArrowUpIcon, CloseIcon, MicIcon, PaperclipIcon, StopIcon } from "./Icon";
 import { Waveform } from "./Waveform";
 
 const HOLD_MS = 350; // shorter than this counts as a tap: keep recording until Stop
@@ -31,6 +31,8 @@ interface Props {
   /** A finished recording. The screen shows what was heard and what it was understood as (see VoiceCard). */
   onVoice: (audio: Blob, durationMs: number) => void;
   onVoiceError: (kind: RecorderError) => void;
+  /** Add a bill from a photo or file. */
+  onAttach?: () => void;
 }
 
 /**
@@ -38,7 +40,15 @@ interface Props {
  * A recording is handed straight on: the screen shows the words and the result, with a way to fix a word.
  * Typing goes through the field below.
  */
-export function Dock({ ref, busy, offline = false, onSubmitText, onVoice, onVoiceError }: Props) {
+export function Dock({
+  ref,
+  busy,
+  offline = false,
+  onSubmitText,
+  onVoice,
+  onVoiceError,
+  onAttach,
+}: Props) {
   const { t } = useI18n();
   const [text, setText] = useState("");
   const [tapMode, setTapMode] = useState(false);
@@ -208,6 +218,17 @@ export function Dock({ ref, busy, offline = false, onSubmitText, onVoice, onVoic
           </>
         ) : (
           <>
+            {onAttach && (
+              <button
+                type="button"
+                onClick={onAttach}
+                disabled={offline}
+                aria-label={offline ? t("bills.attachOffline") : t("bills.attach")}
+                className="text-ink-2 hover:bg-surface-2 mb-1 grid size-12 shrink-0 place-items-center rounded-full transition-transform active:scale-90 disabled:opacity-40"
+              >
+                <PaperclipIcon />
+              </button>
+            )}
             <label className="sr-only" htmlFor="quick-add">
               {t("dock.inputLabel")}
             </label>

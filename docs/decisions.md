@@ -381,3 +381,18 @@ orange fill and `--brand-glyph` (white) for icons on it. Red and orange are clos
 with an icon or a word. Tasks sit in one inset grouped list (rows keep swipe, drag and the leave animations; the
 separator is a pseudo-element). San Francisco is not licensed for the web outside Apple devices, so the font
 stack falls back to Readex Pro, which keeps Arabic and Derja looking right. The logo is `assets/logo.svg`.
+
+## D29. Bills are tasks with a `bill` field; the picture is never kept (v0.13)
+
+A bill is an ordinary task (`list: "bills"`) with `bill: { provider, amountMillimes, reference, paidAt }`, so the
+reminder, push and backup pipelines work unchanged and IndexedDB needs no version bump. Money is whole millimes;
+`parseMillimes` reads what is printed ("45,300", "45.300", "٤٥٫٣٠٠") with the Tunisian convention that a lone
+separator followed by three digits is the decimal point. Following D7 the model only reports what is printed
+(amount and date as text, plus its own YYYY-MM-DD guess); the code resolves them, trusts a printed day-first date
+over the model's conversion, and drops a date more than 400 days from today so the person is asked instead.
+`POST /api/bill` takes a multipart photo/PDF (4 MB cap) or text, has its own tight rate limit, and stores nothing.
+Images need the Gemini vision model (the Groq fallback cannot see); pasted text can fall back. The client shrinks
+photos to 1800 px JPEG before upload. Every extraction goes through a review sheet: a wrong amount in a reminder
+is worse than one more tap. Paying a monthly bill advances the task (`completeTask`) and leaves a paid copy, so the
+month's totals stay right; paid bills older than the previous month are removed. Push titles are unchanged: the
+amount is not added to them.
