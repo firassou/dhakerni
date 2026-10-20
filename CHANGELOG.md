@@ -8,15 +8,17 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ### Changed
 
-- **New look.** The blue is gone. Cream paper, terracotta clay and a touch of saffron, in light and dark,
-  checked against WCAG AA. Danger is now a berry red so it never reads as the brand colour.
-- **New logo.** A checklist with a saffron bell, redrawn as a vector (`assets/logo.svg`). The app icons, the
-  header mark and the opening animation all come from it.
+- **iOS look and feel.** Apple's system colours (grouped greys, label colours, orange accent) in light and
+  dark, the system font (San Francisco on Apple devices, Readex Pro elsewhere), a large title on Home, an iOS
+  segmented control for the filters, and tasks in one inset grouped list with hairline separators. All text
+  clears WCAG AA; orange text uses Apple's accessible orange.
+- **New logo.** A white checklist and bell on an orange tile, redrawn as a vector (`assets/logo.svg`). The app
+  icons (rounded where shown as is), the header mark and the opening animation all come from it.
 - **Speaking no longer fills a text box.** After you talk, the words you said appear one by one in an "I heard"
   card, followed by the task they became. The task is already saved: Undo is on the card. A wrong word is fixed
   by tapping it; the task is replaced (not duplicated) and the fix is learned like before. Typing is unchanged.
-- **Motion everywhere, and it respects reduced motion.** A sliding pill on the filters, springy toasts, sparks
-  when a task is finished, cards that arrive one after another, screens that fade in, a mic that breathes while
+- **Motion everywhere, and it respects reduced motion.** A sliding thumb on the filters, springy toasts, sparks
+  when a task is finished, rows that arrive one after another, screens that fade in, a mic that breathes while
   idle, and a result card that morphs in.
 
 ### Fixed

@@ -102,7 +102,7 @@ function TaskCardBody({
           <span
             className={`grid size-6 place-items-center rounded-full border-2 transition-all duration-[var(--t-base)] ease-[var(--ease-spring)] ${
               task.done
-                ? "border-brand bg-brand text-brand-ink scale-110"
+                ? "border-brand bg-brand text-brand-glyph scale-110"
                 : "border-ink-2/50 group-hover:border-brand"
             }`}
           >
@@ -211,7 +211,7 @@ function TaskCardBody({
                 title={t("task.assumedHint")}
                 aria-label={`${describeFact(task.assumed, t)}. ${t("task.assumedHint")}`}
                 data-bidi
-                className="bg-brand-soft text-brand hover:bg-brand/20 rounded-full px-2 py-0.5"
+                className="bg-brand-soft text-brand-text hover:bg-brand/20 rounded-full px-2 py-0.5"
               >
                 {describeFact(task.assumed, t)}
               </button>
@@ -232,8 +232,8 @@ function TaskCardBody({
   );
 }
 
-const cardClass = (task: Task) =>
-  `group rounded-card bg-surface ${task.priority === "high" ? "border-s-brand border-s-[3px]" : ""}`;
+const rowClass = (task: Task) =>
+  `group ${task.priority === "high" ? "border-s-brand border-s-[3px]" : ""}`;
 
 /** The card in the list. While it is being dragged it stays behind as a dashed placeholder. */
 export function TaskCard({
@@ -434,7 +434,7 @@ export function TaskCard({
       }}
       onClickCapture={onClickCapture}
       onClick={onClick}
-      className={`${cardClass(body.task)} card-in relative cursor-pointer touch-pan-y overflow-hidden select-none [-webkit-touch-callout:none] ${
+      className={`${rowClass(body.task)} card-in relative cursor-pointer touch-pan-y overflow-hidden select-none [-webkit-touch-callout:none] ${
         isDragging ? "drag-ghost" : ""
       } ${leaving ? "card-out" : finishing ? "card-done-out" : ""} ${
         settled ? "drop-settle" : ""
@@ -449,7 +449,7 @@ export function TaskCard({
           data-swipe={dx > 0 || flung > 0 ? "toggle" : "delete"}
           className={`absolute inset-0 flex items-center px-6 ${
             dx > 0 || flung > 0
-              ? "bg-brand text-brand-ink justify-start"
+              ? "bg-brand text-brand-glyph justify-start"
               : "bg-danger text-paper justify-end"
           }`}
         >
@@ -479,13 +479,13 @@ export function TaskCard({
 /** The copy that is lifted and follows the pointer while dragging. */
 export function TaskCardOverlay(body: Omit<BodyProps, "grip">) {
   return (
-    <div data-drag-overlay className={`${cardClass(body.task)} drag-lift`}>
+    <div data-drag-overlay className={`${rowClass(body.task)} rounded-card bg-surface drag-lift`}>
       <TaskCardBody
         {...body}
         grip={
           <span
             aria-hidden
-            className="text-brand grid size-11 shrink-0 cursor-grabbing place-items-center"
+            className="text-brand-text grid size-11 shrink-0 cursor-grabbing place-items-center"
           >
             <GripIcon />
           </span>

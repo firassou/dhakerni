@@ -6,7 +6,7 @@ import type { Transition } from "motion/react";
  */
 export const spring = {
   /** Things that settle: a pill sliding, a sheet arriving. */
-  soft: { type: "spring", stiffness: 380, damping: 32, mass: 0.9 } satisfies Transition,
+  soft: { type: "spring", stiffness: 420, damping: 34, mass: 1 } satisfies Transition,
   /** Small, snappy feedback: a press, a pop. */
   snappy: { type: "spring", stiffness: 620, damping: 30 } satisfies Transition,
   /** A playful overshoot, for rewards. */

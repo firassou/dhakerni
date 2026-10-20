@@ -53,7 +53,7 @@ export function PushBanner({
 
   return (
     <div className="alert-in rounded-card bg-brand-soft mb-3 flex items-center gap-3 p-3">
-      <BellIcon className="text-brand size-5 shrink-0" />
+      <BellIcon className="text-brand-text size-5 shrink-0" />
       <p className="t-small flex-1">{t("push.banner")}</p>
       <button
         onClick={() => void onEnable()}

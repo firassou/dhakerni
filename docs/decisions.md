@@ -373,8 +373,11 @@ the wrong words made, re-runs the corrected sentence (so there is never a duplic
 `observeHeard`, exactly as editing the field did. Speech-to-text is still one batch request (Scribe v2, D5),
 so "live words" is a reveal after release, not a stream. Typing keeps the field and the Undo toast.
 
-## D28. One palette, named for the role (v0.12)
+## D28. Apple's system look (v0.12)
 
-`--door*` became `--brand*`; the brand colour is terracotta `#ab4927` (slightly deeper than first sketched so
-brand text clears 4.5:1 on the secondary surface). Colours that bypassed tokens (mic ring, dock glow, intro,
-icons, theme colour) now follow them. The logo is `assets/logo.svg`, rendered by `scripts/make-icons.mjs`.
+The palette is Apple's system colours; `--door*` became `--brand*`. Orange (`#ff9500`) fails AA as text on white
+(2.2:1), so it is only a fill, with `--brand-text` (`#bf3000`, dark `#ffb340`) for text, `--brand-ink` for text on an
+orange fill and `--brand-glyph` (white) for icons on it. Red and orange are close in hue, so danger always comes
+with an icon or a word. Tasks sit in one inset grouped list (rows keep swipe, drag and the leave animations; the
+separator is a pseudo-element). San Francisco is not licensed for the web outside Apple devices, so the font
+stack falls back to Readex Pro, which keeps Arabic and Derja looking right. The logo is `assets/logo.svg`.

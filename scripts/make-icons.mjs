@@ -1,8 +1,8 @@
-// Builds the app icons from assets/logo.svg: the cream checklist and saffron bell on the app's terracotta.
+// Builds the app icons from assets/logo.svg: the white checklist and bell on Apple's orange, with the soft
+// top-to-bottom gradient of an iOS app icon.
 import { readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import sharp from "sharp";
 
-const TERRACOTTA = { r: 0xab, g: 0x49, b: 0x27 };
 const SRC = "assets/logo.svg";
 const out = "public/icons";
 
@@ -15,14 +15,20 @@ const corners = (size) =>
     `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="${size * 0.225}"/></svg>`,
   );
 
-/** Square icon: terracotta field, glyph scaled to `scale` of the canvas and centered. */
+/** The tile: systemOrange, a touch lighter at the top. */
+const tile = (size) =>
+  Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffae33"/><stop offset="1" stop-color="#ff9500"/></linearGradient></defs><rect width="${size}" height="${size}" fill="url(#g)"/></svg>`,
+  );
+
+/** Square icon: orange tile, glyph scaled to `scale` of the canvas and centered. */
 async function render(size, scale, file, round = false) {
   const g = Math.round(size * scale);
   const sized = await sharp(glyphSvg, { density: Math.max(72, Math.round((72 * g) / 64) * 2) })
     .resize(g, g)
     .png()
     .toBuffer();
-  await sharp({ create: { width: size, height: size, channels: 3, background: TERRACOTTA } })
+  await sharp(tile(size))
     .composite([{ input: sized, gravity: "center" }])
     .png()
     .toBuffer()
@@ -55,7 +61,12 @@ copyFileSync(`${out}/apple-touch-icon.png`, "src/app/apple-icon.png");
 
 const sizes = [16, 32, 48];
 const pngs = await Promise.all(
-  sizes.map((n) => sharp(`${out}/icon-512.png`).resize(n, n).png({ palette: true }).toBuffer()),
+  sizes.map((n) =>
+    sharp(`${out}/icon-512.png`)
+      .resize(n, n)
+      .png({ palette: true, colours: 16, compressionLevel: 9, effort: 10 })
+      .toBuffer(),
+  ),
 );
 const header = Buffer.alloc(6);
 header.writeUInt16LE(1, 2); // type: icon

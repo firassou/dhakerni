@@ -50,7 +50,7 @@ export const Mark = ({ className }: { className?: string }) => (
     aria-hidden
     width={32}
     height={32}
-    className={`rounded-[9px] ${className ?? ""}`}
+    className={`rounded-[22%] ${className ?? ""}`}
   />
 );
 

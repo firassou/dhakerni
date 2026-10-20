@@ -70,11 +70,11 @@ test.describe("intro animation", () => {
     expect(await attr(page, "intro")).toBe("off");
   });
 
-  test("the launch colour of the installed app is the intro's terracotta, so they flow together", async ({
+  test("the launch colour of the installed app is the intro's orange, so they flow together", async ({
     request,
   }) => {
     const manifest = await (await request.get("/manifest.webmanifest")).json();
-    expect(manifest.background_color).toBe("#ab4927");
+    expect(manifest.background_color).toBe("#ff9500");
   });
 });
 

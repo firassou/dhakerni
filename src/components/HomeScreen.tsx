@@ -568,6 +568,7 @@ export function HomeScreen() {
       <header className="flex items-center justify-between py-3">
         <h1>
           <Brand
+            large
             onClick={() => {
               // Already home: tapping the name takes you back to the top of Today.
               setFilter("today");
@@ -664,7 +665,10 @@ export function HomeScreen() {
               items={visible.map((x) => x.id)}
               strategy={verticalListSortingStrategy}
             >
-              <ul className="space-y-2" aria-label={t(`filters.${filter}`)}>
+              <ul
+                className="grouped rounded-group bg-surface overflow-hidden"
+                aria-label={t(`filters.${filter}`)}
+              >
                 {visible.map((task, index) => (
                   <TaskCard
                     key={task.id}

@@ -69,7 +69,7 @@ export function QuestionCard({ task, busy, onAnswer, onVoice, onDismiss, onVoice
             onClick={() => (recording ? rec.stop() : void rec.start())}
             aria-label={recording ? t("q.stopVoice") : t("q.voice")}
             title={recording ? t("q.stopVoice") : t("q.voice")}
-            className={`text-brand-ink grid size-10 place-items-center rounded-full ${
+            className={`text-brand-glyph grid size-10 place-items-center rounded-full ${
               recording ? "mic-live bg-danger" : "bg-brand"
             }`}
           >
@@ -81,7 +81,7 @@ export function QuestionCard({ task, busy, onAnswer, onVoice, onDismiss, onVoice
       {needs.reason === "anchor" && /prayer_/.test(needs.word ?? "") && !busy && (
         <Link
           href="/settings#prayer"
-          className="t-small text-brand inline-block font-medium underline underline-offset-4"
+          className="t-small text-brand-text inline-block font-medium underline underline-offset-4"
         >
           {t("q.prayerCity")}
         </Link>

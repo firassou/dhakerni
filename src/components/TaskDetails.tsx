@@ -46,7 +46,7 @@ function Check({
       aria-label={label}
       onClick={onClick}
       className={`grid size-6 shrink-0 place-items-center rounded-full border-2 transition-all duration-[var(--t-base)] ease-[var(--ease-spring)] ${
-        checked ? "border-brand bg-brand text-brand-ink" : "border-ink-2/50"
+        checked ? "border-brand bg-brand text-brand-glyph" : "border-ink-2/50"
       }`}
     >
       <CheckIcon className={`check size-3.5 ${checked ? "check-on" : ""}`} />
@@ -220,7 +220,7 @@ export function SuggestionsSection({ task, edit }: { task: Task; edit: Edit }) {
               onClick={() => edit((x) => acceptSuggestion(x, text))}
               className="t-small bg-surface flex min-w-0 flex-1 items-center gap-2 rounded-full px-3 py-2 text-start font-medium active:scale-[0.99]"
             >
-              <span aria-hidden className="text-brand">
+              <span aria-hidden className="text-brand-text">
                 +
               </span>
               <span data-bidi className="min-w-0 flex-1">
@@ -263,7 +263,7 @@ export function DecisionSection({ task, edit }: { task: Task; edit: Edit }) {
               aria-label={chosen ? t("editor.picked", { option }) : t("editor.pick", { option })}
               onClick={() => edit((x) => chooseOption(x, option))}
               className={`t-small rounded-full border px-4 py-2 font-medium transition-transform active:scale-95 ${
-                chosen ? "border-brand bg-brand text-brand-ink" : "border-ink/15 bg-surface"
+                chosen ? "border-brand bg-brand text-brand-glyph" : "border-ink/15 bg-surface"
               }`}
             >
               <span data-bidi>{option}</span>

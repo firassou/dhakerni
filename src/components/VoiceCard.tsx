@@ -45,12 +45,10 @@ export function VoiceCard({ heard, outcome, now, onCorrect, onUndo, onClose, onH
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.16 } }}
       transition={spring.soft}
-      className="rounded-card bg-surface mb-2 overflow-hidden px-4 pt-3 pb-3 shadow-[0_6px_24px_var(--brand-glow)]"
+      className="rounded-group bg-surface mb-3 overflow-hidden px-4 pt-3 pb-3 shadow-[0_8px_28px_rgb(0_0_0/0.10)]"
     >
       <div className="flex items-center justify-between">
-        <span className="t-micro text-ink-2 font-medium tracking-wide uppercase">
-          {t("voice.heard")}
-        </span>
+        <span className="t-micro text-ink-2 font-medium">{t("voice.heard")}</span>
         <button
           type="button"
           onClick={onClose}
@@ -91,7 +89,7 @@ export function VoiceCard({ heard, outcome, now, onCorrect, onUndo, onClose, onH
                   initial={{ scale: 0, rotate: -40 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ ...spring.bouncy, delay: 0.1 + i * 0.06 }}
-                  className="bg-brand text-brand-ink grid size-7 shrink-0 place-items-center rounded-full"
+                  className="bg-brand text-brand-glyph grid size-7 shrink-0 place-items-center rounded-full"
                 >
                   <CheckIcon className="size-4" />
                 </motion.span>
@@ -120,7 +118,7 @@ export function VoiceCard({ heard, outcome, now, onCorrect, onUndo, onClose, onH
                 <button
                   type="button"
                   onClick={onUndo}
-                  className="t-small text-brand hover:bg-brand-soft rounded-full px-3 py-1.5 font-medium active:scale-95"
+                  className="t-small text-brand-text hover:bg-brand-soft rounded-full px-3 py-1.5 font-medium active:scale-95"
                 >
                   {t("voice.undo")}
                 </button>

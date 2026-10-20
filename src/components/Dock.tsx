@@ -252,7 +252,7 @@ export function Dock({ ref, busy, offline = false, onSubmitText, onVoice, onVoic
             onPointerCancel={onPointerCancel}
             onClick={onClick}
             onContextMenu={(e) => e.preventDefault()}
-            className={`mic text-brand-ink grid size-14 shrink-0 touch-none place-items-center rounded-full transition-[transform,background-color] duration-[var(--t-base)] ease-[var(--ease-spring)] select-none disabled:opacity-50 ${
+            className={`mic text-brand-glyph grid size-14 shrink-0 touch-none place-items-center rounded-full transition-[transform,background-color] duration-[var(--t-base)] ease-[var(--ease-spring)] select-none disabled:opacity-50 ${
               recording
                 ? "mic-live bg-danger scale-110"
                 : "bg-brand shadow-[0_6px_18px_var(--brand-glow)]"
