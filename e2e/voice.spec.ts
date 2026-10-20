@@ -85,7 +85,19 @@ test("typed multi-task utterance shares one vague reminder and lands in Needs ti
   await expect(page.getByText("نعمل réunion")).toHaveCount(0);
 });
 
-test("holding the mic records, shows the waveform, and writes what it heard for review", async ({
+const HEARD = "بعد 10 دقايق نطفي الفرن";
+
+async function speakWithHold(page: Page) {
+  const mic = page.getByRole("button", { name: "Hold to talk" });
+  const box = (await mic.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await expect(page.getByRole("button", { name: "Stop and send" })).toBeVisible();
+  await page.waitForTimeout(900);
+  await page.mouse.up();
+}
+
+test("holding the mic records, then shows the words heard and the task they became", async ({
   page,
 }) => {
   const mic = page.getByRole("button", { name: "Hold to talk" });
@@ -98,17 +110,47 @@ test("holding the mic records, shows the waveform, and writes what it heard for 
   await page.waitForTimeout(900);
   await page.mouse.up();
 
-  // What was heard is not acted on yet: it sits in the field, where it can be fixed.
-  const field = page.getByLabel("Add a task");
-  await expect(field).toHaveValue("بعد 10 دقايق نطفي الفرن");
-  await expect(page.getByText(/Check what I heard/)).toBeVisible();
-  await expect(page.getByRole("listitem")).toHaveCount(0);
+  // The words appear one by one, then the task they became. There is nothing to confirm.
+  const card = page.getByRole("status").filter({ hasText: "I heard" });
+  await expect(card).toBeVisible();
+  for (const word of HEARD.split(" "))
+    await expect(card.getByRole("button", { name: `Fix the word “${word}”` })).toBeVisible();
+  await expect(card.getByText("Added")).toBeVisible();
 
-  // Sending it makes the task. 10 minutes from now is due today.
-  await page.getByRole("button", { name: "Add", exact: true }).click();
+  // Already saved: 10 minutes from now is due today. The text field stays empty.
   await expect(page.getByRole("tab", { name: "Today" })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("listitem").filter({ hasText: "نطفي الفرن" })).toBeVisible();
-  await expect(field).toHaveValue("");
+  await expect(page.getByLabel("Add a task")).toHaveValue("");
+});
+
+test("Undo on the card takes the task back", async ({ page }) => {
+  await speakWithHold(page);
+  const card = page.getByRole("status").filter({ hasText: "I heard" });
+  await expect(page.getByRole("listitem").filter({ hasText: "نطفي الفرن" })).toBeVisible();
+  await card.getByRole("button", { name: "Undo" }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(0);
+});
+
+test("tapping a wrong word fixes it and replaces the task instead of adding another", async ({
+  page,
+}) => {
+  let parses = 0;
+  await page.route("**/api/parse", (route) => {
+    parses++;
+    return route.fallback();
+  });
+  await speakWithHold(page);
+  const card = page.getByRole("status").filter({ hasText: "I heard" });
+  await expect(page.getByRole("listitem").filter({ hasText: "نطفي الفرن" })).toBeVisible();
+
+  await card.getByRole("button", { name: "Fix the word “نطفي”" }).click();
+  const input = card.getByRole("textbox", { name: "Fix the word “نطفي”" });
+  await input.fill("نطفّي");
+  await input.press("Enter");
+
+  await expect(card.getByRole("button", { name: "Fix the word “نطفّي”" })).toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(1); // replaced, not duplicated
+  expect(parses).toBeGreaterThanOrEqual(2);
 });
 
 test("tap to talk keeps recording until Stop", async ({ page }) => {
@@ -117,7 +159,8 @@ test("tap to talk keeps recording until Stop", async ({ page }) => {
   await expect(stop).toBeVisible();
   await page.waitForTimeout(700);
   await stop.click();
-  await expect(page.getByLabel("Add a task")).toHaveValue("بعد 10 دقايق نطفي الفرن");
+  await expect(page.getByRole("status").filter({ hasText: "I heard" })).toBeVisible();
+  await expect(page.getByLabel("Add a task")).toHaveValue("");
 });
 
 test("parser failure still saves what was typed", async ({ page }) => {

@@ -4,6 +4,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { NO_FLASH_SCRIPT } from "@/lib/i18n/locales";
 import { ToastProvider } from "@/components/Toast";
 import { Intro } from "@/components/Intro";
+import { MotionProvider } from "@/components/MotionProvider";
 import { RegisterSW } from "@/components/RegisterSW";
 import "./globals.css";
 
@@ -25,8 +26,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f2f5f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d1117" },
+    { media: "(prefers-color-scheme: light)", color: "#faf4ec" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1310" },
   ],
 };
 
@@ -39,7 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <I18nProvider>
           <Intro />
-          <ToastProvider>{children}</ToastProvider>
+          <MotionProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </MotionProvider>
         </I18nProvider>
         <RegisterSW />
       </body>

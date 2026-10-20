@@ -77,7 +77,7 @@ export function SttLab() {
       <button
         onClick={() => (recording ? rec.stop() : void rec.start())}
         disabled={busy}
-        className={`text-door-ink rounded-full px-6 py-3 font-medium disabled:opacity-50 ${recording ? "bg-danger" : "bg-door"}`}
+        className={`text-brand-ink rounded-full px-6 py-3 font-medium disabled:opacity-50 ${recording ? "bg-danger" : "bg-brand"}`}
       >
         {recording ? "Stop and compare" : busy ? "Comparing…" : "Record"}
       </button>

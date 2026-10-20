@@ -19,7 +19,7 @@ interface Props {
 }
 
 const chip =
-  "t-small rounded-full border border-ink/15 bg-surface px-3.5 py-2 font-medium transition-transform duration-[var(--t-fast)] ease-[var(--ease-spring)] hover:border-door active:scale-95";
+  "t-small rounded-full border border-ink/15 bg-surface px-3.5 py-2 font-medium transition-transform duration-[var(--t-fast)] ease-[var(--ease-spring)] hover:border-brand active:scale-95";
 
 /** One short question, a few tappable answers, a voice answer. Never blocks anything else. */
 export function QuestionCard({ task, busy, onAnswer, onVoice, onDismiss, onVoiceError }: Props) {
@@ -69,8 +69,8 @@ export function QuestionCard({ task, busy, onAnswer, onVoice, onDismiss, onVoice
             onClick={() => (recording ? rec.stop() : void rec.start())}
             aria-label={recording ? t("q.stopVoice") : t("q.voice")}
             title={recording ? t("q.stopVoice") : t("q.voice")}
-            className={`text-door-ink grid size-10 place-items-center rounded-full ${
-              recording ? "mic-live bg-danger" : "bg-door"
+            className={`text-brand-ink grid size-10 place-items-center rounded-full ${
+              recording ? "mic-live bg-danger" : "bg-brand"
             }`}
           >
             {recording ? <StopIcon width={18} height={18} /> : <MicIcon width={20} height={20} />}
@@ -81,7 +81,7 @@ export function QuestionCard({ task, busy, onAnswer, onVoice, onDismiss, onVoice
       {needs.reason === "anchor" && /prayer_/.test(needs.word ?? "") && !busy && (
         <Link
           href="/settings#prayer"
-          className="t-small text-door inline-block font-medium underline underline-offset-4"
+          className="t-small text-brand inline-block font-medium underline underline-offset-4"
         >
           {t("q.prayerCity")}
         </Link>
@@ -94,7 +94,7 @@ export function QuestionCard({ task, busy, onAnswer, onVoice, onDismiss, onVoice
             aria-label={t("q.other")}
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            className="rounded-field bg-surface focus:ring-door px-3 py-2 outline-none focus:ring-2"
+            className="rounded-field bg-surface focus:ring-brand px-3 py-2 outline-none focus:ring-2"
           />
           <button
             disabled={!time}

@@ -52,12 +52,12 @@ export function PushBanner({
   if (state !== "default" || dismissed) return null;
 
   return (
-    <div className="alert-in rounded-card bg-door-soft mb-3 flex items-center gap-3 p-3">
-      <BellIcon className="text-door size-5 shrink-0" />
+    <div className="alert-in rounded-card bg-brand-soft mb-3 flex items-center gap-3 p-3">
+      <BellIcon className="text-brand size-5 shrink-0" />
       <p className="t-small flex-1">{t("push.banner")}</p>
       <button
         onClick={() => void onEnable()}
-        className="t-small bg-door text-door-ink rounded-full px-4 py-2 font-medium active:scale-95"
+        className="t-small bg-brand text-brand-ink rounded-full px-4 py-2 font-medium active:scale-95"
       >
         {t("push.bannerAction")}
       </button>

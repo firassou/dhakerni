@@ -57,7 +57,7 @@ export function PrayerSettings() {
           disabled={!loaded}
           value={city}
           onChange={(e) => choose(e.target.value)}
-          className="rounded-field bg-surface-2 focus:ring-door w-full px-3 py-3 outline-none focus:ring-2"
+          className="rounded-field bg-surface-2 focus:ring-brand w-full px-3 py-3 outline-none focus:ring-2"
         >
           <option value="">{t("settings.prayer.none")}</option>
           {CITY_KEYS.map((c) => (
@@ -94,7 +94,7 @@ export function PrayerSettings() {
             setRamadan(next);
             void setMeta("ramadan", next);
           }}
-          className="rounded-field bg-surface-2 focus:ring-door w-full px-3 py-3 outline-none focus:ring-2"
+          className="rounded-field bg-surface-2 focus:ring-brand w-full px-3 py-3 outline-none focus:ring-2"
         >
           {RAMADAN_MODES.map((m) => (
             <option key={m} value={m}>

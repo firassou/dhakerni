@@ -363,3 +363,18 @@ differ by a day from the date announced in Tunisia, so Settings has Follow the c
 - **Evening summary.** Off by default. Composed during a sync and booked as one more reminder (`digest`, sent
   once, no buttons). It says what the device knew at the last sync: tasks finished from notifications since
   then are still counted. Fixed at 21:00.
+
+## D27. Speaking creates the task; the words are shown, not edited (v0.12)
+
+Voice used to put the transcript in the text field to be checked and sent. It now goes straight on: the words
+animate into an "I heard" card, the task is created and the card offers Undo (`VoiceCard`, `HeardLine`).
+Derja speech-to-text is still wrong often enough to matter, so each word is a button: fixing one undoes what
+the wrong words made, re-runs the corrected sentence (so there is never a duplicate) and teaches the fix with
+`observeHeard`, exactly as editing the field did. Speech-to-text is still one batch request (Scribe v2, D5),
+so "live words" is a reveal after release, not a stream. Typing keeps the field and the Undo toast.
+
+## D28. One palette, named for the role (v0.12)
+
+`--door*` became `--brand*`; the brand colour is terracotta `#ab4927` (slightly deeper than first sketched so
+brand text clears 4.5:1 on the secondary surface). Colours that bypassed tokens (mic ring, dock glow, intro,
+icons, theme colour) now follow them. The logo is `assets/logo.svg`, rendered by `scripts/make-icons.mjs`.

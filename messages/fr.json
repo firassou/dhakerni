@@ -221,7 +221,15 @@
     "tooShort": "Trop court. Maintenez le micro pendant que vous parlez.",
     "empty": "Rien entendu. Réessayez.",
     "noTask": "Aucune tâche trouvée. Essayez de reformuler.",
-    "review": "Vérifiez ce que j'ai entendu, corrigez si besoin, puis envoyez."
+    "heard": "J'ai entendu",
+    "fixHint": "Faux ? Touchez un mot pour le corriger.",
+    "added": "Ajoutée",
+    "updated": "Mise à jour",
+    "nothing": "Rien à ajouter pour l'instant. Touchez un mot pour corriger ce que j'ai entendu.",
+    "close": "Fermer",
+    "fixWord": "Corriger le mot « {word} »",
+    "items": "{count} éléments",
+    "undo": "Annuler"
   },
   "offline": {
     "title": "Hors ligne",

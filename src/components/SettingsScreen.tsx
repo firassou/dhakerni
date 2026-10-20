@@ -27,7 +27,7 @@ export function SettingsScreen() {
   const options = ["system", ...LOCALES] as const;
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-xl px-4 pt-[max(16px,env(safe-area-inset-top))] pb-16">
+    <div className="page-in mx-auto min-h-dvh w-full max-w-xl px-4 pt-[max(16px,env(safe-area-inset-top))] pb-16">
       <header className="flex items-center gap-1 py-3">
         <Link
           href="/"
@@ -64,7 +64,7 @@ export function SettingsScreen() {
                   aria-hidden
                   className={`size-5 rounded-full border-2 transition-all duration-[var(--t-base)] ease-[var(--ease-spring)] ${
                     active
-                      ? "border-door bg-door shadow-[inset_0_0_0_4px_var(--surface)]"
+                      ? "border-brand bg-brand shadow-[inset_0_0_0_4px_var(--surface)]"
                       : "border-line"
                   }`}
                 />

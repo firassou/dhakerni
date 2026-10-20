@@ -221,7 +221,15 @@
     "tooShort": "Too short. Hold the mic while you speak.",
     "empty": "Didn't catch anything. Try again.",
     "noTask": "No task found in that. Try rephrasing.",
-    "review": "Check what I heard, fix it if needed, then send."
+    "heard": "I heard",
+    "fixHint": "Wrong? Tap a word to fix it.",
+    "added": "Added",
+    "updated": "Updated",
+    "nothing": "Nothing to add yet. Tap a word to fix what I heard.",
+    "close": "Dismiss",
+    "fixWord": "Fix the word “{word}”",
+    "items": "{count} items",
+    "undo": "Undo"
   },
   "offline": {
     "title": "Offline",

@@ -20,17 +20,19 @@ felt, not seen"; speed as a design feature), Things (calm, one primary action), 
 
 ## Identity
 
-Tunisian whitewash walls, a door-blue arch, a small sun. The app icon is a list with a bell (white on door-blue, `assets/icon-source.png` recolored by
+Cream plaster, terracotta clay, a small sun. The app icon is a checklist with a saffron bell (cream on terracotta, drawn in `assets/logo.svg` and rendered by
 `scripts/make-icons.mjs`) and doubles as the header mark.
 Sun yellow is reserved for time and reminders so it keeps its meaning.
 
 | Token                  | Light     | Dark      |
 | ---------------------- | --------- | --------- |
-| paper                  | `#f2f5f4` | `#0d1117` |
-| surface                | `#ffffff` | `#161b24` |
-| ink                    | `#11161d` | `#edf0f4` |
-| ink-2 (secondary text) | `#465160` | `#9aa6b6` |
-| door (primary)         | `#2152d1` | `#7a9dff` |
+| paper                  | `#faf4ec` | `#1a1310` |
+| surface                | `#fffdf9` | `#241b16` |
+| ink                    | `#231a15` | `#f5ebe0` |
+| ink-2 (secondary text) | `#5c4d43` | `#bba99b` |
+| brand (primary)        | `#ab4927` | `#e07f58` |
+| rose (decoration only) | `#d98e7b` | `#e3a08f` |
+| danger                 | `#b0123f` | `#ff7a9a` |
 | sun (time)             | `#f0b429` | `#f2bc4b` |
 
 Light and dark follow the system via `prefers-color-scheme`. Secondary text and primary on paper are
@@ -56,4 +58,4 @@ Recording waveform, task creation, chips and completion get bespoke motion in la
 
 ## Avoided on purpose
 
-Purple gradients, default shadcn styling, emoji icons, centered card on gray, same radius everywhere.
+Indigo/purple gradients and the default blue-on-white look, default shadcn styling, emoji icons, centered card on gray, same radius everywhere.

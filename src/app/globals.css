@@ -1,28 +1,31 @@
 @import "tailwindcss";
 
 /*
- * Dhakerni tokens. Whitewash walls, door-blue, a little sun.
+ * Dhakerni tokens. Cream plaster, terracotta clay, a little sun.
  * Spacing runs on a 4px grid; radii are chosen per role, not one for all.
  */
 :root {
   color-scheme: light dark;
 
-  --paper: #f2f5f4;
-  --surface: #ffffff;
-  --surface-2: #e9eeed;
-  --ink: #11161d;
-  --ink-2: #465160;
-  --line: rgb(17 22 29 / 0.1);
-  --door: #2152d1;
-  --door-ink: #ffffff;
-  --door-soft: rgb(33 82 209 / 0.1);
+  --paper: #faf4ec;
+  --surface: #fffdf9;
+  --surface-2: #f1e8dc;
+  --ink: #231a15;
+  --ink-2: #5c4d43;
+  --line: rgb(35 26 21 / 0.1);
+  --brand: #ab4927;
+  --brand-ink: #ffffff;
+  --brand-soft: rgb(171 73 39 / 0.1);
+  --rose: #d98e7b;
   --sun: #f0b429;
   --sun-ink: #3b2a00;
-  --danger: #b8321f;
+  --danger: #b0123f;
+  --danger-glow: rgb(176 18 63 / 0.45);
+  --brand-glow: rgb(171 73 39 / 0.4);
 
-  --glass: rgb(255 255 255 / 0.72);
-  --glass-edge: rgb(255 255 255 / 0.9);
-  --shadow-float: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 8px 28px rgb(17 22 29 / 0.14);
+  --glass: rgb(255 253 249 / 0.74);
+  --glass-edge: rgb(255 253 249 / 0.9);
+  --shadow-float: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 8px 28px rgb(35 26 21 / 0.14);
 
   --r-field: 12px;
   --r-card: 20px;
@@ -38,20 +41,23 @@
 :root[data-theme="dark"],
 :root:not([data-theme="light"]) {
   @media (prefers-color-scheme: dark) {
-    --paper: #0d1117;
-    --surface: #161b24;
-    --surface-2: #1e2531;
-    --ink: #edf0f4;
-    --ink-2: #9aa6b6;
-    --line: rgb(237 240 244 / 0.12);
-    --door: #7a9dff;
-    --door-ink: #0a1230;
-    --door-soft: rgb(122 157 255 / 0.14);
+    --paper: #1a1310;
+    --surface: #241b16;
+    --surface-2: #2f241d;
+    --ink: #f5ebe0;
+    --ink-2: #bba99b;
+    --line: rgb(245 235 224 / 0.12);
+    --brand: #e07f58;
+    --brand-ink: #2a1005;
+    --brand-soft: rgb(224 127 88 / 0.16);
+    --rose: #e3a08f;
     --sun: #f2bc4b;
-    --danger: #ff8a78;
-    --glass: rgb(22 27 36 / 0.7);
-    --glass-edge: rgb(237 240 244 / 0.14);
-    --shadow-float: 0 1px 0 rgb(237 240 244 / 0.08) inset, 0 10px 30px rgb(0 0 0 / 0.5);
+    --danger: #ff7a9a;
+    --danger-glow: rgb(255 122 154 / 0.45);
+    --brand-glow: rgb(224 127 88 / 0.45);
+    --glass: rgb(36 27 22 / 0.72);
+    --glass-edge: rgb(245 235 224 / 0.14);
+    --shadow-float: 0 1px 0 rgb(245 235 224 / 0.08) inset, 0 10px 30px rgb(0 0 0 / 0.5);
   }
 }
 
@@ -62,9 +68,10 @@
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-line: var(--line);
-  --color-door: var(--door);
-  --color-door-ink: var(--door-ink);
-  --color-door-soft: var(--door-soft);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-rose: var(--rose);
   --color-sun: var(--sun);
   --color-sun-ink: var(--sun-ink);
   --color-danger: var(--danger);
@@ -102,7 +109,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--door);
+    outline: 2px solid var(--brand);
     outline-offset: 3px;
     border-radius: 6px;
   }
@@ -204,20 +211,6 @@
   animation: card-in var(--t-base) var(--ease-spring) backwards;
 }
 
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-.toast {
-  animation: toast-in var(--t-base) var(--ease-spring) both;
-}
-
 @keyframes sheet-in {
   from {
     opacity: 0;
@@ -246,10 +239,10 @@
 /* Recording: a soft ring pulses off the mic. */
 @keyframes mic-ring {
   from {
-    box-shadow: 0 0 0 0 rgb(184 50 31 / 0.45);
+    box-shadow: 0 0 0 0 var(--danger-glow);
   }
   to {
-    box-shadow: 0 0 0 18px rgb(184 50 31 / 0);
+    box-shadow: 0 0 0 18px transparent;
   }
 }
 .mic-live {
@@ -295,7 +288,7 @@
 /*
  * Intro. Hidden unless the script in <head> sets data-intro="on" on <html>, so a failure there can
  * never leave the app covered. Timeline: frame draws, rows pop in, the bell drops and swings with two
- * ripples, the name rises, then the blue collapses toward the mic.
+ * ripples, the name rises, then the terracotta collapses toward the mic.
  */
 .intro {
   display: none;
@@ -306,7 +299,7 @@ html[data-intro="on"] .intro {
   inset: 0;
   z-index: 100;
   place-items: center;
-  background: #2152d1;
+  background: var(--brand);
   color: #fff;
   cursor: pointer;
   touch-action: none;
@@ -349,9 +342,18 @@ html[data-intro="on"] .intro {
   opacity: 0;
   animation: intro-bell 1.05s var(--ease-out) 0.8s forwards;
 }
+.i-bell-body {
+  fill: var(--sun);
+  stroke: var(--brand);
+  stroke-width: 3.6;
+}
 .i-clapper,
 .i-ripple {
   stroke: var(--sun);
+}
+.i-check {
+  animation-delay: 0.4s;
+  animation-duration: 0.3s;
 }
 .i-ripple {
   stroke-width: 1.4;
@@ -460,7 +462,7 @@ html[data-intro-done] .mic:not(.mic-live) {
 /* Where the card will land: a dashed, faded placeholder in the list. */
 .drag-ghost {
   opacity: 0.45;
-  outline: 2px dashed color-mix(in srgb, var(--door) 60%, transparent);
+  outline: 2px dashed color-mix(in srgb, var(--brand) 60%, transparent);
   outline-offset: -2px;
 }
 .drag-ghost > * {
@@ -472,8 +474,8 @@ html[data-intro-done] .mic:not(.mic-live) {
   cursor: grabbing;
   box-shadow:
     0 2px 0 rgb(255 255 255 / 0.5) inset,
-    0 18px 40px rgb(17 22 29 / 0.28),
-    0 0 0 2px var(--door);
+    0 18px 40px rgb(35 26 21 / 0.28),
+    0 0 0 2px var(--brand);
   animation: drag-pickup 0.18s var(--ease-spring) both;
 }
 @keyframes drag-pickup {
@@ -491,8 +493,8 @@ html[data-intro-done] .mic:not(.mic-live) {
 }
 @keyframes drop-settle {
   0% {
-    box-shadow: 0 0 0 3px var(--door);
-    background-color: var(--door-soft);
+    box-shadow: 0 0 0 3px var(--brand);
+    background-color: var(--brand-soft);
   }
   100% {
     box-shadow: 0 0 0 0 transparent;
@@ -525,4 +527,69 @@ html[dir="rtl"] .card-out {
   to {
     opacity: 0;
   }
+}
+
+/* Screens fade in on navigation. Opacity only: a transform here would trap the fixed dock. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+  }
+}
+.page-in {
+  animation: page-in var(--t-slow) var(--ease-out) both;
+}
+
+/* Staggered entrances: set --d (a number) on the element to delay it by that many steps. */
+.stagger {
+  animation: rise var(--t-slow) var(--ease-out) calc(var(--d, 0) * 60ms) both;
+}
+
+/* The idle mic breathes: a slow soft halo says "talk to me" without shouting. */
+.mic {
+  position: relative;
+}
+.mic:not(.mic-live)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: mic-breathe 3.2s ease-in-out 1.4s infinite;
+}
+.mic:disabled::after {
+  animation: none;
+}
+@keyframes mic-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--brand-glow);
+    opacity: 0.9;
+  }
+  50% {
+    box-shadow: 0 0 0 10px transparent;
+    opacity: 0.4;
+  }
+}
+
+/* Completion burst: little sparks fly out from the check. */
+@keyframes spark {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(0.3);
+  }
+}
+.spark {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px;
+  border-radius: 999px;
+  pointer-events: none;
+  animation: spark 560ms var(--ease-out) both;
 }

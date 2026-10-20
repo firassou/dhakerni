@@ -27,18 +27,18 @@ interface Props {
   busy: boolean;
   /** No network: speech-to-text cannot work, so the mic is off. Typing still does. */
   offline?: boolean;
-  /** `heard` is what the microphone gave, when part of the text came from it: the fixes teach the app. */
-  onSubmitText: (text: string, heard?: string) => void;
-  /** Resolves to what was heard, which lands in the field to be checked before sending. */
-  onAudio: (audio: Blob, durationMs: number) => Promise<string | null>;
+  onSubmitText: (text: string) => void;
+  /** A finished recording. The screen shows what was heard and what it was understood as (see VoiceCard). */
+  onVoice: (audio: Blob, durationMs: number) => void;
   onVoiceError: (kind: RecorderError) => void;
 }
 
 /**
  * Bottom dock, always within thumb reach. Hold the mic to talk, or tap to start and tap again to stop.
- * What was heard is written into the field, so it can be corrected before it is sent.
+ * A recording is handed straight on: the screen shows the words and the result, with a way to fix a word.
+ * Typing goes through the field below.
  */
-export function Dock({ ref, busy, offline = false, onSubmitText, onAudio, onVoiceError }: Props) {
+export function Dock({ ref, busy, offline = false, onSubmitText, onVoice, onVoiceError }: Props) {
   const { t } = useI18n();
   const [text, setText] = useState("");
   const [tapMode, setTapMode] = useState(false);
@@ -48,7 +48,6 @@ export function Dock({ ref, busy, offline = false, onSubmitText, onAudio, onVoic
   const downAt = useRef(0);
   const pointerDown = useRef(false);
   const field = useRef<HTMLTextAreaElement>(null);
-  const heardText = useRef("");
   const append = (more: string) =>
     setText((was) => (was.trim() ? `${was.trimEnd()}\n${more}` : more));
   useImperativeHandle(ref, () => ({ fill: append }), []);
@@ -57,11 +56,7 @@ export function Dock({ ref, busy, offline = false, onSubmitText, onAudio, onVoic
     onRecorded: (blob, ms) => {
       setTapMode(false);
       setArmed(false);
-      void onAudio(blob, ms).then((heard) => {
-        if (!heard) return;
-        heardText.current = heardText.current ? `${heardText.current}\n${heard}` : heard;
-        append(heard);
-      });
+      onVoice(blob, ms);
     },
     onError: (kind) => {
       setTapMode(false);
@@ -114,8 +109,7 @@ export function Dock({ ref, busy, offline = false, onSubmitText, onAudio, onVoic
     e.preventDefault();
     const value = text.trim();
     if (!value) return;
-    onSubmitText(value, heardText.current || undefined);
-    heardText.current = "";
+    onSubmitText(value);
     setText("");
   }
 
@@ -223,11 +217,7 @@ export function Dock({ ref, busy, offline = false, onSubmitText, onAudio, onVoic
               data-bidi
               rows={1}
               value={text}
-              onChange={(e) => {
-                // Wiped and started over: what was heard is no longer what is being fixed.
-                if (!e.target.value.trim()) heardText.current = "";
-                setText(e.target.value);
-              }}
+              onChange={(e) => setText(e.target.value)}
               onKeyDown={onFieldKeyDown}
               placeholder={
                 busy
@@ -262,10 +252,10 @@ export function Dock({ ref, busy, offline = false, onSubmitText, onAudio, onVoic
             onPointerCancel={onPointerCancel}
             onClick={onClick}
             onContextMenu={(e) => e.preventDefault()}
-            className={`mic text-door-ink grid size-14 shrink-0 touch-none place-items-center rounded-full transition-[transform,background-color] duration-[var(--t-base)] ease-[var(--ease-spring)] select-none disabled:opacity-50 ${
+            className={`mic text-brand-ink grid size-14 shrink-0 touch-none place-items-center rounded-full transition-[transform,background-color] duration-[var(--t-base)] ease-[var(--ease-spring)] select-none disabled:opacity-50 ${
               recording
                 ? "mic-live bg-danger scale-110"
-                : "bg-door shadow-[0_6px_18px_rgb(33_82_209/0.4)]"
+                : "bg-brand shadow-[0_6px_18px_var(--brand-glow)]"
             }`}
           >
             {recording && tapMode ? (

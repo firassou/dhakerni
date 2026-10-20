@@ -29,7 +29,7 @@ function editorKind(key: string): "minutes" | "time" | "priority" | "text" | nul
   return null;
 }
 
-const field = "rounded-field bg-surface-2 px-3 py-2 outline-none focus:ring-2 focus:ring-door";
+const field = "rounded-field bg-surface-2 px-3 py-2 outline-none focus:ring-2 focus:ring-brand";
 
 export function MemoryScreen() {
   const { t, locale } = useI18n();
@@ -94,7 +94,7 @@ export function MemoryScreen() {
   }
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-xl px-4 pt-[max(16px,env(safe-area-inset-top))] pb-16">
+    <div className="page-in mx-auto min-h-dvh w-full max-w-xl px-4 pt-[max(16px,env(safe-area-inset-top))] pb-16">
       <header className="flex items-center gap-1 py-3">
         <Link
           href="/settings"
