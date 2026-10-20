@@ -1,5 +1,6 @@
 import { getSessionId } from "../db";
 import { markOffline, markOnline } from "../net/online";
+import type { BillDraft } from "./bill-schema";
 import type { ParseRequest, ParseResult } from "./schema";
 
 export type ApiErrorKind = "rate_limited" | "too_large" | "network" | "server";
@@ -48,4 +49,13 @@ export async function parse(input: ParseInput): Promise<ParseResult> {
     body: JSON.stringify(body),
   });
   return (await res.json()) as ParseResult;
+}
+
+/** A bill photo, PDF or pasted text in; a draft to check out. The file is sent once and never kept. */
+export async function readBill(input: { file: Blob } | { text: string }): Promise<BillDraft> {
+  const body = new FormData();
+  if ("file" in input) body.append("file", input.file, "bill");
+  else body.append("text", input.text);
+  const res = await call("/api/bill", { method: "POST", body });
+  return (await res.json()) as BillDraft;
 }

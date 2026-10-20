@@ -119,6 +119,7 @@ export function SettingsScreen() {
         <div className="rounded-card bg-surface space-y-3 p-4">
           <p>{t("settings.privacy.local")}</p>
           <p className="text-ink-2">{t("settings.privacy.server")}</p>
+          <p className="text-ink-2">{t("settings.privacy.bills")}</p>
           <p className="t-micro text-ink-2">
             {t("settings.anonymousId")}:{" "}
             <span dir="ltr" className="font-mono">

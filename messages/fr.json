@@ -50,7 +50,8 @@
   "nav": {
     "settings": "Réglages",
     "back": "Retour",
-    "home": "Accueil"
+    "home": "Accueil",
+    "bills": "Factures"
   },
   "settings": {
     "title": "Réglages",
@@ -64,7 +65,8 @@
     "privacy": {
       "title": "Confidentialité",
       "local": "Vos tâches et ce que Dhakerni apprend sur vous restent sur cet appareil.",
-      "server": "Pour les rappels quand l'app est fermée, notre serveur garde seulement : votre adresse push, un identifiant anonyme, l'heure de chaque rappel et un titre court (coupé à 80 caractères). Tout est chiffré, chaque rappel est supprimé dès que vous y répondez ou après sa dernière répétition, et désactiver les notifications supprime le reste."
+      "server": "Pour les rappels quand l'app est fermée, notre serveur garde seulement : votre adresse push, un identifiant anonyme, l'heure de chaque rappel et un titre court (coupé à 80 caractères). Tout est chiffré, chaque rappel est supprimé dès que vous y répondez ou après sa dernière répétition, et désactiver les notifications supprime le reste.",
+      "bills": "Factures : la photo, le PDF ou le message que vous ajoutez est envoyé une seule fois à l’IA pour être lu, puis effacé. Dhakerni ne garde jamais l’image ; seuls le fournisseur, le montant, la date et la référence que vous confirmez sont enregistrés, sur cet appareil."
     },
     "anonymousId": "Identifiant anonyme",
     "version": "Version",
@@ -436,5 +438,51 @@
     "both": "Demain : {n} à faire · {m} encore sans heure",
     "tomorrow": "Demain : {n} à faire",
     "needsTime": "{m} tâches encore sans heure"
+  },
+  "bills": {
+    "title": "Factures",
+    "summary": "Ce mois-ci",
+    "monthDue": "Reste à payer ce mois-ci",
+    "monthPaid": "Payé ce mois-ci",
+    "addFile": "Photo ou fichier",
+    "addText": "Coller un message",
+    "attach": "Ajouter une facture depuis une photo ou un fichier",
+    "attachOffline": "Ajouter une facture demande internet",
+    "privacy": "La photo ou le message est envoyé une seule fois à l’IA pour être lu, puis effacé. Seuls les détails que vous confirmez sont enregistrés, sur cet appareil.",
+    "emptyTitle": "Pas encore de facture",
+    "emptyBody": "Prenez en photo une facture STEG, SONEDE ou téléphone et je vous rappelle avant l’échéance.",
+    "dueWeek": "À payer cette semaine",
+    "later": "Plus tard",
+    "paid": "Payées",
+    "pay": "Marquer payée",
+    "unpay": "Annuler",
+    "everyMonth": "Chaque mois",
+    "paidOn": "Payée {when}",
+    "paidToast": "{provider} marquée payée",
+    "stamp": "Payée",
+    "added": "Facture ajoutée : {provider}",
+    "pasteTitle": "Coller le message de la facture",
+    "pastePlaceholder": "Collez ici le SMS ou le texte de la facture…",
+    "read": "Lire",
+    "reading": "Lecture de la facture…",
+    "reviewTitle": "Vérifier la facture",
+    "provider": "À qui payer",
+    "amount": "Montant (DT)",
+    "dueDate": "Date limite",
+    "reference": "Référence (facultatif)",
+    "monthly": "Se répète chaque mois",
+    "check": "À vérifier",
+    "save": "Ajouter la facture",
+    "remindNote": "Je vous rappellerai deux jours avant l’échéance, puis à 9 h le jour même.",
+    "byHand": "Remplir à la main",
+    "errNetwork": "Pas d’internet, je ne peux pas la lire. Remplissez-la à la main ou réessayez plus tard.",
+    "errRateLimited": "Trop de factures d’un coup. Attendez une minute ou remplissez à la main.",
+    "errTooLarge": "Ce fichier est trop lourd pour être envoyé. Essayez une photo plus petite.",
+    "errFile": "Je ne peux pas ouvrir ce fichier. Utilisez une photo (JPG, PNG) ou un PDF.",
+    "errRead": "Je n’ai pas pu lire cette facture. Remplissez-la à la main ou essayez une photo plus nette.",
+    "period": "Période couverte (facultatif)",
+    "periodFrom": "Début de période",
+    "periodTo": "Fin de période",
+    "periodShort": "Période : {from} – {to}"
   }
 }

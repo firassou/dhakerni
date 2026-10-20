@@ -3,8 +3,8 @@
  * It talks to the same IndexedDB as the app (tasks, profile, meta) so "Done" and "Snooze" work even when
  * the app is closed. Keep the store names in step with src/lib/db/index.ts.
  */
-const CACHE = "dhakerni-shell-v4";
-const SHELL = ["/", "/settings", "/memory", "/manifest.webmanifest"];
+const CACHE = "dhakerni-shell-v5";
+const SHELL = ["/", "/settings", "/memory", "/bills", "/manifest.webmanifest"];
 const DB_NAME = "dhakerni";
 const DEFAULT_SNOOZE_MIN = 10;
 const VIBRATE = [400, 200, 400, 200, 800]; // long enough to feel in a pocket

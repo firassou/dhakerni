@@ -1,5 +1,5 @@
 import { getDB } from "../db";
-import { Task } from "../schemas";
+import { Bill, Task } from "../schemas";
 
 /**
  * Tasks saved by an older version are missing the fields added since (items, suggestions, ...). The schema
@@ -21,6 +21,7 @@ export function normalizeTask(raw: unknown): Task {
     uncertain: arr(r.uncertain),
     decision: null,
     aiPending: r.aiPending === true,
+    bill: Bill.safeParse(r.bill).data ?? null,
   };
 }
 

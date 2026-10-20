@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import { isOverdue } from "@/lib/tasks/filters";
 import { describeFact } from "@/lib/questions/describe";
+import { formatMillimes } from "@/lib/money";
 import { formatDue, leadLabel } from "@/lib/time/format";
 import { formatRemaining } from "@/lib/time/remaining";
 import { formatItem, stepsDone } from "@/lib/tasks/items";
@@ -191,6 +192,11 @@ function TaskCardBody({
                   {t("task.needsTime")}
                 </span>
               )
+            )}
+            {task.bill && (
+              <span data-bidi className="text-ink font-medium tabular-nums">
+                {formatMillimes(task.bill.amountMillimes, locale)}
+              </span>
             )}
             {remaining && (
               <span data-testid="remaining" data-bidi>
