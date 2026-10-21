@@ -61,6 +61,7 @@ const parsed = (title: string, extra: Partial<ParsedTask> = {}): ParsedTask => (
   reminderId: null,
   recurrence: null,
   subtasks: [],
+  assignTo: null,
   uncertain: [],
   ...extra,
 });

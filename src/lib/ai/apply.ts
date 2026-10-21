@@ -145,6 +145,7 @@ export function toTasks(
         title,
         done: false,
       })),
+      assignedTo: t.assignTo === "partner" ? ("partner" as const) : null,
       uncertain,
       needs,
       assumed,

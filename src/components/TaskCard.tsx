@@ -25,6 +25,8 @@ interface BodyProps {
   footer?: ReactNode;
   /** The drag handle (or its stand-in on the lifted copy). */
   grip?: ReactNode;
+  /** What the person calls their partner, for the "from" and "sent to" labels. */
+  partnerName?: string;
 }
 
 interface Props extends Omit<BodyProps, "grip"> {
@@ -69,6 +71,7 @@ function TaskCardBody({
   onItemToggle,
   footer,
   grip,
+  partnerName,
 }: BodyProps) {
   const { t, locale } = useI18n();
   // Sparks fly for a moment when the task goes from open to done (not when it simply appears done).
@@ -192,6 +195,17 @@ function TaskCardBody({
                   {t("task.needsTime")}
                 </span>
               )
+            )}
+            {(task.origin || task.assignedTo) && (
+              <span
+                data-testid="partner-badge"
+                data-bidi
+                className="bg-brand/15 text-brand-text rounded-full px-2 py-0.5"
+              >
+                {t(task.origin ? "partner.from" : "partner.sentTo", {
+                  name: partnerName || t("partner.someone"),
+                })}
+              </span>
             )}
             {task.bill && (
               <span data-bidi className="text-ink font-medium tabular-nums">

@@ -100,6 +100,15 @@ export const Task = z.object({
   aiPending: z.boolean().default(false),
   /** Set on bill tasks (list "bills"): who to pay, how much, and when it was paid. */
   bill: Bill.nullable().default(null),
+  /** "partner" when the task was sent to this device by the partner. */
+  origin: z.literal("partner").nullable().default(null),
+  /** "partner" on the sender's copy of a task that was sent to the partner. */
+  assignedTo: z.literal("partner").nullable().default(null),
+  /**
+   * Links this task to the partner's copy. `id` is the inbox id of the delivery; `done` is the state both
+   * copies were last known to share, so a difference with `task.done` means "tell the partner".
+   */
+  share: z.object({ id: z.string(), done: z.boolean() }).nullable().default(null),
   done: z.boolean().default(false),
   doneAt: z.iso.datetime({ offset: true }).nullable().default(null),
   order: z.number(),

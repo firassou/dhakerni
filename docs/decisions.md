@@ -396,3 +396,43 @@ photos to 1800 px JPEG before upload. Every extraction goes through a review she
 is worse than one more tap. Paying a monthly bill advances the task (`completeTask`) and leaves a paid copy, so the
 month's totals stay right; paid bills older than the previous month are removed. Push titles are unchanged: the
 amount is not added to them.
+
+## D30. Partner sharing: pair token, encrypted inbox, nothing shared by default (v0.14)
+
+Identity is still a self-generated session id, which anyone can claim, so pairing cannot rest on it. Pairing is a
+single-use 8-character code (no 0/O/1/I, 10 minutes, taken atomically with `GETDEL`). Joining mints a 256-bit
+**pair token** for each device; the server keeps only its SHA-256 and every `/api/share/*` and `/api/pair/leave`
+call must present it, so knowing someone's session id buys nothing. The inviter collects their token from
+`GET /api/pair/status` and it stays available until they use it once (a lost response must not lose the pairing).
+Joining is throttled to 8 a minute and 40 an hour per device.
+
+What the server holds about a pair: the two links, the token hashes, and an inbox of tasks sent and not yet taken.
+All encrypted with the existing AES-256-GCM key; an item is deleted when the partner's device acknowledges it and
+expires after 14 days; the inbox holds at most 50. It never holds the partner's name (each side names the other
+locally) or anything that was not sent. Unpairing deletes both links, both tokens and both inboxes.
+
+A shared task carries only its content (`SharedTask`): title, notes, time, priority, list, checklist, steps,
+repeat. No ids, reminders or learned guesses; a bill goes as a plain task (list `inbox`, no amount or reference).
+The inbox id becomes the task id on the receiving side, so a delivery taken twice (service worker and open app)
+is one task. A task is saved before it is acknowledged: a crash delivers it again, never loses it.
+
+**Delivery.** `POST /api/share/send` stores the task and pushes `{kind: "assigned", title}` to the partner's
+subscription. The service worker answers by draining the inbox itself and writing the tasks straight into
+IndexedDB ("lands directly", no accept step), then notifies; the open app drains on start, on focus, when back
+online and every minute, so a lost push or an offline phone only delays it. `public/sw.js` has its own copy of the
+task builder; `src/lib/partner/sw-parity.test.ts` fails if it drifts from `fromShared`.
+
+**Voice.** `assignTo: "partner"` in the parse schema plus a prompt rule; when paired, the partner's name goes to
+the AI as a hint ("The person's partner is called Sami."), which is the only place the name leaves the device.
+A task that cannot be delivered stays as the person's own, with a toast.
+
+**Finishing.** A shared task carries `share: { id, done }` on both copies (`id` is the delivery's inbox id).
+`done` is the state both copies last agreed on, so `task.done !== share.done` means "this was changed here, tell the
+partner" (`useShareSync`, retried when back online and every minute). The note travels as a status entry in the
+partner's inbox, keyed `st-<id>` so a burst of toggles is one message; applying it sets `done` and `share.done`
+together, which is what stops it echoing back. A finish also pushes `{kind: "finished"}`; the service worker applies
+the status and notifies. Reopening syncs silently. Last change wins; nothing else about the task is synced, and a
+repeating task that rolls to its next date is not a finish. The unlinked case (deleting a copy) is not synced.
+
+**Not done.** Edits to a shared task are not synced (only done and reopened), and there are no tombstones for
+deletes. Only two people per pairing.

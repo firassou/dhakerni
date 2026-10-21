@@ -41,6 +41,9 @@ import {
 } from "@/lib/reminders/engine";
 import { useAiBackfill } from "@/lib/ai/useAiBackfill";
 import { useOnline } from "@/lib/net/useOnline";
+import { sendTask, type Received } from "@/lib/partner/partner";
+import { useShareSync } from "@/lib/partner/useShareSync";
+import { usePartnerLink } from "@/lib/partner/usePartnerLink";
 import { useReminders } from "@/lib/reminders/useReminders";
 import {
   loadTemplates,
@@ -182,6 +185,66 @@ export function HomeScreen() {
 
   useAiBackfill({ tasks, ready, getTasks, insert, remove, upsert, getResolveOptions, hintsFor });
 
+  const partner = usePartnerLink(
+    useCallback(
+      ({ fresh, updated }: Received, name: string) => {
+        void reload();
+        const from = name || t("partner.someone");
+        if (fresh.length) {
+          // Show the view where the new task lives, as for a task made here.
+          const at = new Date();
+          const view = (["today", "upcoming", "needsTime"] as const).find((f) =>
+            matchesFilter(fresh[0], f, at),
+          );
+          if (view) setFilter(view);
+          show({
+            message:
+              fresh.length === 1
+                ? t("partner.received", { name: from, title: fresh[0].title })
+                : t("partner.receivedMany", { name: from, count: fresh.length }),
+          });
+          return;
+        }
+        const finished = updated.filter((u) => u.done);
+        if (finished.length)
+          show({
+            message:
+              finished.length === 1
+                ? t("partner.finished", { name: from, title: finished[0].title })
+                : t("partner.finishedMany", { name: from, count: finished.length }),
+          });
+      },
+      [reload, show, t],
+    ),
+  );
+  useShareSync(tasks, getTasks, upsert);
+  const partnerName = partner?.name ?? "";
+  /** So "tell Sami to ..." can be understood as for the partner. Only the name the person gave is shared with the AI. */
+  const hintsWithPartner = useCallback(
+    (text: string) => {
+      const hints = hintsFor(text);
+      return partnerName ? [`The person's partner is called ${partnerName}.`, ...hints] : hints;
+    },
+    [hintsFor, partnerName],
+  );
+  const sendToPartner = useCallback(
+    async (task: Task): Promise<boolean> => {
+      try {
+        upsert(await sendTask(task));
+        show({
+          message: partnerName
+            ? t("partner.assignedTo", { name: partnerName })
+            : t("partner.assigned"),
+        });
+        return true;
+      } catch {
+        show({ message: t("partner.assignFailed") });
+        return false;
+      }
+    },
+    [partnerName, show, t, upsert],
+  );
+
   const bills = useBillCapture({ getTasks, insert, remove });
   const readBillFile = bills.readFile;
 
@@ -205,7 +268,7 @@ export function HomeScreen() {
     remove,
     upsert,
     getResolveOptions,
-    hintsFor,
+    hintsFor: hintsWithPartner,
     // Jump to the view where the first new task lives, so it is visible straight away.
     onCreated: (created) => {
       const at = new Date();
@@ -705,6 +768,7 @@ export function HomeScreen() {
                     task={task}
                     index={index}
                     now={now}
+                    partnerName={partnerName}
                     draggable={filter !== "done" && !selecting}
                     selecting={selecting}
                     selected={selected.has(task.id)}
@@ -828,6 +892,8 @@ export function HomeScreen() {
           )
         }
         onDelete={(task) => handleDelete([task])}
+        partner={partner}
+        onSend={sendToPartner}
       />
     </div>
   );

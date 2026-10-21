@@ -3,10 +3,10 @@
 Voice-first todo and reminder app for Tunisian Arabic (Derja), French and English. You speak or type;
 it turns what you said into tasks and reminders.
 
-Status: **v0.13.0**: voice and typed capture that understands the idea (clean titles, descriptions, quantities,
+Status: **v0.14.0**: voice and typed capture that understands the idea (clean titles, descriptions, quantities,
 checklists, steps, decision help), clarifying questions, reminders with Web Push (also ahead of the time), tasks
 that repeat, changes to existing tasks by voice, a visible learned profile, backup, prayer-time words and
-Ramadan, sharing from other apps, an evening summary, bills read from photos or messages, accessibility checks. See [CHANGELOG](CHANGELOG.md).
+Ramadan, sharing from other apps, an evening summary, bills read from photos or messages, sending tasks to a partner, accessibility checks. See [CHANGELOG](CHANGELOG.md).
 
 ## Setup
 
@@ -94,4 +94,8 @@ corrections work is in [docs/decisions.md](docs/decisions.md) (D9).
   checklists. Your other tasks are never sent.
 - The evening summary is written on your device; the server only receives its one line of text
   ("Tomorrow: 3 to do"), like any reminder title.
+- Partner sharing (v0.14): pairing uses a single-use code and a secret pair token (only its hash is stored). A task
+  you send waits in an AES-256-GCM encrypted inbox until your partner's device takes it, then it is deleted (or
+  after 14 days). The name you give your partner never leaves your device, except as a hint to the AI so "tell
+  Sami to ..." is understood. Unpairing deletes the link and both inboxes.
 - Export and import work on a JSON file you control. The file leaves out the anonymous ID and push subscription.

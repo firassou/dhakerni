@@ -1110,6 +1110,72 @@
           }
         ]
       }
+    },
+    {
+      "id": "as01",
+      "category": "assign",
+      "text": "قول لمراتي تجيب الخبز غدوة الصباح",
+      "expect": {
+        "titles": [["خبز"]],
+        "reminders": [],
+        "assign": ["partner"],
+        "smart": {
+          "timeAny": true
+        }
+      }
+    },
+    {
+      "id": "as02",
+      "category": "assign",
+      "text": "dis à ma femme d'appeler le plombier demain matin",
+      "expect": {
+        "titles": [["plombier"]],
+        "reminders": [],
+        "assign": ["partner"],
+        "smart": {
+          "timeAny": true
+        }
+      }
+    },
+    {
+      "id": "as03",
+      "category": "assign",
+      "text": "ask Sami to pay the electricity bill tomorrow morning",
+      "expect": {
+        "titles": [["bill", "electricity", "pay"]],
+        "reminders": [],
+        "assign": ["partner"],
+        "smart": {
+          "timeAny": true
+        }
+      },
+      "hints": ["The person's partner is called Sami."]
+    },
+    {
+      "id": "as04",
+      "category": "assign",
+      "text": "nechri el 7lib ghodwa sba7",
+      "expect": {
+        "titles": [["7lib", "lait"]],
+        "reminders": [],
+        "assign": [null],
+        "smart": {
+          "timeAny": true
+        }
+      }
+    },
+    {
+      "id": "as05",
+      "category": "assign",
+      "text": "tell the plumber to come tomorrow morning",
+      "expect": {
+        "titles": [["plumber"]],
+        "reminders": [],
+        "assign": [null],
+        "smart": {
+          "timeAny": true
+        }
+      }
     }
   ]
 }
