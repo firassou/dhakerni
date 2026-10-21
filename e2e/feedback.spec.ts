@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { pinMidday } from "./clock";
 
 const parse = (title: string, offsetMinutes: number | null) => ({
   tasks: [
@@ -38,6 +39,7 @@ const parse = (title: string, offsetMinutes: number | null) => ({
 });
 
 async function setup(page: Page) {
+  await pinMidday(page);
   await page.route("**/api/parse", (route) => {
     const { text } = route.request().postDataJSON() as { text: string };
     const m = /in (\d+)m/.exec(text);
@@ -222,8 +224,6 @@ test.describe("time remaining", () => {
   });
 
   test("it counts down as time passes", async ({ page }) => {
-    await page.clock.install();
-    await page.reload();
     await add(page, "tick in 25m");
     await page.getByRole("tab", { name: "Today" }).click();
     await expect(page.getByTestId("remaining")).toHaveText(/in 2[45] minutes/);

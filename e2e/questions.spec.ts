@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { pinMidday } from "./clock";
 
 const when = (p: object) => ({
   kind: "vague",
@@ -67,6 +68,7 @@ const facts = (page: Page) =>
   );
 
 test.beforeEach(async ({ page }) => {
+  await pinMidday(page);
   await mockParse(page);
   await page.route("**/api/transcribe", (route) => route.fulfill({ json: { text: "نص ساعة" } }));
   await page.goto("/");

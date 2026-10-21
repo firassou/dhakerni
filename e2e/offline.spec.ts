@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { pinMidday } from "./clock";
 
 const when = (p: object) => ({
   kind: "relative",
@@ -16,6 +17,7 @@ const when = (p: object) => ({
 });
 
 async function reset(page: Page) {
+  await pinMidday(page);
   await page.goto("/");
   await page.evaluate(async () => {
     const dbs = await indexedDB.databases();

@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { pinMidday } from "./clock";
 
 test.beforeEach(async ({ page }) => {
+  await pinMidday(page);
   // The parser is mocked: every typed text becomes one task with no time.
   await page.route("**/api/parse", (route) => {
     const { text } = route.request().postDataJSON() as { text: string };
@@ -66,7 +68,8 @@ test("add, complete with undo, edit, delete with undo", async ({ page }) => {
   // edit title and give it a time -> moves to Today
   await page.getByRole("button", { name: /Edit task: buy bread/ }).click();
   await page.getByLabel("Title").fill("buy bread and milk");
-  const soon = new Date(Date.now() + 3600_000);
+  const soon = new Date();
+  soon.setHours(13, 0, 0, 0); // an hour after the pinned midday clock
   const pad = (n: number) => String(n).padStart(2, "0");
   await page
     .getByLabel("Due")
