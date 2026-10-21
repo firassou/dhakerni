@@ -1,5 +1,5 @@
 import webpush from "web-push";
-import type { Sender } from "./reminders";
+import type { Sender, Subscription } from "./reminders";
 
 export const pushConfigured = () =>
   !!(
@@ -8,7 +8,8 @@ export const pushConfigured = () =>
     process.env.REMINDER_ENCRYPTION_KEY
   );
 
-export const sendPush: Sender = async (sub, payload) => {
+/** Any JSON payload to a push subscription. Reminders and "your partner sent you a task" share this. */
+export async function sendRaw(sub: Subscription, payload: object): Promise<void> {
   webpush.setVapidDetails(
     process.env.VAPID_SUBJECT ?? "mailto:admin@example.com",
     process.env.VAPID_PUBLIC_KEY!,
@@ -16,4 +17,6 @@ export const sendPush: Sender = async (sub, payload) => {
   );
   // TTL: if the device is offline, the push service keeps it for up to an hour.
   await webpush.sendNotification(sub, JSON.stringify(payload), { TTL: 3600, urgency: "high" });
-};
+}
+
+export const sendPush: Sender = (sub, payload) => sendRaw(sub, payload);

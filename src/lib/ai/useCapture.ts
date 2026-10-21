@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import type { LearnedOptions } from "@/lib/memory/profile";
 import { getOnline } from "@/lib/net/online";
+import { deliverAssigned, getPairing } from "@/lib/partner/partner";
 import { newTask } from "@/lib/tasks/ops";
 import { ApiError, transcribe } from "./client";
 import { understand } from "./understand";
@@ -66,6 +67,16 @@ export function useCapture({
         onCreated(created);
       }
       changed.forEach(upsert);
+      if (created.some((c) => c.assignedTo === "partner")) {
+        // Said for the partner: send it. If that cannot be done it stays here as the person's own.
+        void deliverAssigned(created).then(async ({ sent, failed }) => {
+          sent.forEach(upsert);
+          failed.forEach(upsert);
+          if (failed.length) return show({ message: t("partner.assignFailed") });
+          const name = (await getPairing())?.name;
+          show({ message: name ? t("partner.assignedTo", { name }) : t("partner.assigned") });
+        });
+      }
       const undo = () => {
         created.forEach((c) => remove(c.id));
         before.forEach(upsert);
@@ -81,7 +92,7 @@ export function useCapture({
       undoToast(message, undo);
       return { created, changed, undo };
     },
-    [insert, onCreated, remove, t, undoToast, upsert],
+    [insert, onCreated, remove, show, t, undoToast, upsert],
   );
 
   const submitText = useCallback(

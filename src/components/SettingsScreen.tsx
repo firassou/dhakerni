@@ -9,6 +9,7 @@ import { Brand } from "./Brand";
 import { BackIcon } from "./Icon";
 import { BackupControls } from "./BackupControls";
 import { DigestSwitch } from "./DigestSwitch";
+import { PartnerSettings } from "./PartnerSettings";
 import { LearningSwitch } from "./LearningSwitch";
 import { PrayerSettings } from "./PrayerSettings";
 import { PushControls } from "./PushControls";
@@ -80,6 +81,13 @@ export function SettingsScreen() {
         </h2>
         <PushControls />
         <DigestSwitch />
+      </section>
+
+      <section id="partner" aria-labelledby="partner-h" className="mt-10">
+        <h2 id="partner-h" className="t-small text-ink-2 mb-2 font-medium">
+          {t("partner.title")}
+        </h2>
+        <PartnerSettings />
       </section>
 
       <section id="prayer" aria-labelledby="prayer-h" className="mt-10">

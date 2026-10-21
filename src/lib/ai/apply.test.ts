@@ -29,6 +29,7 @@ const task = (title: string, reminderId: string | null): ParsedTask => ({
   reminderId,
   recurrence: null,
   subtasks: [],
+  assignTo: null,
   uncertain: [],
 });
 
@@ -201,5 +202,19 @@ describe("smarter tasks", () => {
     } as unknown as ParsedTasks;
     const [a] = toTasks(old, now, []);
     expect(a).toMatchObject({ title: "x", notes: "", items: [], suggestions: [], decision: null });
+  });
+
+  it("marks a task said for the partner, and leaves the others alone", () => {
+    const r: ParsedTasks = {
+      tasks: [
+        { ...task("Buy bread", null), assignTo: "partner" },
+        task("Call the bank", null),
+        { ...task("Pay rent", null), assignTo: null },
+      ],
+      reminders: [],
+    };
+    const out = toTasks(r, now, []);
+    expect(out.map((t) => t.assignedTo)).toEqual(["partner", null, null]);
+    expect(out.every((t) => t.origin === null)).toBe(true);
   });
 });

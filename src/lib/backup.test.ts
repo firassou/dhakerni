@@ -28,6 +28,8 @@ async function seed() {
   await learnFact("vague.شوية", "20", "answer");
   await setMeta("obs:freq", { x: 2 });
   await setMeta("sessionId", "device-only-id");
+  await setMeta("pairToken", "partner-secret-token");
+  await setMeta("partnerName", "Sami");
 }
 
 describe("backup", () => {
@@ -35,6 +37,9 @@ describe("backup", () => {
     await seed();
     const backup = await exportBackup("0.6.0");
     expect(JSON.stringify(backup)).not.toContain("device-only-id");
+    // The pair token is a secret like the session id: restoring a backup must not hand it to another device.
+    expect(JSON.stringify(backup)).not.toContain("partner-secret-token");
+    expect(JSON.stringify(backup)).not.toContain("Sami");
     expect(backup).toMatchObject({ app: "dhakerni", appVersion: "0.6.0" });
 
     await resetDBForTests();

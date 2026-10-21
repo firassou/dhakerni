@@ -147,6 +147,12 @@ export const ParsedTask = z.object({
     })
     .nullable(),
   subtasks: z.array(z.string()),
+  assignTo: z
+    .enum(["self", "partner"])
+    .nullable()
+    .describe(
+      '"partner" only when the person says their partner (wife, husband, spouse, or the partner by name when "About this person" gives it) should do or get this ("قول لمراتي تجيب الخبز", "dis à ma femme d\'appeler", "ask Sami to pay the bill"). Otherwise "self" (or null).',
+    ),
   uncertain: z
     .array(z.string())
     .describe("Names of fields you are unsure about, instead of guessing."),

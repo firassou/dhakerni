@@ -1,6 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { Task } from "@/lib/schemas";
 import { fromLocalInput, leadLabel, toLocalInput } from "@/lib/time/format";
@@ -24,13 +25,27 @@ interface Props {
   onClose: () => void;
   onChange: (id: string, patch: Partial<Task>) => void;
   onDelete: (task: Task) => void;
+  /** The paired partner, or null. Only then can a task be sent. */
+  partner?: { name: string } | null;
+  /** Sends a copy to the partner. Resolves to whether it went. */
+  onSend?: (task: Task) => Promise<boolean>;
   /** Where focus goes on close: the button that opened the editor. */
   onCloseAutoFocus?: (e: Event) => void;
 }
 
 /** Edits apply live: nothing to confirm, so nothing to lose. */
-export function TaskEditor({ task, onClose, onChange, onDelete, onCloseAutoFocus }: Props) {
+export function TaskEditor({
+  task,
+  onClose,
+  onChange,
+  onDelete,
+  partner,
+  onSend,
+  onCloseAutoFocus,
+}: Props) {
   const { t } = useI18n();
+  const [sending, setSending] = useState(false);
+  const who = partner?.name || t("partner.someone");
 
   /** Each section computes the next task; we save only the parts those sections own. */
   const edit: Edit = (fn) => {
@@ -174,6 +189,32 @@ export function TaskEditor({ task, onClose, onChange, onDelete, onCloseAutoFocus
                 <ItemsSection task={task} edit={edit} />
                 <StepsSection task={task} edit={edit} />
                 <SuggestionsSection task={task} edit={edit} />
+
+                {partner && onSend && !task.origin && (
+                  <div className="rounded-field bg-surface-2 flex items-center justify-between gap-3 p-3">
+                    <span className="t-small text-ink-2">
+                      {task.assignedTo ? t("partner.sentTo", { name: who }) : t("partner.sendHelp")}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={sending}
+                      data-testid="send-to-partner"
+                      onClick={async () => {
+                        setSending(true);
+                        try {
+                          await onSend(task);
+                        } finally {
+                          setSending(false);
+                        }
+                      }}
+                      className="t-small bg-brand text-brand-ink shrink-0 rounded-full px-4 py-2 font-medium transition-transform active:scale-95 disabled:opacity-50"
+                    >
+                      {task.assignedTo
+                        ? t("partner.sendAgain")
+                        : t("partner.sendTo", { name: who })}
+                    </button>
+                  </div>
+                )}
 
                 <button
                   onClick={() => onDelete(task)}

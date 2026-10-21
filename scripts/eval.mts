@@ -19,12 +19,15 @@ interface Case {
   category: string;
   text: string;
   followUp?: { taskTitle: string; question: string };
+  hints?: string[];
   expect: {
     titles: string[][];
     reminders: ExpectedReminder[];
     shared?: boolean;
     priority?: string;
     recurrence?: string;
+    /** Per task, in order: "partner" when it was said for the partner, else null. */
+    assign?: ("partner" | null)[];
     smart?: {
       items?: { name: string[]; qty: number | null }[];
       itemCount?: number;
@@ -177,7 +180,8 @@ function score(c: Case, out: ParseResult) {
         : ids.size > 1;
   const extras =
     (e.priority === undefined || out.tasks[0]?.priority === e.priority) &&
-    (e.recurrence === undefined || out.tasks[0]?.recurrence?.freq === e.recurrence);
+    (e.recurrence === undefined || out.tasks[0]?.recurrence?.freq === e.recurrence) &&
+    (e.assign === undefined || e.assign.every((a, i) => (out.tasks[i]?.assignTo ?? null) === a));
   const smart = scoreSmart(e.smart, out);
   const checks: Checks = { count, titles, time, shared, extras, smart };
   return { checks, pass: Object.values(checks).every(Boolean), resolutions };
@@ -195,6 +199,7 @@ async function worker() {
           now: spec.now,
           timeZone: spec.timeZone,
           followUp: c.followUp,
+          hints: c.hints,
         }),
       );
       const s = score(c, out);

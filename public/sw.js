@@ -3,7 +3,7 @@
  * It talks to the same IndexedDB as the app (tasks, profile, meta) so "Done" and "Snooze" work even when
  * the app is closed. Keep the store names in step with src/lib/db/index.ts.
  */
-const CACHE = "dhakerni-shell-v5";
+const CACHE = "dhakerni-shell-v6";
 const SHELL = ["/", "/settings", "/memory", "/bills", "/manifest.webmanifest"];
 const DB_NAME = "dhakerni";
 const DEFAULT_SNOOZE_MIN = 10;
@@ -13,16 +13,42 @@ const EARLY_SUFFIX = "~early"; // the server's id for a task's earlier reminder 
 const DIGEST_ID = "digest"; // the evening summary: not a task, nothing to answer
 
 const TEXT = {
-  en: { done: "Done", snooze: "Snooze", open: "Open", body: "Reminder", dir: "ltr", lang: "en" },
+  en: {
+    done: "Done",
+    snooze: "Snooze",
+    open: "Open",
+    body: "Reminder",
+    partner: "Your partner",
+    sent: "sent you",
+    sentMany: "tasks from",
+    finished: "finished",
+    dir: "ltr",
+    lang: "en",
+  },
   fr: {
     done: "Terminé",
     snooze: "Reporter",
     open: "Ouvrir",
     body: "Rappel",
+    partner: "Votre partenaire",
+    sent: "vous a envoyé",
+    sentMany: "tâches de",
+    finished: "a terminé",
     dir: "ltr",
     lang: "fr",
   },
-  ar: { done: "خلصت", snooze: "أجّل", open: "حلّ", body: "تذكير", dir: "rtl", lang: "ar-TN" },
+  ar: {
+    done: "خلصت",
+    snooze: "أجّل",
+    open: "حلّ",
+    body: "تذكير",
+    partner: "شريكك",
+    sent: "بعثلك",
+    sentMany: "مهمات من",
+    finished: "كمّل",
+    dir: "rtl",
+    lang: "ar-TN",
+  },
 };
 
 self.addEventListener("install", (event) => {
@@ -113,6 +139,139 @@ async function tellClients() {
   }
 }
 
+/* ---------- Partner inbox ---------- */
+
+/*
+ * A task the partner sent lands on the list by itself: no accept step. The inbox is the one way in (the push
+ * only says "look"), so a push that is lost or arrives twice changes nothing: the app reads it on opening too.
+ * The inbox id is the task id, so a task taken twice is saved once. Keep in step with src/lib/partner:
+ * `fromShared` (shared.ts) builds the same task, and the meta keys are TOKEN_KEY / NAME_KEY (partner.ts).
+ */
+const newId = () => crypto.randomUUID();
+
+function taskFromShared(shared, id, order) {
+  const stamp = new Date().toISOString();
+  const dueAt = shared.dueAt || null;
+  return {
+    id,
+    title: shared.title,
+    notes: shared.notes || "",
+    dueAt,
+    reminders: dueAt ? [dueAt] : [],
+    priority: shared.priority || "normal",
+    list: shared.list || "inbox",
+    recurrence: shared.recurrence || null,
+    subtasks: (shared.subtasks || []).map((title) => ({ id: newId(), title, done: false })),
+    items: (shared.items || []).map((i) => ({
+      id: newId(),
+      name: i.name,
+      qty: i.qty ?? null,
+      unit: i.unit ?? null,
+      done: false,
+    })),
+    suggestions: [],
+    decision: null,
+    uncertain: [],
+    needs: dueAt
+      ? null
+      : { reason: "none", word: null, group: null, openedAt: null, dismissed: true },
+    timeBy: null,
+    anchor: null,
+    anchorLabel: null,
+    remindBefore: null,
+    notifiedAt: null,
+    assumed: null,
+    aiPending: false,
+    bill: null,
+    origin: "partner",
+    assignedTo: null,
+    share: { id, done: false },
+    done: false,
+    doneAt: null,
+    order,
+    createdAt: stamp,
+    updatedAt: stamp,
+  };
+}
+
+/** Takes what the partner sent, saves it, acknowledges it. Resolves to the tasks that were new here. */
+async function drainInbox(db) {
+  const token = await getMeta(db, "pairToken");
+  const sid = await getMeta(db, "sessionId");
+  if (!token || !sid) return { fresh: [], finished: [] };
+  const headers = { "x-session-id": sid, "x-pair-token": token };
+  const res = await fetch("/api/share/inbox", { headers, cache: "no-store" });
+  if (!res.ok) return { fresh: [], finished: [] };
+  const { items } = await res.json();
+  if (!items || !items.length) return { fresh: [], finished: [] };
+  const all = await wrap(db.transaction("tasks").objectStore("tasks").getAll());
+  const known = new Set(all.map((t) => t.id));
+  let order = all.reduce((m, t) => Math.min(m, t.order), 0);
+  const fresh = [];
+  const finished = [];
+  for (const item of items) {
+    if (item.status) {
+      // The partner finished or reopened their copy: the same here. The link records it, so it is not sent back.
+      const t = all.find((x) => x.share && x.share.id === item.status.shareId);
+      if (t && (t.done !== item.status.done || t.share.done !== item.status.done)) {
+        const stamp = new Date().toISOString();
+        const next = {
+          ...t,
+          done: item.status.done,
+          doneAt: item.status.done ? t.doneAt || stamp : null,
+          share: { ...t.share, done: item.status.done },
+          updatedAt: stamp,
+        };
+        await putTask(db, next);
+        if (item.status.done) finished.push(next);
+      }
+      continue;
+    }
+    if (known.has(item.id) || !item.task || !item.task.title) continue;
+    fresh.push(taskFromShared(item.task, item.id, --order));
+  }
+  for (const task of fresh) await putTask(db, task);
+  // Saved first, acknowledged after: a crash in between delivers it again instead of losing it.
+  await fetch("/api/share/ack", {
+    method: "POST",
+    headers: { ...headers, "content-type": "application/json" },
+    body: JSON.stringify({ ids: items.map((i) => i.id) }),
+  });
+  return { fresh, finished };
+}
+
+async function showFinished(db, finished, fallbackTitle) {
+  const L = await textFor();
+  const name = (await getMeta(db, "partnerName")) || L.partner;
+  const body =
+    finished.length === 1 ? finished[0].title : finished.length ? "" : fallbackTitle || "";
+  return self.registration.showNotification(`${name} ${L.finished}`, {
+    body,
+    tag: "partner-finished",
+    data: {},
+    lang: L.lang,
+    dir: L.dir,
+    icon: "/icons/icon-192.png",
+  });
+}
+
+async function showPartnerTasks(db, fresh, fallbackTitle) {
+  const L = await textFor();
+  const name = (await getMeta(db, "partnerName")) || L.partner;
+  const title = fresh.length > 1 ? `${fresh.length} ${L.sentMany} ${name}` : `${name} ${L.sent}`;
+  const body = fresh.length === 1 ? fresh[0].title : fresh.length ? "" : fallbackTitle || "";
+  return self.registration.showNotification(title, {
+    body,
+    tag: "partner-task", // several in a row replace each other: one notification, the latest count
+    renotify: true,
+    data: {},
+    lang: L.lang,
+    dir: L.dir,
+    icon: "/icons/icon-192.png",
+    vibrate: VIBRATE,
+  });
+}
+
 /* ---------- Push ---------- */
 
 async function show(title, taskId, minutes) {
@@ -154,6 +313,30 @@ self.addEventListener("push", (event) => {
         data = event.data.json();
       } catch {
         /* a push with no usable payload still has to show something */
+      }
+      if (data.kind === "assigned" || data.kind === "finished") {
+        // Not a reminder: the partner sent a task, or finished one. Take it now, so the list is right before
+        // the person looks.
+        let fresh = [];
+        let finished = [];
+        let db = null;
+        try {
+          db = await openDb();
+          ({ fresh, finished } = await drainInbox(db));
+          if (fresh.length || finished.length) tellClients();
+        } catch {
+          /* offline or not paired here: the notification still tells them something arrived */
+        }
+        // A push must always show something. If an open window took the task a moment ago, `fresh` is empty
+        // and the notification falls back to the title the push carried.
+        if (data.kind === "finished") {
+          return db
+            ? showFinished(db, finished, data.title)
+            : show(data.title || "Dhakerni", "x", DEFAULT_SNOOZE_MIN);
+        }
+        return db
+          ? showPartnerTasks(db, fresh, data.title)
+          : show(data.title || "Dhakerni", "x", DEFAULT_SNOOZE_MIN);
       }
       // The earlier reminder of a task travels under the task's id plus a suffix.
       const taskId = data.taskId ? String(data.taskId).split(EARLY_SUFFIX)[0] : "";

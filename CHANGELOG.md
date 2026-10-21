@@ -4,6 +4,25 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-21
+
+### Added
+
+- **Partner sharing.** Settings -> Partner: make an invitation (a link and an 8-character code, single use, ten
+  minutes) or enter one, and say what you call the other person. No accounts. Once paired, any task can be sent
+  from its editor ("Send to Sami"), and saying it works too: "tell Sami to buy bread" (or "قول لمراتي تجيب
+  الخبز") makes the task and sends it. It lands on their list by itself, with a "From ..." label and a
+  notification, even with their app closed; if they were offline it arrives the next time the app is open.
+  Your copy shows "Sent to ...".
+- Nothing is shared unless you send it. A sent task waits in an encrypted inbox on the server until their phone
+  takes it, then it is deleted (it also expires after 14 days). Bills are sent as plain tasks: the amount and
+  reference stay on your phone. The name you give your partner stays on your phone too.
+- **Finishing is shared.** Once a task has been sent, ticking it off on either phone ticks the other copy too, and
+  reopening it reopens both. The sender gets a "Sami finished: ..." notification. It works the same when the
+  other app is closed (the notification updates their list), and a change made offline is sent when the
+  connection returns.
+- Either person can unpair at any time; it ends the pairing for both and empties both inboxes.
+
 ## [0.13.0] - 2026-10-21
 
 ### Added
