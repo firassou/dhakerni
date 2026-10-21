@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: Keep a Changelo
 
 ## [Unreleased]
 
+### Changed
+
+- The end-to-end tests no longer depend on the time of day. Specs that add a task "in N minutes" used to fail
+  between about 23:35 and midnight, when the due time fell on tomorrow; they now start the browser clock at
+  midday (`e2e/clock.ts`).
+
 ## [0.14.0] - 2026-10-21
 
 ### Added
