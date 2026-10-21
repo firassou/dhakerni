@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   // The dev badge floats over the bottom-left of the screen, right on top of the dock's cancel button.
   devIndicators: false,
   // Lets a phone reach the dev server through a temporary HTTPS tunnel (see README).
-  allowedDevOrigins: ["*.trycloudflare.com"],
+  allowedDevOrigins: ["*.trycloudflare.com", "192.168.1.133"],
   turbopack: {
     rules: {
       "*.css": {
